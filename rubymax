@@ -1,0 +1,6 @@
+#!/usr/bin/env ruby
+
+# require 'world'
+
+# First step towards writing rubymax using rubymax
+puts "Hello World !"
