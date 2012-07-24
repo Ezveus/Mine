@@ -1,0 +1,18 @@
+Raw Input from UI
+	=> traduction (de la "raw input" vers une string well-formed)
+	=> get_type_of_raw_input
+		=> action correspondant à une touche
+			=> Effectuer l'action correspondante
+		=> texte
+			=> Ecrire dans le "output buffer"
+
+action_corresponding_key = {
+	"C-x C-c" => quit,
+	"C-x C-s" => save
+}
+
+
+/!\ Important :
+	-> À chaque UI (GUI, CUI, ...) correspondent un format de "raw input" ET un module de traduction.
+	-> D'un point de vue visuel, toutes les UI doivent être identiques (ou au moins semblable).
+	-> Afin d'uniformiser le fonctionnement des diverses UI, l'architecture du code doit être la plus abstraite possible (penser aux interfaces C++)
