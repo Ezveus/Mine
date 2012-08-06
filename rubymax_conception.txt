@@ -1,5 +1,7 @@
+---- UI ----
 Raw Input from UI
 	=> traduction (de la "raw input" vers une string well-formed)
+---- Core ----
 	=> get_type_of_raw_input
 		=> action correspondant à une touche
 			=> Effectuer l'action correspondante
