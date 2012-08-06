@@ -20,6 +20,8 @@ action_corresponding_key = {
 	-> Afin d'uniformiser le fonctionnement des diverses UI, l'architecture du code doit être la plus abstraite possible (penser aux interfaces C++)
 	-> Penser a la gestion du presse-papier systeme (Middle-click)
 	-> Quand un raccourci est-il termine ? Quand on arrive au bout d'une branche => obligation d'avoir un arbre de raccourcis.
+	-> Un arbre pour raccourcis core + conf
+	-> Un arbre par buffer pour raccourcis du mode selectionne
 
 Taches :
 	-> Coder le serveur et le client curses
