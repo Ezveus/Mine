@@ -1,0 +1,12 @@
+Accès à un même fichier avec 2 clients
+
+On ouvre le fichier une première fois aucun problème
+Un second client se connecte en ouvrant le même fichier
+
+2 choix
+- copier le buffer modifié et le fournir au second client
+- rouvrir le fichier tel que sur le disk et le fournir au second client
+
+Dans les 2 cas une fois que le premier des deux aura sauvegardé le second aura le choix entre overwriter, ignorer ses propres changements, merger
+
+Dans tout les cas sauf le second une copie du fichier sera créée sauf si l'option est désactivée

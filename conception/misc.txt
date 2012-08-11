@@ -1,0 +1,10 @@
+	-> À chaque UI (GUI, CUI, ...) correspondent un format de "raw input" ET un module de traduction.
+	-> D'un point de vue visuel, toutes les UI doivent être identiques (ou au moins semblable).
+	-> Afin d'uniformiser le fonctionnement des diverses UI, l'architecture du code doit être la plus abstraite possible (penser aux interfaces C++)
+	-> Penser a la gestion du presse-papier systeme (Middle-click)
+	-> Quand un raccourci est-il termine ? Quand on arrive au bout d'une branche => obligation d'avoir un arbre de raccourcis.
+	-> Un arbre pour raccourcis core + conf
+	-> Un arbre par buffer pour raccourcis du mode selectionne
+	-> Penser à créer une commande qui permette de connaître les infos de connexion au serveur ip, port, domaine...
+	-> Connexion à distance implique possibilité de se lancer sans nom de fichier implique gestion de l'arborescence (gestion façon FTP...) implique buffer spécialisé
+	-> Explorer la piste de la clé ssh ou des identifiants de connexion pour les connections distantes

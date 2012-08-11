@@ -1,0 +1,10 @@
+SERVEUR
+créer la socket sur laquelle les clients iront se connecter
+mise en place et repartition de la charge en sous serveurs threadés (cf threading_serveur.txt)
+
+SOUS SERVEUR
+	=> get_type_of_raw_input
+		=> action correspondant à une touche
+			=> Effectuer l'action correspondante
+		=> texte
+			=> Ecrire dans le "output buffer"

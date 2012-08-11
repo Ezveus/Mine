@@ -1,0 +1,6 @@
+formatage de de la raw input en chaines well formed
+affichage du retour du serveur
+
+ouvrir le fichier le lire et l'envoyer au serveur si client et serveur ne sont pas sur la meme machine
+sinon envoyer le chemin du fichier a ouvrir
+sauvegarde des fichiers si le fichier est ouvert en local

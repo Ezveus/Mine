@@ -1,0 +1,20 @@
+un exemple vaut parfois mieux que de nombreuses phrases
+
+on se trouve sur une machine quadcore
+
+on lance le serveur
+
+on se retrouve avec le serveur maitre seul gerant de la socket serveur, et un serveur esclave threadé qui n'a pour l'instant aucun client a gérer
+
+un premier client se connecte
+le serveur maitre l'accepte et regarde si parmis ses serveurs esclave il n'y en aurait pas un sans client
+il assigne le premier client au premier serveur esclave
+un second client se connecte
+le serveur maitre l'accepte
+le serveur maitre compare son nombre de serveurs esclaves avec celui du nombre de coeur de la machine
+si ce nombre est inférieur alors on thread un nouveau serveur esclave et on lui assigne le nouveau client
+
+ainsi de suite jusqu'a se que le nombre de serveurs esclaves soit égal qu nombre de coeurs de la machine
+
+une fois ce nombre atteint
+on fait un min du nombre de clients connectés sur chaque serveur esclave et on assigne le nouveau client a celui qui sort le plus bas a partir de la
