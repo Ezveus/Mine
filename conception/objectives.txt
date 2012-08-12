@@ -1,4 +1,4 @@
-Objectifs Primairees
+Objectifs Primaires
 
 => Architecture client=serveur
 => Edition de fichiers locaux au client
