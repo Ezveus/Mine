@@ -1,0 +1,22 @@
+Objectifs Primairees
+
+=> Architecture client=serveur
+=> Edition de fichiers locaux au client
+=> Mode d'édition fondamental
+=> Mode d'édition ruby
+=> Client curses
+
+Objectifs Secondaires
+
+-> Client GUI
+-> Client standalone (ne necessitant pas de serveur)
+-> Connexions sécurisees par tunnel SSH
+-> Mode d'édition C
+
+Objectifs tertiaires
+
+> Client Web
+> Mode d'édition C++
+> M-x butterflies
+> M-x doctor
+> Snake
