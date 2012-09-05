@@ -2,5 +2,5 @@
 
 # require 'world'
 
-# First step towards writing rubymax using rubymax
+# First step towards writing mine using mine
 puts "Hello World !"
