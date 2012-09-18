@@ -53,7 +53,7 @@ class Userdb
   #
   # Matches a user pass with the stored hash
   #
-  def cmpPass username, pass
+  def matchPass username, pass
     stmt = @db.prepare "SELECT pass FROM users WHERE name IS \"#{username}\""
     pass == stmt.execute!.flatten[0]
   end
@@ -69,8 +69,8 @@ if __FILE__ == $0
   puts "=> selectUsers : #{users}"
   usersInfo = mydb.selectUser "root"
   puts "=> selectUser root : #{usersInfo}"
-  cmp_pass = mydb.cmpPass "root", "plop"
-  puts "=> cmpPass root plop : #{cmp_pass}"
-  cmp_pass = mydb.cmpPass "root", "toor"
-  puts "=> cmpPass root toor : #{cmp_pass}"
+  cmp_pass = mydb.matchPass "root", "plop"
+  puts "=> matchPass root plop : #{cmp_pass}"
+  cmp_pass = mydb.matchPass "root", "toor"
+  puts "=> matchPass root toor : #{cmp_pass}"
 end
