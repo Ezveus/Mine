@@ -1,11 +1,25 @@
+# header & licence needed !
+
+
+# 
+# Class Cursor :
+# Used to manage the cursor of a user on a buffer
+# There is a bunch of function to move it on a given file
+# 
+
 class Cursor
   attr_reader :line
   attr_reader :column
   attr_reader :owner
 
-  @file = ""
-  @offset
-
+  # 
+  # Initializes the cursor assigning to it :
+  #  - it's owner
+  #  - the file on which the cursor is working
+  #  - the line of the file where the cursor is put (0 by default)
+  #  - the column number (0)
+  #  - the offset value depending on the line number
+  # 
   def initialize owner, file, line = 0
     @line = line
     @column = 0
@@ -22,7 +36,11 @@ class Cursor
     @offset += 1 unless @offset == 0
   end
 
-  def move_up
+  # 
+  # Moves the cursor to @line - 1.
+  # If already on line 0 sets the column to 0.
+  # 
+  def moveUp
     if @line > 0
       @offset -= 2
       @offset -= 1 until @file[@offset] == '\n' || @offset == 0
@@ -31,10 +49,14 @@ class Cursor
     else
       @column = 0
     end
-    [@line, @column, @offset]
+    [@line, @column]
   end
 
-  def move_right
+  # 
+  # Moves the cursor to @column + 1.
+  # If the cursor is at the end of the line : goes to next line & sets @column to 0.
+  # 
+  def moveRight
     print @file[@offset + @column]
     if @file[@offset + @column] == "\n"
       @offset += @column + 1
@@ -43,10 +65,14 @@ class Cursor
     else
       @column += 1 if @offset + @column < @file.size
     end
-    [@line, @column, @offset]
+    [@line, @column]
   end
 
-  def move_down
+  # 
+  # Moves the cursor to @line + 1.
+  # If the cursor is at the end of @file : sets the column to the end of line.
+  # 
+  def moveDown
     last_line = @file[@offset, @file.size - @offset]
     if nb = (last_line =~ /\n/)
       @line += 1
@@ -54,10 +80,16 @@ class Cursor
     else
       @column = last_line.size - 1
     end
-    [@line, @column, @offset]
+    [@line, @column]
   end
 
-  def move_left
+  # 
+  # Moves the cursor to @column - 1
+  # If the cursor is at beginning of line :
+  #  - goes to previous line 
+  #  - sets @column to the end of line
+  # 
+  def moveLeft
     if @line > 0
       if @column > 0
         @column -= 1
@@ -70,7 +102,7 @@ class Cursor
         @column = columns - @offset + 1
       end
     end
-    [@line, @column, @offset]
+    [@line, @column]
   end
 
 end
