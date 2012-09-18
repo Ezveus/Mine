@@ -4,16 +4,11 @@
 require 'socket'
 
 class Client
+  attr_reader :socket, :id
+
   def initialize(socket, id)
     @socket = socket
     @id = id
-  end
-
-  def socket
-    @socket
-  end
-  def id
-    @id
   end
 
   def puts(msg)
