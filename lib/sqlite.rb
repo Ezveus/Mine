@@ -57,6 +57,17 @@ class Userdb
     stmt = @db.prepare "SELECT pass FROM users WHERE name IS \"#{username}\""
     pass == stmt.execute!.flatten[0]
   end
+
+  #
+  # Add a user in the database
+  # Returns true if success
+  #
+  def addUser username, pass, mail="none", site="none"
+    stmt = @db.prepare "INSERT INTO users (name, pass, email, website) VALUES (\"#{username}\", \"#{pass}\", \"#{mail}\", \"#{site}\")"
+    stmt.execute!
+    stmt = @db.prepare "SELECT name FROM users WHERE name IS \"#{username}\""
+    username == stmt.execute!.flatten[0]
+  end
 end
 
 #
@@ -73,4 +84,6 @@ if __FILE__ == $0
   puts "=> matchPass root plop : #{cmp_pass}"
   cmp_pass = mydb.matchPass "root", "toor"
   puts "=> matchPass root toor : #{cmp_pass}"
+  add_user = mydb.addUser "plop", "polp", "plop@a.net", "www.plop.org"
+  puts "=> addUser plop polp plop@a.net www.plop.org : #{add_user}"
 end
