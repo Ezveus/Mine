@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+
 require 'active_record'
 require 'logger'
 
@@ -26,6 +27,7 @@ class Userdb
         t.string :pass
         t.string :email
         t.string :website
+        t.integer :isAdmin
         t.timestamps
       end
     end
@@ -58,23 +60,39 @@ class Userdb
   #
   # Class User :
   # Inherits from ActiveRecord::Base
-  # Represents a user
+  # Represents a user in the database
   #
   class User < ActiveRecord::Base
-    attr_accessible :name, :pass, :email, :website
+    attr_accessible :name, :pass, :email, :website, :isAdmin
     validates :name, :presence => true, :uniqueness => true
     validates :pass, :presence => true
     validates :email, :uniqueness => { :case_sensitive => false }
+  end
 
-    before_save :encrypt_password
+  #
+  # Class UserInfos :
+  # Stores the information of the user
+  # for use by the server
+  #
+  class UserInfos
+    attr_accessor :name, :mail, :website, :isAdmin
 
-    private
-    def encrypt_password
-      self.encrypted_password = encrypt(pass)
+    def initialize name, mail, website, isAdmin
+      @name = name
+      @mail = mail
+      @website = website
+      @isAdmin = isAdmin
     end
 
-    def encrypt str
-      str
+    def to_s
+      res = "#{@name}"
+      res += " # " if @isAdmin == 1
+      res += " $ " unless @isAdmin == 1
+      res += "<"
+      res += "@ : #{@mail}" if @mail and @mail != ""
+      res += ", web : #{@website}" if @website and @website != "" and @mail
+      res += "web : #{@website}" if @website and @website != "" and !@mail
+      res += ">"
     end
   end
 
@@ -92,7 +110,7 @@ class Userdb
     unless first_one
       CreateUsers.up
       AddUniquenessIndex.up
-      rootUser = User.create :id => 0, :name => "root", :pass => "toor"
+      rootUser = User.create :id => 0, :name => "root", :pass => "toor", :isAdmin => 1
     end
   end
 
@@ -108,11 +126,11 @@ class Userdb
   end
 
   #
-  # Returns an array with all informations about a user
+  # Returns a UserInfos object
   #
   def selectUser username
     user = User.find_by_name username
-    [user.name, user.email, user.website] if user
+    UserInfos.new user.name, user.email, user.website, user.isAdmin if user
   end
 
   #
@@ -127,8 +145,8 @@ class Userdb
   # Add a user in the database
   # Returns true if success
   #
-  def addUser username, pass, mail="none", site="none"
-    user = User.new :name => username, :pass => pass, :email => mail, :website => site
+  def addUser username, pass, mail="", site="", isAdmin=0
+    user = User.new :name => username, :pass => pass, :email => mail, :website => site, :isAdmin => isAdmin
     user.save
   end
 
@@ -145,6 +163,8 @@ class Userdb
       user.email = newval
     elsif field == :website
       user.website = newval
+    elsif field == :isAdmin
+      user.isAdmin = newval
     else
       return false
     end
@@ -188,4 +208,16 @@ if __FILE__ == $0
   puts "=> modUser Unknown :website plop.site.net : #{mod_user}"
   usersInfo = mydb.selectUser "Unknown"
   puts "=> selectUser Unknown : #{usersInfo}"
+  add_user = mydb.addUser "Test", "plop", "test@a.net"
+  puts "=> addUser Test plop test@a.net : #{add_user}"
+  usersInfo = mydb.selectUser "Test"
+  puts "=> selectUser Test : #{usersInfo}"
+  add_user = mydb.addUser "Test2", "plop"
+  puts "=> addUser Test plop : #{add_user}"
+  usersInfo = mydb.selectUser "Test2"
+  puts "=> selectUser Test2 : #{usersInfo}"
+  add_user = mydb.addUser "TestAdmin", "plop", "admin@plop.net", "", 1
+  puts "=> addUser TestAdmin plop admin@plop.net \"\" 1 : #{add_user}"
+  usersInfo = mydb.selectUser "TestAdmin"
+  puts "=> selectUser TestAdmin : #{usersInfo}"
 end

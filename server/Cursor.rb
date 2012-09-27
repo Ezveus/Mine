@@ -1,5 +1,4 @@
-# header & licence needed !
-
+#!/usr/bin/env ruby
 
 # 
 # Class Cursor :
