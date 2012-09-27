@@ -65,6 +65,17 @@ class Userdb
     validates :name, :presence => true, :uniqueness => true
     validates :pass, :presence => true
     validates :email, :uniqueness => { :case_sensitive => false }
+
+    before_save :encrypt_password
+
+    private
+    def encrypt_password
+      self.encrypted_password = encrypt(pass)
+    end
+
+    def encrypt str
+      str
+    end
   end
 
   #
