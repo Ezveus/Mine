@@ -1,0 +1,36 @@
+GET / HTTP/1.1 
+AUTHENTICATE: {"name":"root","pass":"toor"}
+=> http_request_method = GET
+=> http_path_info = /
+=> http_request_uri = /
+=> http_headers = AUTHENTICATE: {"name":"root","pass":"toor"}
+
+GET /?AUTHENTICATE={"name":"root","pass":"toor"} HTTP/1.1
+=> http_request_method = GET
+=> http_path_info = /
+=> http_request_uri = /
+=> http_query_string = AUTHENTICATE: {"name":"root","pass":"toor"}
+
+GET / HTTP/1.1
+Host: localhost
+Cookie: AUTHENTICATE={"name":"root","pass":"toor"}
+=> http_request_method = GET
+=> http_path_info = /
+=> http_request_uri = /
+=> http_headers = Host: localhostCookie: AUTHENTICATE={"name":"root","pass":"toor"}
+=> http_cookie = AUTHENTICATE={"name":"root","pass":"toor"}
+
+POST / HTTP/1.1
+Host: localhost
+Connection: Keep-Alive
+Content-type: application/x-www-form-urlencoded
+Content-Length: 42
+
+AUTHENTICATE={"name":"root","pass":"toor"}
+
+=> http_request_method = POST
+=> http_path_info = /
+=> http_request_uri = /
+=> http_content_type = application/x-www-form-urlencoded
+=> http_post_content = AUTHENTICATE={"name":"root","pass":"toor"}
+=> http_headers = Host: localhostConnection: Keep-AliveContent-type: application/x-www-form-urlencodedContent-Length: 42
