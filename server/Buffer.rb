@@ -8,6 +8,10 @@ class Buffer
     @rights = {}
     @serverSide = serverSide
     @workingUsers = []
-    @fileContent = File.new(@fileLocation + @fileName).readlines.join
+    @fileContent = File.new(@fileLocation + @fileName).read
+  end
+
+  def updateCursorPosition
+    nil
   end
 end

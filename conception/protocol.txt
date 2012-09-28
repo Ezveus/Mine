@@ -1,0 +1,14 @@
+POST /mine/protocol/request HTTP/1.1
+Host: localhost <- Mutable ->
+Connection: Close
+Content-type: application/x-www-form-urlencoded
+Content-Length: 42 <- Mutable ->
+
+AUTHENTICATE={"name":"root","pass":"toor"} <- Mutable ->
+
+=> http_request_method = POST
+=> http_path_info = /mine/protocol/request
+=> http_request_uri = /mine/protocol/request
+=> http_content_type = application/x-www-form-urlencoded
+=> http_post_content = AUTHENTICATE={"name":"root","pass":"toor"}
+=> http_headers = Host: localhostConnection: CloseContent-type: application/x-www-form-urlencodedContent-Length: 42
