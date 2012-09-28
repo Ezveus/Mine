@@ -66,7 +66,7 @@ class Userdb
     attr_accessible :name, :pass, :email, :website, :isAdmin
     validates :name, :presence => true, :uniqueness => true
     validates :pass, :presence => true
-    validates :email, :uniqueness => { :case_sensitive => false }
+    validates :email, :presence => true, :uniqueness => { :case_sensitive => false }
   end
 
   #
@@ -89,9 +89,9 @@ class Userdb
       res += " # " if @isAdmin == 1
       res += " $ " unless @isAdmin == 1
       res += "<"
-      res += "@ : #{@mail}" if @mail and @mail != ""
-      res += ", web : #{@website}" if @website and @website != "" and @mail
-      res += "web : #{@website}" if @website and @website != "" and !@mail
+      res += "@ : #{@mail}"# if @mail and @mail != ""
+      res += ", web : #{@website}" if @website and @website != "" #and @mail
+#      res += "web : #{@website}" if @website and @website != "" and !@mail
       res += ">"
     end
   end
@@ -110,7 +110,7 @@ class Userdb
     unless first_one
       CreateUsers.up
       AddUniquenessIndex.up
-      rootUser = User.create :id => 0, :name => "root", :pass => "toor", :isAdmin => 1
+      rootUser = User.create :id => 0, :name => "root", :pass => "toor", :email => "user@localhost", :isAdmin => 1
     end
   end
 
@@ -145,7 +145,7 @@ class Userdb
   # Add a user in the database
   # Returns true if success
   #
-  def addUser username, pass, mail="", site="", isAdmin=0
+  def addUser username, pass, mail, site="", isAdmin=0
     user = User.new :name => username, :pass => pass, :email => mail, :website => site, :isAdmin => isAdmin
     user.save
   end
@@ -212,10 +212,6 @@ if __FILE__ == $0
   puts "=> addUser Test plop test@a.net : #{add_user}"
   usersInfo = mydb.selectUser "Test"
   puts "=> selectUser Test : #{usersInfo}"
-  add_user = mydb.addUser "Test2", "plop"
-  puts "=> addUser Test plop : #{add_user}"
-  usersInfo = mydb.selectUser "Test2"
-  puts "=> selectUser Test2 : #{usersInfo}"
   add_user = mydb.addUser "TestAdmin", "plop", "admin@plop.net", "", 1
   puts "=> addUser TestAdmin plop admin@plop.net \"\" 1 : #{add_user}"
   usersInfo = mydb.selectUser "TestAdmin"
