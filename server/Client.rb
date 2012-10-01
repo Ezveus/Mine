@@ -53,7 +53,6 @@ class Client < EM::Connection
     return Constant::Fail if unknownRequest? response
     key = @http_post_content.split('=')[0].to_sym
     Commands[key].call(@http_post_content, response)
-    Constant::Success
   end
 
   def unvalidRequest? response
@@ -69,7 +68,6 @@ class Client < EM::Connection
   end
 
   def unknownRequest? response
-#    Protocol::
     unless Requests.index @http_post_content.split('=')[0]
       response.status = Constant::UnknownRequest
       return true
