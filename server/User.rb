@@ -7,6 +7,7 @@ class User
   attr_accessor :cmdHistory, :killRing
 
   def initialize username
+    @clients = []
     @cmdHistory = []
     @killRing = ""
     @frames = []
