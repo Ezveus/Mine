@@ -1,6 +1,13 @@
 #!/usr/bin/env ruby
 
-# require 'world'
+load "server/Client.rb"
 
-# First step towards writing mine using mine
-puts "Hello World !"
+puts "Launching server"
+begin
+  EM.run do
+    EM.start_server '0.0.0.0', 8080, Client
+  end
+rescue Interrupt
+  puts "\rTerminating server"
+  exit 0
+end
