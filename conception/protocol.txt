@@ -1,14 +1,40 @@
-POST /mine/protocol/request HTTP/1.1
-Host: localhost <- Mutable ->
-Connection: Close
-Content-type: application/x-www-form-urlencoded
-Content-Length: 42 <- Mutable ->
+POST /mine/protocol/request HTTP/1.1			|
+Host: localhost						|
+Connection: Close					|=> HTTP_HEADER
+Content-type: application/x-www-form-urlencoded		|
+Content-Length: 42					|
 
-AUTHENTICATE={"name":"root","pass":"toor"} <- Mutable ->
+AUTHENTICATE={"name":"root","pass":"toor"}
 
-=> http_request_method = POST
-=> http_path_info = /mine/protocol/request
-=> http_request_uri = /mine/protocol/request
-=> http_content_type = application/x-www-form-urlencoded
-=> http_post_content = AUTHENTICATE={"name":"root","pass":"toor"}
-=> http_headers = Host: localhostConnection: CloseContent-type: application/x-www-form-urlencodedContent-Length: 42
+=> http_request_method = POST												|
+=> http_path_info = /mine/protocol/request										|
+=> http_request_uri = /mine/protocol/request										|=> result
+=> http_content_type = application/x-www-form-urlencoded								|
+=> http_post_content = AUTHENTICATE={"name":"root","pass":"toor"}							|
+=> http_headers = Host: localhostConnection: CloseContent-type: application/x-www-form-urlencodedContent-Length: 42	|
+
+------------------------------------
+
+REQUEST = HTTP_HEADER NEWLINE COMMAND
+
+NEWLINE = "\n"
+
+HTTP_HEADER = see above
+
+COMMAND =  AUTHENTICATE={"name" : ".+", "pass" : ".+"}
+	 | SIGNUP={"name" : ".+", "pass" : ".+", "email" : ".+" \[, "website" : ".+"\]?}
+	 | MINIBUFFER={"buffer" : ".+", "command" : ".+", "args" : [value*]}
+	 | MINIBUFFER_COMPLETION={"buffer" : ".+", "to_complete" : ".+"}
+	 | INSERT={"buffer" : ".+", "text" : ".+"}
+	 | MOVE={"buffer" : ".+", "direction" : value}			(up, right, down, left, pageup, pagedown, origin, end)
+	 | BACKSPACE={"buffer" : ".+", "number" : value}
+	 | DELETE={"buffer" : ".+", "number" : value}
+
+
+Things to think about :
+
+       -> Would be better if minibuffer completion was handled client side
+       	  => all clients knows the "basic" commands name + the user defined one
+       
+       -> Managing shortcuts on the client side to send only MINIBUFFER commands would also be cool
+       	  => all clients knows the "basic"
