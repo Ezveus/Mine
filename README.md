@@ -1,6 +1,4 @@
-mine
-=======
+Mine
+====
 
-Proof-of-Concept of an Emacs inspired editor written in Ruby
-
-
+A collaborative editor written in ruby with the configuration and shortcuts in GNU Emacs style.
