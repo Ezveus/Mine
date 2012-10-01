@@ -8,6 +8,9 @@ load "server/Protocol.rb"
 load "server/Userdb.rb"
 
 class Client < EM::Connection
+  attr_accessor :userdb
+  attr_accessor :user
+
   include EM::HttpServer
   include Protocol
 
@@ -28,6 +31,7 @@ class Client < EM::Connection
     puts "Received new response"
     response = EM::DelegatedHttpResponse.new self
     response.content_type 'text/plain'
+    response.status = Constant::Ok
     response.content = getResponse response
     response.send_response
   end
@@ -52,7 +56,7 @@ class Client < EM::Connection
     return Constant::Fail if unvalidRequest? response
     return Constant::Fail if unknownRequest? response
     key = @http_post_content.split('=')[0].to_sym
-    Commands[key].call(@http_post_content, response)
+    Commands[key].call @http_post_content, response, self
   end
 
   def unvalidRequest? response

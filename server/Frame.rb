@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
-load "Buffer.rb"
-load "Cursor.rb"
+load "server/Buffer.rb"
+load "server/Cursor.rb"
 
 class Frame
   attr_accessor :buffer, :cursor
