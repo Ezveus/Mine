@@ -9,17 +9,20 @@ load "server/Userdb.rb"
 
 class Client < EM::Connection
   attr_accessor :userdb
-  attr_accessor :user
+  attr_reader :user
 
   include EM::HttpServer
   include Protocol
+
+  @@clients = []
 
   def initialize *args
     super *args
 
     @authenticated = false
-    @user = nil# user
+    @user = nil
     @userdb = Userdb.new
+    @@clients << self
   end
 
   def post_init
@@ -34,6 +37,20 @@ class Client < EM::Connection
     response.status = Constant::Ok
     response.content = getResponse response
     response.send_response
+  end
+
+  def user= user
+    @user = user
+    @authenticated = true
+  end
+
+  def exit
+    puts "Sending exit message"
+    puts "Sent"
+  end
+
+  def self.clients
+    @@clients
   end
 
   private
@@ -61,10 +78,12 @@ class Client < EM::Connection
 
   def unvalidRequest? response
     if @http_protocol != "HTTP/1.1" or @http_request_method != "POST" or @http_path_info != "/mine/protocol/request" or @http_content_type != "application/x-www-form-urlencoded"
+      $stderr.puts "Error : Unvalid request"
       response.status = Constant::UnvalidRequest
       return true
     end
     unless (@http_post_content =~ /.+={.*}/) == 0
+      $stderr.puts "Error : Unvalid request"
       response.status = Constant::UnvalidRequest
       return true
     end
@@ -73,6 +92,7 @@ class Client < EM::Connection
 
   def unknownRequest? response
     unless Requests.index @http_post_content.split('=')[0]
+      $stderr.puts "Error : Unknown request"
       response.status = Constant::UnknownRequest
       return true
     end

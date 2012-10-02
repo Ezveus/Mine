@@ -12,6 +12,11 @@ module Protocol
              ]
 
   def self.authenticate postContent, response, client
+    if client.user and client.user.authenticated
+      $stderr.puts "Error : #{client.user} already logged"
+      response.status = Constant::AlreadyLogged
+      return Constant::Fail
+    end
     puts "Parsing #{postContent.split('=')[1]}"
     object = {}
     begin
@@ -34,6 +39,7 @@ module Protocol
       return Constant::Fail
     end
     client.user = User.new name, client.userdb
+    puts "User logged : #{client.user.userInfo}"
     Constant::Success
   end
 

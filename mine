@@ -8,6 +8,10 @@ begin
     EM.start_server '0.0.0.0', 8080, Client
   end
 rescue Interrupt
+  #  EM.stop_server
+  # Client.clients.each do |client|
+  #   client.exit
+  # end
   puts "\rTerminating server"
   exit 0
 end
