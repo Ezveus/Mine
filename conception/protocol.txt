@@ -21,20 +21,16 @@ NEWLINE = "\n"
 
 HTTP_HEADER = see above
 
-COMMAND =  AUTHENTICATE={"name" : ".+", "pass" : ".+"}
-	 | SIGNUP={"name" : ".+", "pass" : ".+", "email" : ".+" \[, "website" : ".+"\]?}
-	 | MINIBUFFER={"buffer" : ".+", "command" : ".+", "args" : [value*]}
-	 | MINIBUFFER_COMPLETION={"buffer" : ".+", "to_complete" : ".+"}
-	 | INSERT={"buffer" : ".+", "text" : ".+"}
-	 | MOVE={"buffer" : ".+", "direction" : value}			(up, right, down, left, pageup, pagedown, origin, end)
-	 | BACKSPACE={"buffer" : ".+", "number" : value}
-	 | DELETE={"buffer" : ".+", "number" : value}
+COMMAND =  AUTHENTICATE = { "name" : ".+" , "pass" : ".+" }
 
+	 | SIGNUP = { "name" : ".+" , "pass" : ".+" , "email" : ".+" \[, "website" : ".+"\]? }
 
-Things to think about :
+	 | EXEC = { "buffer" : ".+" , "command" : ".+" , "args" : [value*] }
+	 | INSERT = { "buffer" : ".+" , "text" : ".+" }
 
-       -> Would be better if minibuffer completion was handled client side
-       	  => all clients knows the "basic" commands name + the user defined one
-       
-       -> Managing shortcuts on the client side to send only MINIBUFFER commands would also be cool
-       	  => all clients knows the "basic"
+	 | MOVE = { "buffer" : ".+" , "direction" : value , "number" : value }
+	   (up, right, down, left, origin, end)
+
+	 | BACKSPACE = { "buffer" : ".+" , "number" : value }
+
+	 | DELETE = { "buffer" : ".+" , "number" : value }
