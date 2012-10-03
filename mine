@@ -3,15 +3,31 @@
 load "server/Client.rb"
 
 puts "Launching server"
+
+def exitServer exitType
+  printf "\r"
+  Client.clients.each do |client|
+    client.exit exitType
+  end
+  EM.stop_event_loop if exitType == :signalCatch
+  puts "Terminating server"
+  exit 0
+end
+
+Signal.trap "INT" do
+  exitServer :signalCatch
+end
+
+Signal.trap "TERM" do
+  exitServer :signalCatch
+end
+
 begin
   EM.run do
     EM.start_server '0.0.0.0', 8080, Client
   end
 rescue Interrupt
-  #  EM.stop_server
-  # Client.clients.each do |client|
-  #   client.exit
-  # end
-  puts "\rTerminating server"
-  exit 0
+  puts "\rOn operating systems where Signal.trap doesn't work,"
+  puts "catch Interrupt works."
+  exitServer :exceptionCatch
 end

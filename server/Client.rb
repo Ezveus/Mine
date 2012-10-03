@@ -44,9 +44,13 @@ class Client < EM::Connection
     @authenticated = true
   end
 
-  def exit
-    puts "Sending exit message"
-    puts "Sent"
+  def exit exitType
+    if exitType == :signalCatch
+      puts "Sending exit message"
+      puts "Sent"
+    else
+      puts "Doing what we can do"
+    end
   end
 
   def self.clients
