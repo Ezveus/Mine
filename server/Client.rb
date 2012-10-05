@@ -6,6 +6,7 @@ require 'evma_httpserver'
 load "server/Constant.rb"
 load "server/Protocol.rb"
 load "server/Userdb.rb"
+load "server/Webclient.rb"
 
 class Client < EM::Connection
   attr_accessor :userdb
@@ -23,6 +24,7 @@ class Client < EM::Connection
     @user = nil
     @userdb = Userdb.new
     @@clients << self
+    @isWebClient = false
   end
 
   def post_init
@@ -77,17 +79,21 @@ class Client < EM::Connection
   def getResponse response
     return Constant::Fail if unvalidRequest? response
     return Constant::Fail if unknownRequest? response
+    return Webclient.dealWithWebClient response, {:uri =>@http_request_uri, :requestType => @http_request_method, :queryString => @http_query_string, :postContent => @http_post_content} if @isWebClient
     key = @http_post_content.split('=')[0].to_sym
     Commands[key].call @http_post_content, response, self
   end
 
   def unvalidRequest? response
-    if @http_protocol != "HTTP/1.1" or @http_request_method != "POST" or @http_path_info != "/mine/protocol/request" or @http_content_type != "application/x-www-form-urlencoded"
-      $stderr.puts "Error : Unvalid request"
-      response.status = Constant::UnvalidRequest
-      return true
+    if @http_protocol != "HTTP/1.1" or @http_request_method != "POST" or @http_request_uri != "/mine/protocol/request" or @http_content_type != "application/x-www-form-urlencoded"
+      @isWebClient = webclient? response
+      unless @isWebClient
+        $stderr.puts "Error : Unvalid request"
+        response.status = Constant::UnvalidRequest
+        return true
+      end
     end
-    unless (@http_post_content =~ /.+={.*}/) == 0
+    if !@isWebClient and (@http_post_content =~ /.+={.*}/) != 0
       $stderr.puts "Error : Unvalid request"
       response.status = Constant::UnvalidRequest
       return true
@@ -96,11 +102,18 @@ class Client < EM::Connection
   end
 
   def unknownRequest? response
-    unless Requests.index @http_post_content.split('=')[0]
+    if !@isWebClient and !Requests.index @http_post_content.split('=')[0]
       $stderr.puts "Error : Unknown request"
       response.status = Constant::UnknownRequest
       return true
     end
     false
+  end
+
+  def webclient? response
+    if (@http_request_uri =~ /\/mine.*/)
+      return false
+    end
+    true
   end
 end
