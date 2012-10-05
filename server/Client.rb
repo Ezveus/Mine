@@ -41,7 +41,8 @@ class Client < EM::Connection
 
   def user= user
     @user = user
-    @authenticated = true
+    @authenticated = true if @user
+    @authenticated = false unless @user
   end
 
   def exit exitType
