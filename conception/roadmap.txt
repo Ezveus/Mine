@@ -1,0 +1,3 @@
+1ère soutenance : semaine 01/02
+-> Edition de fichier locaux en fondamental
+-> Commandes : quit, saveFile, writeFile, loadFile, move{Up,Down,Left,Right,Origin,End,PageUp,PageDown,ParagraphUp,ParagraphDown,WordLeft,WordRight}, cut, yank, overwriteMode, killBuffer
