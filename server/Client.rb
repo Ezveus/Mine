@@ -79,7 +79,7 @@ class Client < EM::Connection
   def getResponse response
     return Constant::Fail if unvalidRequest? response
     return Constant::Fail if unknownRequest? response
-    return Webclient.dealWithWebClient response, {:uri =>@http_request_uri, :requestType => @http_request_method, :queryString => @http_query_string, :postContent => @http_post_content} if @isWebClient
+    return Webclient.dealWithWebClient response, {:uri => @http_request_uri, :requestType => @http_request_method, :queryString => @http_query_string, :postContent => @http_post_content} if @isWebClient
     key = @http_post_content.split('=')[0].to_sym
     Commands[key].call @http_post_content, response, self
   end
@@ -88,13 +88,13 @@ class Client < EM::Connection
     if @http_protocol != "HTTP/1.1" or @http_request_method != "POST" or @http_request_uri != "/mine/protocol/request" or @http_content_type != "application/x-www-form-urlencoded"
       @isWebClient = webclient? response
       unless @isWebClient
-        $stderr.puts "Error : Unvalid request"
+        $stderr.puts "Error : Unvalid request : bad HTTP format"
         response.status = Constant::UnvalidRequest
         return true
       end
     end
     if !@isWebClient and (@http_post_content =~ /.+={.*}/) != 0
-      $stderr.puts "Error : Unvalid request"
+      $stderr.puts "Error : Unvalid request : bad MINEP format"
       response.status = Constant::UnvalidRequest
       return true
     end
@@ -111,7 +111,8 @@ class Client < EM::Connection
   end
 
   def webclient? response
-    if (@http_request_uri =~ /\/mine.*/)
+    puts "Requested URI : #{@http_request_uri}"
+    if (@http_request_uri =~ /^\/mine.*/)
       return false
     end
     true

@@ -2,10 +2,12 @@
 require 'eventmachine'
 require 'evma_httpserver'
 
+load "server/HTTP.rb"
+
 module Webclient
   def self.dealWithWebClient response, httpInfos
     response.status = 200
-    response.headers = getHeaders response
+    getHeaders response
     response.content = getContent response, httpInfos
   end
 
@@ -14,15 +16,18 @@ module Webclient
   def self.getContent response, httpInfos
     httpInfos[:uri] = "./ui/webclient/index.html" if httpInfos[:uri] == "/"
     httpInfos[:uri][/^\//] = "./ui/webclient/" if httpInfos[:uri] != "./ui/webclient/index.html"
-    # lire le fichier demandé
+    begin
+      return File.new(httpInfos[:uri]).read
+    rescue Errno::ENOENT
+      return HTTP.error404 response, httpInfos
+    end
     httpInfos.each do |key, value|
       puts "httpInfos[#{key}] = #{value}"
     end
-    "OK"
   end
 
   def self.getHeaders response
     puts "response.headers = #{response.headers}"
-    response.headers
+    response.headers["Content-type"] = "text/html"
   end
 end
