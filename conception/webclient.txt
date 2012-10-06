@@ -1,0 +1,5 @@
+localEdit :
+ -> open => kind of upload
+ -> save => download
+ -> write => download
+ -> quit => close tab/window if possible
