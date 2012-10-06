@@ -1,0 +1,3 @@
+-> Existing Files <-
+ => distant edit : prints all accessible files
+ => local edit : prints files in current directory
