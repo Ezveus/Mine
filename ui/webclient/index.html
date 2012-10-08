@@ -8,8 +8,18 @@
     <h1><img src="assets/mine.png" alt="Mine" />Mine Is Not Emacs : Embedded Client</h1>
     <p>
       <!-- Asks for authentication -->
-      <h2>Authentication</h2>
-      
+      <form>
+	<fieldset>
+	  <legend>Authentication</legend>
+	  <label for="name">Name : </label>
+	  <input name="name" id="name" type="text" autofocus required />
+	  <br />
+	  <label for="pass">Password: </label>
+	  <input name="pass" id="pass" type="password" required />
+	  <br />
+	  <input id="send" type="button" value="Send" />
+	</fieldset>
+      </form>
       <!-- Asks for the home buffer -->
       <!-- <h2>Buffer Name</h2> -->
     </p>
