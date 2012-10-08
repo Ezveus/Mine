@@ -1,3 +1,22 @@
 1ère soutenance : semaine 01/02
--> Edition de fichier locaux en fondamental
--> Commandes : quit, saveFile, writeFile, loadFile, move{Up,Down,Left,Right,Origin,End,PageUp,PageDown,ParagraphUp,ParagraphDown,WordLeft,WordRight}, cut, yank, overwriteMode, killBuffer
+-> Edition de fichiers locaux en fondamental
+-> Commandes : quit, saveLocalFile, writeLocalFile(save as), loadLocalFile, move{Up,Down,Left,Right,Origin,End,PageUp,PageDown,ParagraphUp,ParagraphDown,WordLeft,WordRight}, cut, yank, overwriteMode, killBuffer, undo, redo
+-> Client javascript
+-> Client Curses
+-> db management
+
+2ème soutenance : semaine 09/10
+-> Edition de fichiers à distance
+-> Edition collaborative
+-> Mode Ruby
+-> Arborescence coté serveur
+-> Commandes : saveDistantFile, writeDistantFile, loadDistantFile
+-> Conf server-side
+
+3ème soutenance : semaine 16
+-> Moar commands
+-> M-x doctor (lol woot)
+-> Clients upgrade
+-> Administration buffer
+-> Conf user-side
+-> shell
