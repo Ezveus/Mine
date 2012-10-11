@@ -3,7 +3,7 @@
 class Buffer
   attr_reader :fileContent
 
-  def initialize fileLocation, fileName, fileContent, serverSide
+  def initialize fileLocation, fileName, fileContent, serverSide, eofnewline = true
     @fileLocation = fileLocation
     @fileName = fileName
     @id = Random.rand.to_i
@@ -11,10 +11,7 @@ class Buffer
     @serverSide = serverSide
     @workingUsers = []
     @fileContent = fileContent
-    @eofnewline = false
-    if @fileContent.last.rindex(/\n/)
-      @eofnewline = true
-    end
+    @eofnewline = eofnewline
   end
 
   def printFileContent
@@ -23,11 +20,11 @@ class Buffer
 
   def insertText cursor, text
     if @fileContent.size == 1 and @fileContent[0] == ""
+      # empty file
       @fileContent[cursor.line] = text.split(/\n/)
-      printFileContent
-      puts "#{cursor.line}, #{cursor.column}"
       dataStr = text
     else
+      # filled file
       cursor.moveLeft
       cursor.moveRight
       dataStr = @fileContent[cursor.line]
@@ -35,12 +32,18 @@ class Buffer
       s2 = dataStr[cursor.column, dataStr.size - cursor.column]
       @fileContent[cursor.line] = (s1 + text + s2).split(/\n/)
     end
-    if @fileContent[cursor.line].size - 1 > 0
-      cursor.moveDown(@fileContent[cursor.line].size - 1)
-    end
+
+    # flatten of the split
+    splitSize = @fileContent[cursor.line].size - 1
     @fileContent = @fileContent.flatten
     cursor.file = @fileContent
-    printFileContent
+
+    # cursor line replacement
+    if splitSize > 0
+      cursor.moveDown(splitSize)
+    end
+
+    # cursor column replacement
     if dataStr.rindex(/\n/)
       lastLineInserted = (text.split(/\n/)).last.size
       cursorColumn = cursor.column
@@ -51,6 +54,15 @@ class Buffer
       end
     else
       cursor.moveRight(text.size)
+    end
+    
+    # last '\n' handler
+    if text.end_with? "\n" and cursor.column == @fileContent[cursor.line].size and cursor.line == @fileContent.rindex(@fileContent.last)
+      @fileContent << ""
+      @eofnewline = true
+      cursor.moveRight
+    else
+      @eofnewline = false
     end
     # call the method to update the clients
   end
