@@ -26,6 +26,7 @@ COMMAND =  AUTHENTICATE = { "name" : ".+" , "pass" : ".+" }
 	 | SIGNUP = { "name" : ".+" , "pass" : ".+" , "email" : ".+" \[, "website" : ".+"\]? }
 
 	 | EXEC = { "buffer" : ".+" , "command" : ".+" , "args" : [value*] }
+
 	 | INSERT = { "buffer" : ".+" , "text" : ".+" }
 
 	 | MOVE = { "buffer" : ".+" , "direction" : value , "number" : value }
@@ -34,3 +35,5 @@ COMMAND =  AUTHENTICATE = { "name" : ".+" , "pass" : ".+" }
 	 | BACKSPACE = { "buffer" : ".+" , "number" : value }
 
 	 | DELETE = { "buffer" : ".+" , "number" : value }
+
+	 | SYNC = { [ ["buffer" : ".+" , "diff" : ".+"]* ]}
