@@ -29,7 +29,7 @@ class Cursor
   # Moves the cursor to @line - nbMove.
   # If already on line 0 sets the column to 0.
   # 
-  def moveUp nbMove
+  def moveUp nbMove = 1
     (1..nbMove).each do
       if @line > 0
         @line -= 1
@@ -44,9 +44,9 @@ class Cursor
   # Moves the cursor to @column + nbMove.
   # If the cursor is at the end of the line : goes to next line & sets @column to 0.
   # 
-  def moveRight nbMove
+  def moveRight nbMove = 1
     (1..nbMove).each do
-      if @file[@line].size == @column
+      if @file[@line].size <= @column
         @line += 1
         @column = 0
       else
@@ -60,12 +60,12 @@ class Cursor
   # Moves the cursor to @line + nbMove.
   # If the cursor is at the end of @file : sets the column to the end of line.
   # 
-  def moveDown nbMove
+  def moveDown nbMove = 1
     (1..nbMove).each do
       if @line < @file.length - 1
         @line += 1
       else
-        @column = @file[@column].size
+        @column = @file[@line].size
       end
     end
     [@line, @column]
@@ -77,8 +77,9 @@ class Cursor
   #  - goes to previous line 
   #  - sets @column to the end of line
   # 
-  def moveLeft nbMove
+  def moveLeft nbMove = 1
     (1..nbMove).each do
+      @column = @file[@line].size if @column > @file[@line].size
       if @line > 0
         if @column > 0
           @column -= 1
