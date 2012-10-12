@@ -14,6 +14,7 @@ tmp
 *.db
 *.log
 *.sqlite3
+ui/webclient/.README.rdoc
 
 # YARD artifacts
 .yardoc
