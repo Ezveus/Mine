@@ -10,9 +10,17 @@ def exitServer exitType
     client.exit exitType
   end
   EM.stop_event_loop if exitType == :signalCatch
+  begin
+    $railsPID = File.new("ui/webclient/tmp/pids/server.pid").read.to_i
+  rescue Errno::ENOENT
+    $railsPID = -42
+  end
+  Process.kill "INT", $railsPID if $railsPID > 1
   puts "Terminating server"
   exit 0
 end
+
+launchRails = true              # Set to false with options
 
 Signal.trap "INT" do
   exitServer :signalCatch
@@ -20,6 +28,14 @@ end
 
 Signal.trap "TERM" do
   exitServer :signalCatch
+end
+
+if launchRails
+  Process.fork do
+    Dir.chdir "ui/webclient"
+    puts "Executing rails server -d"
+    Process.exec "rails server -d"
+  end
 end
 
 begin
