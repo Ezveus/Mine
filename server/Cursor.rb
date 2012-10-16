@@ -93,4 +93,12 @@ class Cursor
     [@line, @column]
   end
 
+  def moveToColumnIndex index
+    if index > @column
+      moveRight index - @column
+    elsif index < @column
+      moveLeft index - @column
+    end
+  end
+
 end
