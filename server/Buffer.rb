@@ -18,52 +18,98 @@ class Buffer
     puts "file\n#{@fileContent}\n\n"
   end
 
+  public
   def insertText cursor, text
     if @fileContent.size == 1 and @fileContent[0] == ""
-      # empty file
-      @fileContent[cursor.line] = text.split(/\n/)
-      dataStr = text
+      dataStr = insertTextEmptyFile cursor, text
     else
-      # filled file
-      cursor.moveLeft
-      cursor.moveRight
-      dataStr = @fileContent[cursor.line]
-      s1 = dataStr[0, cursor.column]
-      s2 = dataStr[cursor.column, dataStr.size - cursor.column]
-      @fileContent[cursor.line] = (s1 + text + s2).split(/\n/)
+      dataStr = insertTextFilledFile cursor, text
     end
+    splitSize = insertTextSplitFlatten cursor
+    insertTextCursorReplacement text, cursor, splitsize, dataStr
+    insertTextNewLineHandler text, cursor
 
-    # flatten of the split
+    # call the method to update the clients and make a diff
+  end
+
+  private
+  def insertTextEmptyFile cursor, text
+    @fileContent[cursor.line] = text.split(/\n/)
+    text
+  end
+
+  def insertTextFilledFile cursor, text
+    cursor.moveLeft
+    cursor.moveRight
+    dataStr = @fileContent[cursor.line]
+    s1 = dataStr[0, cursor.column]
+    s2 = dataStr[cursor.column, dataStr.size - cursor.column]
+    @fileContent[cursor.line] = (s1 + text + s2).split(/\n/)
+    return s1 + text + s2
+  end
+
+  def insertTextSplitFlatten cursor
     splitSize = @fileContent[cursor.line].size - 1
     @fileContent = @fileContent.flatten
     cursor.file = @fileContent
+    return splitSize
+  end
 
-    # cursor line replacement
+  def insertTextCursorReplacement text, cursor, splitsize, dataStr
     if splitSize > 0
       cursor.moveDown(splitSize)
     end
-
-    # cursor column replacement
     if dataStr.rindex(/\n/)
       lastLineInserted = (text.split(/\n/)).last.size
-      cursorColumn = cursor.column
-      if cursorColumn < lastLineInserted
-        cursor.moveRight(lastLineInserted - cursorColumn)
-      elsif cursorColumn > lastLineInserted
-        cursor.moveLeft(cursorColumn - lastLineInserted)
-      end
+      cursor.moveToColumnIndex lastLineInserted
     else
-      cursor.moveRight(text.size)
+      cursor.moveRight text.size
     end
-    
-    # last '\n' handler
-    if text.end_with? "\n" and cursor.column == @fileContent[cursor.line].size and cursor.line == @fileContent.rindex(@fileContent.last)
+  end
+
+  def insertTextNewLineHandler text, cursor
+    if text.end_with? "\n" and cursor.column == @fileContent[cursor.line].size and
+        cursor.line == @fileContent.rindex(@fileContent.last)
       @fileContent << ""
       @eofnewline = true
       cursor.moveRight
     else
       @eofnewline = false
     end
-    # call the method to update the clients
   end
+
+  public
+  # need to manage @eofnewline !
+  def deleteTextBackspace cursor, nbToDelete = 1
+    while @fileContent[cursor.line].size - nbToDelete < 0
+      nbToDelete = deleteTextBackSpaceConcatLine cursor, nbToDelete
+    end
+    deleteTextBackspaceSameLine cursor, nbToDelete
+    cursor.file = @fileContent
+  end
+  
+  private
+  def deleteTextBackspaceSameLine cursor, nbToDelete
+    @fileContent[cursor.line] =
+      @fileContent[cursor.line][0, cursor.column - nbToDelete] +
+      @fileContent[cursor.line][cursor.column, @fileContent[cursor.line].size]
+    cursor.moveLeft nbToDelete
+  end
+
+  def deleteTextBackspaceConcatLine cursor, nbToDelete
+    column = @fileContent [cursor.line - 1].size
+    @fileContent[cursor.line - 1] =
+      @fileContent[cursor.line - 1] <<
+      @fileContent[cursor.line][cursor.column, @fileContent[cursor.line].size]
+    nbToDelete -= cursor.column
+    cursor.moveUp
+    cursor.moveToColumnIndex column
+    return nbToDelete
+  end
+
+  public
+  def deleteTextDelete cursor, nbToDelete = 1
+
+  end
+
 end
