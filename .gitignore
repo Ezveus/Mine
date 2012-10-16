@@ -1,3 +1,5 @@
+config/CGIHandlers.json
+ui/webclient
 *.gem
 *.rbc
 .bundle
