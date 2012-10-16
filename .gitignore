@@ -1,3 +1,4 @@
+*.xcf
 *.gem
 *.rbc
 .bundle
