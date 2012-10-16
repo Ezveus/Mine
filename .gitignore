@@ -1,3 +1,4 @@
+config/CGIHandlers.json
 *.xcf
 *.gem
 *.rbc
