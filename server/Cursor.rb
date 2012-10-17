@@ -79,21 +79,21 @@ class Cursor
   #  - sets @column to the end of line
   # 
   def moveLeft nbMove = 1
+    @column = @file[@line].size if @column > @file[@line].size
     (1..nbMove).each do
       @column = @file[@line].size if @column > @file[@line].size
-      if @line > 0
-        if @column > 0
-          @column -= 1
-        else
-          @line -= 1
-          @column = @file[@line].size
-        end
+      if @column > 0
+        @column -= 1
+      elsif @line > 0
+        @line -= 1
+        @column = @file[@line].size
       end
     end
     [@line, @column]
   end
 
   def moveToColumnIndex index
+    puts "#{index}, #{@column}"
     if index > @column
       moveRight index - @column
     elsif index < @column

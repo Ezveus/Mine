@@ -11,7 +11,7 @@ class Buffer
     @serverSide = serverSide
     @workingUsers = []
     @fileContent = fileContent
-    @eofnewline = eofnewline
+    @eofNewLine = eofnewline
   end
 
   def printFileContent
@@ -26,7 +26,7 @@ class Buffer
       dataStr = insertTextFilledFile cursor, text
     end
     splitSize = insertTextSplitFlatten cursor
-    insertTextCursorReplacement text, cursor, splitsize, dataStr
+    insertTextCursorReplacement text, cursor, splitSize, dataStr
     insertTextNewLineHandler text, cursor
 
     # call the method to update the clients and make a diff
@@ -39,8 +39,9 @@ class Buffer
   end
 
   def insertTextFilledFile cursor, text
-    cursor.moveLeft
-    cursor.moveRight
+    if cursor.column > @fileContent[cursor.line].size
+      cursor.moveToColumnIndex @fileContent[cursor.line].size
+    end
     dataStr = @fileContent[cursor.line]
     s1 = dataStr[0, cursor.column]
     s2 = dataStr[cursor.column, dataStr.size - cursor.column]
@@ -55,7 +56,7 @@ class Buffer
     return splitSize
   end
 
-  def insertTextCursorReplacement text, cursor, splitsize, dataStr
+  def insertTextCursorReplacement text, cursor, splitSize, dataStr
     if splitSize > 0
       cursor.moveDown(splitSize)
     end
@@ -71,29 +72,37 @@ class Buffer
     if text.end_with? "\n" and cursor.column == @fileContent[cursor.line].size and
         cursor.line == @fileContent.rindex(@fileContent.last)
       @fileContent << ""
-      @eofnewline = true
+      @eofNewLine = true
       cursor.moveRight
     else
-      @eofnewline = false
+      @eofNewLine = false
     end
   end
 
   public
-  # need to manage @eofnewline !
   def deleteTextBackspace cursor, nbToDelete = 1
-    while @fileContent[cursor.line].size - nbToDelete < 0
-      nbToDelete = deleteTextBackSpaceConcatLine cursor, nbToDelete
+    if @fileContent[cursor.line] == @fileContent.last and
+        (@fileContent[cursor.line] == "" or
+         cursor.column == @fileContent.last.size)
+      @eofNewLine = false
+    end
+    while cursor.column < nbToDelete
+      nbToDelete = deleteTextBackspaceConcatLine cursor, nbToDelete
     end
     deleteTextBackspaceSameLine cursor, nbToDelete
+    puts "#{@eofNewLine}"
     cursor.file = @fileContent
   end
   
   private
   def deleteTextBackspaceSameLine cursor, nbToDelete
-    @fileContent[cursor.line] =
-      @fileContent[cursor.line][0, cursor.column - nbToDelete] +
-      @fileContent[cursor.line][cursor.column, @fileContent[cursor.line].size]
-    cursor.moveLeft nbToDelete
+    if nbToDelete > 0
+      @fileContent[cursor.line] =
+        @fileContent[cursor.line][0, cursor.column - nbToDelete] +
+        @fileContent[cursor.line][cursor.column, @fileContent[cursor.line].size]
+      cursor.moveToColumnIndex cursor.column - nbToDelete
+      puts "#{nbToDelete}"
+    end
   end
 
   def deleteTextBackspaceConcatLine cursor, nbToDelete
@@ -101,9 +110,11 @@ class Buffer
     @fileContent[cursor.line - 1] =
       @fileContent[cursor.line - 1] <<
       @fileContent[cursor.line][cursor.column, @fileContent[cursor.line].size]
-    nbToDelete -= cursor.column
+    nbToDelete -= cursor.column + 1
+    @fileContent.delete_at cursor.line
     cursor.moveUp
     cursor.moveToColumnIndex column
+    puts "#{column}"
     return nbToDelete
   end
 
