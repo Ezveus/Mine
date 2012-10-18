@@ -18,6 +18,10 @@ class Buffer
     puts "file\n#{@fileContent}\n\n"
   end
 
+  def isNewLineTerminated?
+    @eofNewLine
+  end
+
   public
   def insertText cursor, text
     if @fileContent.size == 1 and @fileContent[0] == ""
@@ -81,27 +85,40 @@ class Buffer
 
   public
   def deleteTextBackspace cursor, nbToDelete = 1
-    if @fileContent[cursor.line] == @fileContent.last and
-        (@fileContent[cursor.line] == "" or
-         cursor.column == @fileContent.last.size)
-      @eofNewLine = false
-    end
+    nbToDelete = deleteTextBackspaceTooBig cursor, nbToDelete
     while cursor.column < nbToDelete
       nbToDelete = deleteTextBackspaceConcatLine cursor, nbToDelete
     end
     deleteTextBackspaceSameLine cursor, nbToDelete
-    puts "#{@eofNewLine}"
+    if @fileContent.last == "" and @fileContent.size > 1
+      @eofNewLine = true
+    else
+      @eofNewLine = false
+    end
     cursor.file = @fileContent
   end
   
   private
+  def deleteTextBackspaceTooBig cursor, nbToDelete
+    nb = nbToDelete - cursor.column
+    line = cursor.line - 1
+    while nb > 0 && line >= 0
+      nb -= @fileContent[line].size + 1
+      line -= 1
+    end
+    if nb <= 0
+      return nbToDelete
+    else 
+      return nbToDelete - nb
+    end
+  end
+
   def deleteTextBackspaceSameLine cursor, nbToDelete
     if nbToDelete > 0
       @fileContent[cursor.line] =
         @fileContent[cursor.line][0, cursor.column - nbToDelete] +
         @fileContent[cursor.line][cursor.column, @fileContent[cursor.line].size]
       cursor.moveToColumnIndex cursor.column - nbToDelete
-      puts "#{nbToDelete}"
     end
   end
 
@@ -114,7 +131,6 @@ class Buffer
     @fileContent.delete_at cursor.line
     cursor.moveUp
     cursor.moveToColumnIndex column
-    puts "#{column}"
     return nbToDelete
   end
 
