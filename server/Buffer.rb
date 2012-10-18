@@ -1,8 +1,20 @@
 #!/usr/bin/env ruby
 
-class Buffer
-  attr_reader :fileContent
+#
+# Class Buffer
+# Used to manage every action on a buffer
+# 
 
+class Buffer
+
+  #
+  # Initializes the buffer assigning to it
+  #  - the file's location
+  #  - the file's name
+  #  - the File's content
+  #  - if the file is hosted by the server or the client
+  #  - if the file is terminated by a new line
+  #
   def initialize fileLocation, fileName, fileContent, serverSide, eofnewline = true
     @fileLocation = fileLocation
     @fileName = fileName
@@ -14,15 +26,25 @@ class Buffer
     @eofNewLine = eofnewline
   end
 
+  #
+  # Debuging function
+  #
   def printFileContent
     puts "file\n#{@fileContent}\n\n"
   end
 
+  #
+  # The function's name should be clear enough
+  #
   def isNewLineTerminated?
     @eofNewLine
   end
 
   public
+  #
+  # Insert text in the buffer according to the position of cursor
+  # Moves the cursor in consequence
+  #
   def insertText cursor, text
     if @fileContent.size == 1 and @fileContent[0] == ""
       dataStr = insertTextEmptyFile cursor, text
@@ -36,6 +58,9 @@ class Buffer
     # call the method to update the clients and make a diff
   end
 
+  #
+  # Here is a bunch of functionto insert what we awant were we want
+  #
   private
   def insertTextEmptyFile cursor, text
     @fileContent[cursor.line] = text.split(/\n/)
@@ -84,6 +109,10 @@ class Buffer
   end
 
   public
+  #
+  # Delete some characters at the position given by the cursor
+  # Moves the cursor in consequence
+  #
   def deleteTextBackspace cursor, nbToDelete = 1
     nbToDelete = deleteTextBackspaceTooBig cursor, nbToDelete
     while cursor.column < nbToDelete
@@ -99,6 +128,9 @@ class Buffer
   end
   
   private
+  #
+  # Here is a bunch of function to delete some text
+  #
   def deleteTextBackspaceTooBig cursor, nbToDelete
     nb = nbToDelete - cursor.column
     line = cursor.line - 1
@@ -136,7 +168,7 @@ class Buffer
 
   public
   def deleteTextDelete cursor, nbToDelete = 1
-
+    puts "Ho, hello there it's cool you called me but i'm not implemented yet !"
   end
 
 end

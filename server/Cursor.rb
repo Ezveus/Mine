@@ -92,6 +92,9 @@ class Cursor
     [@line, @column]
   end
 
+  #
+  # Moves the cursor to the specified index
+  #
   def moveToColumnIndex index
     puts "#{index}, #{@column}"
     if index > @column
@@ -99,6 +102,22 @@ class Cursor
     elsif index < @column
       moveLeft index - @column
     end
+  end
+
+  #
+  # Moves the cursor to the current line origin
+  #
+  def moveToOrigin
+    @column = 0
+    [@line, @column]
+  end
+
+  #
+  # Moves the cursor to the current line end
+  #
+  def moveToEnd
+    @column = @file[@line].size
+    [@line, @column]
   end
 
 end
