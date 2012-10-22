@@ -1,7 +1,4 @@
-<h1>
-  <%= image_tag "mine.png", :alt => "Mine" %>
-  <%= title %>
-</h1>
+<%= render 'layouts/maintitle' %>
 <p>
   <form>
     <fieldset>
@@ -12,8 +9,8 @@
       <label for="pass">Password: </label>
       <input name="pass" id="pass" type="password" required />
       <br />
-      <input id="send" type="button" value="Send" />
-      <input id="reset" type="button" value="Reset" />
+      <input id="send" class="btn btn-primary" type="button" value="Send" />
+      <input id="reset" class="btn" type="button" value="Reset" />
     </fieldset>
   </form>
 </p>

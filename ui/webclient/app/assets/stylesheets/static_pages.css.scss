@@ -3,3 +3,21 @@
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
 @import "bootstrap";
+
+body section {
+    margin-top: 3%;
+}
+
+#maintitle {
+    border: {
+        style: solid;
+        width: 1%;
+        radius: 10px;
+    }
+    padding: {
+        left: 0.5%;
+        right: 0.5%;
+        top: 0.5%;
+        bottom: 0.5%;
+    }
+}
