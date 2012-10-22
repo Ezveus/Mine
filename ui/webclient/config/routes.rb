@@ -1,6 +1,16 @@
 Webclient::Application.routes.draw do
   get 'static_pages/home'
-  match '/' => "StaticPages#home"
+  root :to => "StaticPages#home"
+  # get 'static_pages/help'
+  # match '/help' => "StaticPages#help"
+  get 'static_pages/signin'
+  match '/signin' => "StaticPages#signin"
+  get 'static_pages/signup'
+  match '/signup' => "StaticPages#signup"
+  get 'static_pages/about'
+  match '/about' => "StaticPages#about"
+  get 'static_pages/contact'
+  match '/contact' => "StaticPages#contact"
 end
 
 # The priority is based upon order of creation:

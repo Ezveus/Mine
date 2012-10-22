@@ -8,11 +8,10 @@
     <%= csrf_meta_tags %>
   </head>
   <body>
-    <header>
-      <%= render partial: 'layouts/navbar.html.erb' %>
-    </header>
+    <%= render partial: 'layouts/navbar' %>
     <section>
       <%= yield %>
     </section>
+    <%= render partial: 'layouts/footer' %>
   </body>
 </html>
