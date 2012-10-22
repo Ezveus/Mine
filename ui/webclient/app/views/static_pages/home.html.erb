@@ -1,12 +1,12 @@
 <h1>
-  <img src="assets/images/mine.png" alt="Mine" />
+  <%= image_tag "mine.png", :alt => "Mine" %>
   <%= title %>
 </h1>
 <p>
   <!-- Asks for authentication -->
   <form>
     <fieldset>
-      <legend>Authentication</legend>
+      <legend id="formlegend">Authentication</legend>
       <label for="name">Name : </label>
       <input name="name" id="name" type="text" autofocus required />
       <br />
