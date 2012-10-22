@@ -33,13 +33,6 @@ class Buffer
     puts "file\n#{@fileContent}\n\n"
   end
 
-  #
-  # The function's name should be clear enough
-  #
-  def isNewLineTerminated?
-    @eofNewLine
-  end
-
   public
   #
   # Insert text in the buffer according to the position of cursor
@@ -109,6 +102,14 @@ class Buffer
   end
 
   public
+  def eofNewLine?
+    if @fileContent.last == "" and @fileContent.size > 1
+      @eofNewLine = true
+    else
+      @eofNewLine = false
+    end
+  end
+
   #
   # Delete some characters at the position given by the cursor
   # Moves the cursor in consequence
@@ -119,11 +120,7 @@ class Buffer
       nbToDelete = deleteTextBackspaceConcatLine cursor, nbToDelete
     end
     deleteTextBackspaceSameLine cursor, nbToDelete
-    if @fileContent.last == "" and @fileContent.size > 1
-      @eofNewLine = true
-    else
-      @eofNewLine = false
-    end
+    eofNewLine?
     cursor.file = @fileContent
   end
   
@@ -167,8 +164,52 @@ class Buffer
   end
 
   public
+  #
+  # Delete characters after the cursor
+  #
   def deleteTextDelete cursor, nbToDelete = 1
-    puts "Ho, hello there it's cool you called me but i'm not implemented yet !"
+    nbToDelete = deleteTextDeleteTooBig cursor, nbToDelete
+    puts "#{nbToDelete}"
+    while cursor.column < nbToDelete
+      nbToDelete = deleteTextDeleteConcatLine cursor, nbToDelete
+    end
+    deleteTextDeleteSameLine cursor, nbToDelete
+    eofNewLine?
+    cursor.file = @fileContent
+  end
+
+  private
+  def deleteTextDeleteTooBig cursor, nbToDelete
+    line = cursor.line + 1
+    nb = nbToDelete - @fileContent[line - 1].size - cursor.column
+    while nb > 0 and line < @fileContent.size
+      nb -= @fileContent[line].size + 1
+      line += 1
+    end
+    if nb <= 0
+      return nbToDelete
+    else
+      return nbToDelete - nb
+    end
+  end
+
+  def deleteTextDeleteConcatLine cursor, nbToDelete
+    column = @fileContent[cursor.line][cursor.column,
+                                       @fileContent[cursor.line].size].size + 1
+    @fileContent[cursor.line] = 
+      @fileContent[cursor.line][0, cursor.column] +
+      @fileContent[cursor.line + 1]
+    @fileContent.delete_at cursor.line + 1
+    nbToDelete - column
+  end
+
+  def deleteTextDeleteSameLine cursor, nbToDelete
+    if nbToDelete > 0
+      @fileContent[cursor.line] =
+        @fileContent[cursor.line][0, cursor.column] +
+        @fileContent[cursor.line][cursor.column + nbToDelete,
+                                  @fileContent[cursor.line].size]
+    end
   end
 
 end
