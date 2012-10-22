@@ -3,5 +3,17 @@
   <%= title %>
 </h1>
 <p>
-  Signup Page
+  <form>
+    <fieldset>
+      <legend id="formlegend">Authentication</legend>
+      <label for="name">Name : </label>
+      <input name="name" id="name" type="text" autofocus required />
+      <br />
+      <label for="pass">Password: </label>
+      <input name="pass" id="pass" type="password" required />
+      <br />
+      <input id="send" type="button" value="Send" />
+      <input id="reset" type="button" value="Reset" />
+    </fieldset>
+  </form>
 </p>
