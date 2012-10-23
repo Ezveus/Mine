@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 require 'spec_helper'
 
 rootTitle = "Mine Is Not Emacs : Embedded Client"
@@ -53,6 +54,30 @@ describe "LayoutLinks" do
       get '/contact'
       response.should have_selector('title',
                                     :content => contactTitle)
+    end
+  end
+
+  describe "Check Links" do
+    it "checks the links" do
+      visit root_path
+      click_link "About"
+      response.should have_selector('title',
+                                    :content => aboutTitle)
+      # click_link "Help"
+      # response.should have_selector('title',
+      #                               :content => helpTitle)
+      click_link "Contact"
+      response.should have_selector('title',
+                                    :content => contactTitle)
+      click_link "Home"
+      response.should have_selector('title',
+                                    :content => rootTitle)
+      click_link "Signup"
+      response.should have_selector('title',
+                                    :content => signupTitle)
+      click_link "Signin"
+      response.should have_selector('title',
+                                    :content => signinTitle)
     end
   end
 end
