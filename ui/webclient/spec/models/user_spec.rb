@@ -45,9 +45,11 @@ describe User do
       end
     end
 
-    it "should reject a non-unique email" do
-      User.create!(@attr)
-      user_with_duplicate_email = User.new(@attr.merge(:name => "User"))
+    it "should reject a non-unique email (checking case)" do
+      upcased_email = @attr[:email].upcase
+      User.create!(@attr.merge(:email => upcased_email,
+                               :name => "User 1"))
+      user_with_duplicate_email = User.new(@attr.merge(:name => "User 2"))
       user_with_duplicate_email.should_not be_valid
     end
   end
