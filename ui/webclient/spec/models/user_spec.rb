@@ -23,6 +23,12 @@ describe User do
       long_name_user = User.new(@attr.merge(:name => long_name))
       long_name_user.should_not be_valid
     end
+
+    it "should reject a non-unique name" do
+      User.create!(@attr)
+      user_with_duplicate_name = User.new(@attr.merge(:email => "another@valid.email"))
+      user_with_duplicate_name.should_not be_valid
+    end
   end
 
   describe "Email Tests" do
@@ -41,7 +47,7 @@ describe User do
 
     it "should reject a non-unique email" do
       User.create!(@attr)
-      user_with_duplicate_email = User.new(@attr)
+      user_with_duplicate_email = User.new(@attr.merge(:name => "User"))
       user_with_duplicate_email.should_not be_valid
     end
   end
