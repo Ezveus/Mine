@@ -1,4 +1,6 @@
 Webclient::Application.routes.draw do
+  get "users/new"
+
   get 'static_pages/home'
   root :to => "StaticPages#home"
   # get 'static_pages/help'
