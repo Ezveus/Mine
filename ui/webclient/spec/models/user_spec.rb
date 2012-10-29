@@ -29,5 +29,13 @@ describe User do
       bad_guy = User.new(@attr.merge(:email => ""))
       bad_guy.should_not be_valid
     end
+
+    it "should reject unvalid email" do
+      adresses = %w[user@foo,com user_at_foo.org example.user@foo.]
+      adresses.each do |adress|
+        invalid_email_user = User.new(@attr.merge(:email => adress))
+        invalid_email_user.should_not be_valid
+      end
+    end
   end
 end
