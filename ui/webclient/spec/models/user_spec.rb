@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 require 'spec_helper'
 
 describe User do
@@ -36,6 +37,12 @@ describe User do
         invalid_email_user = User.new(@attr.merge(:email => adress))
         invalid_email_user.should_not be_valid
       end
+    end
+
+    it "should reject a non-unique email" do
+      User.create!(@attr)
+      user_with_duplicate_email = User.new(@attr)
+      user_with_duplicate_email.should_not be_valid
     end
   end
 end
