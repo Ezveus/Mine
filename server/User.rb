@@ -5,13 +5,13 @@ load "server/Frame.rb"
 
 class User
   attr_accessor :cmdHistory, :killRing
-  attr_reader :userInfo
+  attr_reader :userInfo, :frames
 
   def initialize username, userdb
     @clients = []
     @cmdHistory = []
     @killRing = ""
-    @frames = []
+    @frames = {}
     @userInfo = userdb.selectUser username
   end
 

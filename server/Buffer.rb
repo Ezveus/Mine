@@ -5,7 +5,11 @@
 # Used to manage every action on a buffer
 # 
 
+load 'server/Change.rb'
+
 class Buffer
+
+  attr_reader :fileContent
 
   #
   # Initializes the buffer assigning to it
@@ -24,6 +28,7 @@ class Buffer
     @workingUsers = []
     @fileContent = fileContent
     @eofNewLine = eofnewline
+    @diffHistory = []
   end
 
   #
@@ -47,8 +52,6 @@ class Buffer
     splitSize = insertTextSplitFlatten cursor
     insertTextCursorReplacement text, cursor, splitSize, dataStr
     insertTextNewLineHandler text, cursor
-
-    # call the method to update the clients and make a diff
   end
 
   #
@@ -210,6 +213,23 @@ class Buffer
         @fileContent[cursor.line][cursor.column + nbToDelete,
                                   @fileContent[cursor.line].size]
     end
+  end
+
+  public
+  def insertDiff change
+    @diffHistory.insert(0, change)
+    if @diffHistory.size > @workingUsers.size * 100
+      @diffHistory.delete @diffHistory.last
+    end
+    nil
+  end
+
+  def undo
+    puts "Nice try but the work is still to do"
+  end
+
+  def redo
+    puts "Nice try but the work is still to do"
   end
 
 end
