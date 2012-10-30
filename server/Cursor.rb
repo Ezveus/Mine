@@ -120,4 +120,12 @@ class Cursor
     [@line, @column]
   end
 
+  def isAtEOL?
+    @column == @file[@line].size
+  end
+
+  def isAtBOL?
+    @column == 0
+  end
+
 end
