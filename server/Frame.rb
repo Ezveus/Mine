@@ -12,6 +12,11 @@ class Frame
     @cursor = cursor
     @overWrite = overWrite
     @lastCmd = ""
+    @region = []
+  end
+
+  def isRegionDefined?
+    @region == []
   end
 
   def isOverWrite? 
