@@ -1,12 +1,12 @@
 Webclient::Application.routes.draw do
-  get "users/new"
+  resources :users
 
   get 'static_pages/home'
   root :to => "StaticPages#home"
   # get 'static_pages/help'
   # match '/help' => "StaticPages#help"
   get 'static_pages/signin'
-  match '/signin' => "StaticPages#signin"
+  match '/signin' => "Users#new"
   get 'static_pages/signup'
   match '/signup' => "StaticPages#signup"
   get 'static_pages/about'

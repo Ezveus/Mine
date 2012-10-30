@@ -1,0 +1,10 @@
+<%= render 'layouts/maintitle' %>
+<p>
+  <% res = "#{@user.name} " %>
+  <!--  res += "# " if @user.isAdmin == 1 %> -->
+  <!--  res += "$ " unless @user.isAdmin == 1 %> -->
+  <% res += "<" %>
+  <% res += "@ : #{@user.email}" %>
+   <!-- res += ", web : #{@user.website}" if @user.website and @user.website != "" %> -->
+  <%= res += ">" %>
+</p>
