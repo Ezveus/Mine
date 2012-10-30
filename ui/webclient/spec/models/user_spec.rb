@@ -5,7 +5,10 @@ describe User do
   before(:each) do
     @attr = {
       :name => "Example User",
-      :email => "user@example.com" }
+      :email => "user@example.com"
+      # :password => "foobar",
+      # :password_confirmation => "foobar"
+    }
   end
 
   it "should create a new instance with valids attributes" do
@@ -53,4 +56,31 @@ describe User do
       user_with_duplicate_email.should_not be_valid
     end
   end
+
+  # describe "Passwords Tests" do
+  #   it "should have a password" do
+  #     u = User.new(@attr.merge(:password => "",
+  #                              :password_confirmation => ""))
+  #     u.should_not be_valid
+  #   end
+
+  #   it "should need a password confirmation identical to the password" do
+  #     u = User.new(@attr.merge(:password_confirmation => "invalid"))
+  #     u.should_not be_valid
+  #   end
+
+  #   it "should reject too short passwords" do
+  #     short = "a" * 5
+  #     u = User.new(@attr.merge(:password => short,
+  #                              :password_confirmation => short))
+  #     u.should_not be_valid
+  #   end
+
+  #   it "should reject too long passwords" do
+  #     long = "a" * 41
+  #     u = User.new(@attr.merge(:password => long,
+  #                              :password_confirmation => long))
+  #     u.should_not be_valid
+  #   end
+  # end
 end
