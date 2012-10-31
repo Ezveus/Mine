@@ -2,6 +2,9 @@
 
 require 'diff/lcs'
 
+#
+# Class to stock the diff made by Diff::LCS.diff
+#
 class Change
   attr_reader :cursorBefore, :cursorAfter, :user
 
