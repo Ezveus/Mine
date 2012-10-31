@@ -3,6 +3,7 @@
 #
 # Class Buffer
 # Used to manage every action on a buffer
+# Also managing the diffHistory
 # 
 
 require 'diff/lcs'
@@ -19,6 +20,7 @@ class Buffer
   #  - the File's content
   #  - if the file is hosted by the server or the client
   #  - if the file is terminated by a new line
+  #  - the diffHistory of the buffer (common to each user on buffer)
   #
   def initialize fileLocation, fileName, fileContent, serverSide, eofnewline = true
     @fileLocation = fileLocation
@@ -33,11 +35,16 @@ class Buffer
     @diffHistoryPosition = 0
   end
 
+  public
   #
-  # Debuging function
+  # Test if the Buffer is terminated by a new line or not
   #
-  def printFileContent
-    puts "file\n#{@fileContent}\n\n"
+  def eofNewLine?
+    if @fileContent.last == "" and @fileContent.size > 1
+      @eofNewLine = true
+    else
+      @eofNewLine = false
+    end
   end
 
   public
@@ -56,10 +63,10 @@ class Buffer
     insertTextNewLineHandler text, cursor
   end
 
-  #
-  # Here is a bunch of functionto insert what we awant were we want
-  #
   private
+  #
+  # Here is a bunch of function to insert what we want where we want
+  #
   def insertTextEmptyFile cursor, text
     @fileContent[cursor.line] = text.split(/\n/)
     text
@@ -107,14 +114,6 @@ class Buffer
   end
 
   public
-  def eofNewLine?
-    if @fileContent.last == "" and @fileContent.size > 1
-      @eofNewLine = true
-    else
-      @eofNewLine = false
-    end
-  end
-
   #
   # Delete some characters at the position given by the cursor
   # Moves the cursor in consequence
@@ -184,6 +183,9 @@ class Buffer
   end
 
   private
+  #
+  # Here is a bunch of function to delete text
+  #
   def deleteTextDeleteTooBig cursor, nbToDelete
     line = cursor.line + 1
     nb = nbToDelete - @fileContent[line - 1].size - cursor.column
@@ -218,7 +220,12 @@ class Buffer
   end
 
   public
+  #
+  # Function to insert a diff in the diffHistory
+  # Discards old diff if you undo some and then creates a new diff
+  #
   def insertDiff change
+    @diffHistoryPosition = 0 if @diffHistoryPosition < 0
     if @diffHistoryPosition != 0
       @diffHistory = @diffHistory.drop @diffHistoryPosition
     end
@@ -229,13 +236,48 @@ class Buffer
     nil
   end
 
+  public
+  #
+  # Function to undo the last change in the buffer
+  #
+  def undo
+    if @diffHistoryPosition < @diffHistory.size
+      @diffHistoryPosition = 0 if @diffHistoryPosition < 0
+      diff = @diffHistory[@diffHistoryPosition]
+      patch :patch, diff
+      user.cursor.moveToLine diff.cursorBefore[0]
+      user.cursor.moveToColumn diff.cursorBefore[1]
+      @diffHistoryPosition += 1
+      return #whatever we want
+    end
+    return #whatever we want but not the same as above
+  end
+
+  public
+  #
+  # Function to redo the last undo in the buffer
+  #
+  def redo
+    if @diffHistoryPosition > -1
+      diff = @diffHistory[@diffHistoryPosition]
+      patch :unpatch, diff
+      user.cursor.moveToLine diff.cursorAfter[0]
+      user.cursor.moveToColumn diff.cursorAfter[1]
+      @diffHistoryPosition -= 1
+      return #whatever we want
+    end
+    return #whatever we want but not the same as above
+  end
+
   private
   PATCH = {
     :patch => {'+' => '+', '-' => '-'},
     :unpatch => {'+' => '-', '-' => '+'}
   }
 
-  private
+  #
+  # Function to apply the changes wether you called undo or redo
+  #
   def patch direction, diff
     i = j = 0
     diff.diff.each do |change|
@@ -257,24 +299,6 @@ class Buffer
         j += 1
       end
     end
-  end
-
-  public
-  def undo
-    diff = @diffHistory[@diffHistoryPosition]
-    patch :patch, diff
-    user.cursor.moveToLine diff.cursorBefore[0]
-    user.cursor.moveToColumn diff.cursorBefore[1]
-    @diffHistoryPosition -= 1
-  end
-
-  public
-  def redo
-    diff = @diffHistory[@diffHistoryPosition]
-    patch :unpatch, diff
-    user.cursor.moveToLine diff.cursorAfter[0]
-    user.cursor.moveToColumn diff.cursorAfter[1]
-    @diffHistoryPosition += 1
   end
 
 end
