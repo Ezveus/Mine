@@ -12,11 +12,6 @@ class StaticPagesController < ApplicationController
     @active = :signin
   end
 
-  def signup
-    @title = "Signup"
-    @active = :signup
-  end
-
   def about
     @title = "About"
     @active = :about

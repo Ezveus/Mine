@@ -1,30 +1,45 @@
-# == Schema Information
-#
-# Table name: users
-#
-#  id         :integer          not null, primary key
-#  name       :string(255)
-#  pass       :string(255)
-#  email      :string(255)
-#  website    :string(255)
-#  isAdmin    :integer
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
-#
+require 'digest'
 
 class User < ActiveRecord::Base
-  attr_accessible :name, :pass, :email, :website, :isAdmin
+  attr_accessor :password
+  attr_accessible :email, :name, :website
+  attr_accessible :isAdmin, :password, :password_confirmation
 
   email_regex = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i
 
   validates(:name,
             :presence => true,
-            :uniqueness => true
-            )
-  validates(:pass,
-            :presence => true)
+            :length => { :maximum => 50 },
+            :uniqueness => true)
   validates(:email,
             :presence => true,
-            :uniqueness => { :case_sensitive => false },
-            :format   => { :with => email_regex })
+            :format => { :with => email_regex },
+            :uniqueness => { :case_sensitive => false })
+  validates(:password,
+            :presence => true,
+            :confirmation => true,
+            :length => { :within => 6..40 })
+
+  before_save :encrypt_password
+
+  def has_password? password
+    self.encrypted_password == encrypt(password)
+  end
+
+  def self.authenticate userid, password
+    user = self.find_by_name userid
+    user = self.find_by_email userid unless user
+    return nil unless user
+    return user if user.has_password? password
+    nil
+  end
+
+  private
+  def encrypt_password
+    self.encrypted_password = encrypt(password)
+  end
+
+  def encrypt s
+    s
+  end
 end

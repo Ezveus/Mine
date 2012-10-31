@@ -13,11 +13,12 @@
 #              contact     /contact(.:format)              StaticPages#contact
 
 Webclient::Application.routes.draw do
+  resources :users
+
   get 'static_pages/home'
   get "users/new"
   # get 'static_pages/help'
   get 'static_pages/signin'
-  get 'static_pages/signup'
   get 'static_pages/about'
   get 'static_pages/contact'
 
