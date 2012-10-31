@@ -1,7 +1,7 @@
 class UsersController < ApplicationController
   def new
-    @title = "Signin"
-    @active = :signin
+    @title = "Signup"
+    @active = :signup
   end
 
   def show

@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 rootTitle = "Mine Is Not Emacs : Embedded Client"
-newTitle = "#{rootTitle} - Signin"
+newTitle = "#{rootTitle} - Signup"
 ezveusUserTitle = "#{rootTitle} - Ezveus"
 ezveusUserPar = "Ezveus # <@ : ciappam@gmail.com, web : http://localhost:3000>"
 

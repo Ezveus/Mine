@@ -2,7 +2,6 @@ require 'spec_helper'
 
 rootTitle = "Mine Is Not Emacs : Embedded Client"
 # helpTitle = "#{rootTitle} - Help"
-# signinTitle = "#{rootTitle} - Signin"
 signupTitle = "#{rootTitle} - Signup"
 aboutTitle = "#{rootTitle} - About"
 contactTitle = "#{rootTitle} - Contact"
