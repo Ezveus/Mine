@@ -93,14 +93,24 @@ class Cursor
   end
 
   #
-  # Moves the cursor to the specified index
+  # Moves the cursor to the specified index on the same line
   #
-  def moveToColumnIndex index
-    puts "#{index}, #{@column}"
+  def moveToColumn index
     if index > @column
       moveRight index - @column
     elsif index < @column
-      moveLeft index - @column
+      moveLeft @column - index
+    end
+  end
+
+  #
+  # Moves the cursor to the specified line
+  #
+  def moveToLine index
+    if index > @line
+      moveDown index - @line
+    elsif index < @line
+      moveUp @line - index
     end
   end
 
