@@ -18,8 +18,6 @@ Webclient::Application.routes.draw do
   get 'static_pages/home'
   get "users/new"
   # get 'static_pages/help'
-  # match '/help' => "StaticPages#help"
-  match '/signup' => "Users#new"
   get 'static_pages/signin'
   get 'static_pages/about'
   get 'static_pages/contact'

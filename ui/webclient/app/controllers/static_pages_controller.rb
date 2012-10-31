@@ -7,9 +7,9 @@ class StaticPagesController < ApplicationController
   #   @title = "Help"
   # end
 
-  def signup
-    @title = "Signup"
-    @active = :signup
+  def signin
+    @title = "Signin"
+    @active = :signin
   end
 
   def about
