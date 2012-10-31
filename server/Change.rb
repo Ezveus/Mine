@@ -2,11 +2,11 @@
 
 require 'diff/lcs'
 
-class Change < Diff::LCS::Change
+class Change
   attr_reader :cursorBefore, :cursorAfter, :user
 
   def initialize user, cursorBefore, cursorAfter, diff
-    super diff.action, diff.position, diff.element
+    @diff = Diff::LCS.__normalize_patchset diff
     @user = user
     @cursorBefore = cursorBefore
     @cursorAfter = cursorAfter
