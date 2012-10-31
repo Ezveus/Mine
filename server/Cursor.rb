@@ -130,10 +130,17 @@ class Cursor
     [@line, @column]
   end
 
+
+  #
+  # Check if the cursor is at the end of the current line
+  #
   def isAtEOL?
     @column == @file[@line].size
   end
 
+  #
+  # Check if the cursor is at the beginning of the current line
+  #
   def isAtBOL?
     @column == 0
   end
