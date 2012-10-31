@@ -89,9 +89,8 @@ class Userdb
       res += " # " if @isAdmin == 1
       res += " $ " unless @isAdmin == 1
       res += "<"
-      res += "@ : #{@mail}"# if @mail and @mail != ""
-      res += ", web : #{@website}" if @website and @website != "" #and @mail
-#      res += "web : #{@website}" if @website and @website != "" and !@mail
+      res += "@ : #{@mail}"
+      res += ", web : #{@website}" if @website and @website != ""
       res += ">"
     end
   end
@@ -110,7 +109,7 @@ class Userdb
     unless first_one
       CreateUsers.up
       AddUniquenessIndex.up
-      rootUser = User.create :id => 0, :name => "root", :pass => "toor", :email => "user@localhost", :isAdmin => 1
+      rootUser = User.create :name => "root", :pass => "toor", :email => "user@localhost", :isAdmin => 1
     end
   end
 
