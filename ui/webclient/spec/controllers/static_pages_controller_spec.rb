@@ -2,7 +2,7 @@ require 'spec_helper'
 
 rootTitle = "Mine Is Not Emacs : Embedded Client"
 # helpTitle = "#{rootTitle} - Help"
-signinTitle = "#{rootTitle} - Signin"
+# signinTitle = "#{rootTitle} - Signin"
 signupTitle = "#{rootTitle} - Signup"
 aboutTitle = "#{rootTitle} - About"
 contactTitle = "#{rootTitle} - Contact"
@@ -39,21 +39,6 @@ describe StaticPagesController do
   #                                   :content => helpTitle)
   #   end
   # end
-
-  describe "GET 'signin'" do
-    it "returns http success" do
-      get 'signin'
-      response.should be_success
-    end
-  end
-
-  describe "'signin' title" do
-    it "should be #{signinTitle}" do
-      get 'signin'
-      response.should have_selector("title",
-                                    :content => signinTitle)
-    end
-  end
 
   describe "GET 'signup'" do
     it "returns http success" do

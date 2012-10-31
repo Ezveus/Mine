@@ -5,7 +5,6 @@ Webclient::Application.routes.draw do
   root :to => "StaticPages#home"
   # get 'static_pages/help'
   # match '/help' => "StaticPages#help"
-  get 'static_pages/signin'
   match '/signin' => "Users#new"
   get 'static_pages/signup'
   match '/signup' => "StaticPages#signup"
