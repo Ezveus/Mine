@@ -5,6 +5,7 @@
 # Used to manage every action on a buffer
 # 
 
+require 'diff/lcs'
 load 'server/Change.rb'
 
 class Buffer
@@ -29,6 +30,7 @@ class Buffer
     @fileContent = fileContent
     @eofNewLine = eofnewline
     @diffHistory = []
+    @diffHistoryPosition = 0
   end
 
   #
@@ -65,7 +67,7 @@ class Buffer
 
   def insertTextFilledFile cursor, text
     if cursor.column > @fileContent[cursor.line].size
-      cursor.moveToColumnIndex @fileContent[cursor.line].size
+      cursor.moveToColumn @fileContent[cursor.line].size
     end
     dataStr = @fileContent[cursor.line]
     s1 = dataStr[0, cursor.column]
@@ -87,7 +89,7 @@ class Buffer
     end
     if dataStr.rindex(/\n/)
       lastLineInserted = (text.split(/\n/)).last.size
-      cursor.moveToColumnIndex lastLineInserted
+      cursor.moveToColumn lastLineInserted
     else
       cursor.moveRight text.size
     end
@@ -150,7 +152,7 @@ class Buffer
       @fileContent[cursor.line] =
         @fileContent[cursor.line][0, cursor.column - nbToDelete] +
         @fileContent[cursor.line][cursor.column, @fileContent[cursor.line].size]
-      cursor.moveToColumnIndex cursor.column - nbToDelete
+      cursor.moveToColumn cursor.column - nbToDelete
     end
   end
 
@@ -162,7 +164,7 @@ class Buffer
     nbToDelete -= cursor.column + 1
     @fileContent.delete_at cursor.line
     cursor.moveUp
-    cursor.moveToColumnIndex column
+    cursor.moveToColumn column
     return nbToDelete
   end
 
@@ -217,6 +219,9 @@ class Buffer
 
   public
   def insertDiff change
+    if @diffHistoryPosition != 0
+      @diffHistory = @diffHistory.drop @diffHistoryPosition
+    end
     @diffHistory.insert(0, change)
     if @diffHistory.size > @workingUsers.size * 100
       @diffHistory.delete @diffHistory.last
@@ -224,12 +229,52 @@ class Buffer
     nil
   end
 
-  def undo
-    puts "Nice try but the work is still to do"
+  private
+  PATCH = {
+    :patch => {'+' => '+', '-' => '-'},
+    :unpatch => {'+' => '-', '-' => '+'}
+  }
+
+  private
+  def patch direction, diff
+    i = j = 0
+    diff.diff.each do |change|
+      action = PATCH[direction][change.action]
+      case action
+      when '-'
+        while i < change.position
+          i += 1
+          j += 1
+        end
+        @fileContent.delete_at(i)
+        i += 1
+      when '+'
+        while bj < change.position
+          i += 1
+          j += 1
+        end
+        @fileContent.insert j, change.element
+        j += 1
+      end
+    end
   end
 
+  public
+  def undo
+    diff = @diffHistory[@diffHistoryPosition]
+    patch :patch, diff
+    user.cursor.moveToLine diff.cursorBefore[0]
+    user.cursor.moveToColumn diff.cursorBefore[1]
+    @diffHistoryPosition -= 1
+  end
+
+  public
   def redo
-    puts "Nice try but the work is still to do"
+    diff = @diffHistory[@diffHistoryPosition]
+    patch :unpatch, diff
+    user.cursor.moveToLine diff.cursorAfter[0]
+    user.cursor.moveToColumn diff.cursorAfter[1]
+    @diffHistoryPosition += 1
   end
 
 end
