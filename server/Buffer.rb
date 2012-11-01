@@ -37,6 +37,22 @@ class Buffer
 
   public
   #
+  # Method to add a user to the list of the working users
+  #
+  def addWorkingUser user
+    @workingUsers << user
+  end
+
+  public
+  #
+  # Method to remove a user from the list of the working users
+  #
+  def removeWorkingUser user
+    @workingUsers.delete user
+  end
+
+  public
+  #
   # Test if the Buffer is terminated by a new line or not
   #
   def eofNewLine?
@@ -125,7 +141,7 @@ class Buffer
     end
     deleteTextBackspaceSameLine cursor, nbToDelete
     eofNewLine?
-    cursor.file = @fileContent
+    # cursor.file = @fileContent
   end
   
   private
@@ -148,10 +164,19 @@ class Buffer
 
   def deleteTextBackspaceSameLine cursor, nbToDelete
     if nbToDelete > 0
+      if cursor.isAtEOL?
+        eol = true
+      else
+        eol = false
+      end
       @fileContent[cursor.line] =
         @fileContent[cursor.line][0, cursor.column - nbToDelete] +
         @fileContent[cursor.line][cursor.column, @fileContent[cursor.line].size]
-      cursor.moveToColumn cursor.column - nbToDelete
+      if eol
+        cursor.moveToEnd
+      else
+        cursor.moveToColumn cursor.column - nbToDelete
+      end
     end
   end
 
@@ -270,10 +295,10 @@ class Buffer
   end
 
   private
-  PATCH = {
+  PATCHHASH = {
     :patch => {'+' => '+', '-' => '-'},
     :unpatch => {'+' => '-', '-' => '+'}
-  }
+  } unless const_defined? :PATCHHASH
 
   #
   # Function to apply the changes wether you called undo or redo
@@ -281,7 +306,7 @@ class Buffer
   def patch direction, diff
     i = j = 0
     diff.diff.each do |change|
-      action = PATCH[direction][change.action]
+      action = PATCHHASH[direction][change.action]
       case action
       when '-'
         while i < change.position
@@ -291,7 +316,7 @@ class Buffer
         @fileContent.delete_at(i)
         i += 1
       when '+'
-        while bj < change.position
+        while j < change.position
           i += 1
           j += 1
         end

@@ -51,7 +51,7 @@ class Frame
     bufferBefore = buffer.fileContent
     cursorBefore = [@cursor.line, @cursor.column]
     buffer.insertText @cursor, text
-    buffer.deleteTextDelete @cursor, text.size if isOverWrite?
+    # Think about a method to manage the overwrite with multiples lines passed
     bufferAfter = buffer.fileContent
     cursorAfter = [@cursor.line, @cursor.column] 
     diff = Change.new(@cursor.owner, cursorBefore, cursorAfter, 
@@ -68,12 +68,12 @@ class Frame
   def backspaceBuffer buffer, nb
     bufferBefore = buffer.fileContent
     cursorBefore = [@cursor.line, @cursor.column]
-    buffer.deleteTextDelete @cursor, nb
+    buffer.deleteTextBackspace @cursor, nb
     bufferAfter = buffer.fileContent
     cursorAfter = [@cursor.line, @cursor.column] 
-    diff = Change.new(cursorBefore, cursorAfter, 
+    diff = Change.new(@cursor.owner, cursorBefore, cursorAfter, 
                       Diff::LCS.diff(bufferBefore, bufferAfter))
-    buffer.insertDiff diff, @cursor.owner
+    buffer.insertDiff diff
     # call the method to update the clients
   end
 
@@ -88,16 +88,17 @@ class Frame
     buffer.deleteTextDelete @cursor, nb
     bufferAfter = buffer.fileContent
     cursorAfter = [@cursor.line, @cursor.column] 
-    diff = Change.new(cursorBefore, cursorAfter, 
+    diff = Change.new(@cursor.owner, cursorBefore, cursorAfter, 
                       Diff::LCS.diff(bufferBefore, bufferAfter))
-    buffer.insertDiff diff, @cursor.owner
+    buffer.insertDiff diff
     # call the method to update the clients
   end
 
   #
   # Moves the cursor in the given direction
+  # The second argument is ignored if :origin or :end are passed first
   #
-  def moveCursor direction, nb
+  def moveCursor direction, nb = 1
     cursorPosition = case direction
                      when :up then @cursor.moveUp nb
                      when :right then @cursor.moveRight nb
