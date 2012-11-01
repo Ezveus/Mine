@@ -1,22 +1,25 @@
 <%= render 'layouts/maintitle' %>
 <p>
-  <form>
+  <%= form_for @user do |f| %>
     <fieldset>
       <legend id="formlegend">Sign up</legend>
-      <label for="name">Name :</label>
-      <input name="name" id="name" type="text" autofocus required />
+      <%= f.label :name, "Name :" %>
+      <%= f.text_field :name, :autofocus => "", :required => "" %>
       <br />
-      <label for="pass">Password :</label>
-      <input name="pass" id="pass" type="password" required />
+      <%= f.label :password, "Password :" %>
+      <%= f.password_field :password, :required => "" %>
       <br />
-      <label for="mail">Mail :</label>
-      <input name="mail" id="mail" type="text" required />
+      <%= f.label :password_confirmation, "Password confirmation :" %>
+      <%= f.password_field :password_confirmation, :required => "" %>
       <br />
-      <label for="website">Website :</label>
-      <input name="website" id="website" type="text" />
+      <%= f.label :email, "Mail :" %>
+      <%= f.email_field :email, :required => "" %>
       <br />
-      <input id="send" class="btn btn-primary" type="button" value="Send" />
-      <input id="reset" class="btn" type="button" value="Reset" />
+      <%= f.label :website, "Website :" %>
+      <%= f.text_field :website %>
+      <br />
+      <%= f.submit "Send", :class => "btn btn-primary" %>
+      <%= f.submit "Reset", :class => "btn", :type => "reset" %>
     </fieldset>
-  </form>
+  <% end %>
 </p>

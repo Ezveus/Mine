@@ -2,6 +2,7 @@ class UsersController < ApplicationController
   def new
     @title = "Signup"
     @active = :signup
+    @user = User.new
   end
 
   def show
