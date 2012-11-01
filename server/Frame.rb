@@ -48,14 +48,14 @@ class Frame
   # Also creates a diff
   #
   def fillBuffer buffer, text
-    bufferBefore = buffer.fileContent
+    bufferBefore = Array.new(buffer.fileContent)
     cursorBefore = [@cursor.line, @cursor.column]
     buffer.insertText @cursor, text
     # Think about a method to manage the overwrite with multiples lines passed
-    bufferAfter = buffer.fileContent
-    cursorAfter = [@cursor.line, @cursor.column] 
-    diff = Change.new(@cursor.owner, cursorBefore, cursorAfter, 
-                      Diff::LCS.diff(bufferBefore, bufferAfter))
+    bufferAfter = Array.new(buffer.fileContent)
+    cursorAfter = [@cursor.line, @cursor.column]
+    d = Diff::LCS.diff(bufferAfter, bufferBefore)
+    diff = Change.new(@cursor.owner, cursorBefore, cursorAfter, d)
     buffer.insertDiff diff
     # call the method to update the clients
   end
@@ -66,13 +66,13 @@ class Frame
   # Also creates a diff
   #
   def backspaceBuffer buffer, nb
-    bufferBefore = buffer.fileContent
+    bufferBefore = Array.new(buffer.fileContent)
     cursorBefore = [@cursor.line, @cursor.column]
     buffer.deleteTextBackspace @cursor, nb
-    bufferAfter = buffer.fileContent
-    cursorAfter = [@cursor.line, @cursor.column] 
-    diff = Change.new(@cursor.owner, cursorBefore, cursorAfter, 
-                      Diff::LCS.diff(bufferBefore, bufferAfter))
+    bufferAfter = Array.new(buffer.fileContent)
+    cursorAfter = [@cursor.line, @cursor.column]
+    d = Diff::LCS.diff(bufferAfter, bufferBefore)
+    diff = Change.new(@cursor.owner, cursorBefore, cursorAfter, d)
     buffer.insertDiff diff
     # call the method to update the clients
   end
@@ -83,13 +83,13 @@ class Frame
   # Also creates a diff
   #
   def deleteBuffer buffer, nb
-    bufferBefore = buffer.fileContent
+    bufferBefore = Array.new(buffer.fileContent)
     cursorBefore = [@cursor.line, @cursor.column]
     buffer.deleteTextDelete @cursor, nb
-    bufferAfter = buffer.fileContent
-    cursorAfter = [@cursor.line, @cursor.column] 
-    diff = Change.new(@cursor.owner, cursorBefore, cursorAfter, 
-                      Diff::LCS.diff(bufferBefore, bufferAfter))
+    bufferAfter = Array.new(buffer.fileContent)
+    cursorAfter = [@cursor.line, @cursor.column]
+    d = Diff::LCS.diff(bufferAfter, bufferBefore)
+    diff = Change.new(@cursor.owner, cursorBefore, cursorAfter, d)
     buffer.insertDiff diff
     # call the method to update the clients
   end

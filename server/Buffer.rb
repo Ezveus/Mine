@@ -84,7 +84,7 @@ class Buffer
   # Here is a bunch of function to insert what we want where we want
   #
   def insertTextEmptyFile cursor, text
-    @fileContent[cursor.line] = text.split(/\n/)
+    @fileContent[cursor.line].replace text.split(/\n/)
     text
   end
 
@@ -101,8 +101,7 @@ class Buffer
 
   def insertTextSplitFlatten cursor
     splitSize = @fileContent[cursor.line].size - 1
-    @fileContent = @fileContent.flatten
-    cursor.file = @fileContent
+    @fileContent.replace @fileContent.flatten
     return splitSize
   end
 
@@ -141,7 +140,6 @@ class Buffer
     end
     deleteTextBackspaceSameLine cursor, nbToDelete
     eofNewLine?
-    # cursor.file = @fileContent
   end
   
   private
@@ -162,29 +160,27 @@ class Buffer
     end
   end
 
-  def deleteTextBackspaceSameLine cursor, nbToDelete
+  def deleteTextBackspaceSameLine c, nbToDelete
     if nbToDelete > 0
-      if cursor.isAtEOL?
+      if c.isAtEOL?
         eol = true
       else
         eol = false
       end
-      @fileContent[cursor.line] =
-        @fileContent[cursor.line][0, cursor.column - nbToDelete] +
-        @fileContent[cursor.line][cursor.column, @fileContent[cursor.line].size]
+      @fileContent[c.line] = @fileContent[c.line][0, c.column - nbToDelete] +
+        @fileContent[c.line][c.column, @fileContent[c.line].size]
       if eol
-        cursor.moveToEnd
+        c.moveToEnd
       else
-        cursor.moveToColumn cursor.column - nbToDelete
+        c.moveToColumn c.column - nbToDelete
       end
     end
   end
 
-  def deleteTextBackspaceConcatLine cursor, nbToDelete
+  def deleteTextBackspaceConcatLine c, nbToDelete
     column = @fileContent [cursor.line - 1].size
-    @fileContent[cursor.line - 1] =
-      @fileContent[cursor.line - 1] <<
-      @fileContent[cursor.line][cursor.column, @fileContent[cursor.line].size]
+    @fileContent[c.line - 1] = @fileContent[c.line - 1] <<
+      @fileContent[c.line][c.column, @fileContent[c.line].size]
     nbToDelete -= cursor.column + 1
     @fileContent.delete_at cursor.line
     cursor.moveUp
@@ -196,15 +192,13 @@ class Buffer
   #
   # Delete characters after the cursor
   #
-  def deleteTextDelete cursor, nbToDelete = 1
-    nbToDelete = deleteTextDeleteTooBig cursor, nbToDelete
-    puts "#{nbToDelete}"
-    while cursor.column < nbToDelete
-      nbToDelete = deleteTextDeleteConcatLine cursor, nbToDelete
+  def deleteTextDelete c, nbToDelete = 1
+    nbToDelete = deleteTextDeleteTooBig c, nbToDelete
+    while @fileContent[c.line].size - c.column < nbToDelete
+      nbToDelete = deleteTextDeleteConcatLine c, nbToDelete
     end
-    deleteTextDeleteSameLine cursor, nbToDelete
+    deleteTextDeleteSameLine c, nbToDelete
     eofNewLine?
-    cursor.file = @fileContent
   end
 
   private
@@ -225,22 +219,18 @@ class Buffer
     end
   end
 
-  def deleteTextDeleteConcatLine cursor, nbToDelete
-    column = @fileContent[cursor.line][cursor.column,
-                                       @fileContent[cursor.line].size].size + 1
-    @fileContent[cursor.line] = 
-      @fileContent[cursor.line][0, cursor.column] +
-      @fileContent[cursor.line + 1]
-    @fileContent.delete_at cursor.line + 1
+  def deleteTextDeleteConcatLine c, nbToDelete
+    column = @fileContent[c.line][c.column, @fileContent[c.line].size].size + 1
+    @fileContent[c.line] = @fileContent[c.line][0, c.column] +
+      @fileContent[c.line + 1]
+    @fileContent.delete_at c.line + 1
     nbToDelete - column
   end
 
-  def deleteTextDeleteSameLine cursor, nbToDelete
+  def deleteTextDeleteSameLine c, nbToDelete
     if nbToDelete > 0
-      @fileContent[cursor.line] =
-        @fileContent[cursor.line][0, cursor.column] +
-        @fileContent[cursor.line][cursor.column + nbToDelete,
-                                  @fileContent[cursor.line].size]
+      @fileContent[c.line] = @fileContent[c.line][0, c.column] +
+        @fileContent[c.line][c.column + nbToDelete, @fileContent[c.line].size]
     end
   end
 
@@ -253,6 +243,7 @@ class Buffer
     @diffHistoryPosition = 0 if @diffHistoryPosition < 0
     if @diffHistoryPosition != 0
       @diffHistory = @diffHistory.drop @diffHistoryPosition
+      @diffHistoryPosition = 0
     end
     @diffHistory.insert(0, change)
     if @diffHistory.size > @workingUsers.size * 100
@@ -265,13 +256,13 @@ class Buffer
   #
   # Function to undo the last change in the buffer
   #
-  def undo
+  def undo cursor
     if @diffHistoryPosition < @diffHistory.size
       @diffHistoryPosition = 0 if @diffHistoryPosition < 0
       diff = @diffHistory[@diffHistoryPosition]
       patch :patch, diff
-      user.cursor.moveToLine diff.cursorBefore[0]
-      user.cursor.moveToColumn diff.cursorBefore[1]
+      cursor.moveToLine diff.cursorBefore[0]
+      cursor.moveToColumn diff.cursorBefore[1]
       @diffHistoryPosition += 1
       return #whatever we want
     end
@@ -282,12 +273,12 @@ class Buffer
   #
   # Function to redo the last undo in the buffer
   #
-  def redo
-    if @diffHistoryPosition > -1
-      diff = @diffHistory[@diffHistoryPosition]
+  def redo cursor
+    if @diffHistoryPosition > 0
+      diff = @diffHistory[@diffHistoryPosition - 1]
       patch :unpatch, diff
-      user.cursor.moveToLine diff.cursorAfter[0]
-      user.cursor.moveToColumn diff.cursorAfter[1]
+      cursor.moveToLine diff.cursorAfter[0]
+      cursor.moveToColumn diff.cursorAfter[1]
       @diffHistoryPosition -= 1
       return #whatever we want
     end
