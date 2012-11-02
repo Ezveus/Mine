@@ -83,12 +83,12 @@ class Client < EM::Connection
 
   def unvalidRequest? response
     if @http_protocol != "HTTP/1.1" or @http_request_method != "POST" or @http_path_info != "/mine/protocol/request" or @http_content_type != "application/x-www-form-urlencoded"
-      $stderr.puts "Error : Unvalid request"
+      $stderr.puts "Error : Unvalid request : bad header"
       response.status = Constant::UnvalidRequest
       return true
     end
     unless (@http_post_content =~ /.+={.*}/) == 0
-      $stderr.puts "Error : Unvalid request"
+      $stderr.puts "Error : Unvalid request : bad body"
       response.status = Constant::UnvalidRequest
       return true
     end

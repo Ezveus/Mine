@@ -10,6 +10,7 @@ require 'logger'
 #
 class Userdb
   attr_reader :dbpath
+  attr_reader :errors
 
   #
   # class CreateUsers :
@@ -90,8 +91,7 @@ class Userdb
       res += " $ " unless @isAdmin == 1
       res += "<"
       res += "@ : #{@mail}"# if @mail and @mail != ""
-      res += ", web : #{@website}" if @website and @website != "" #and @mail
-#      res += "web : #{@website}" if @website and @website != "" and !@mail
+      res += ", web : #{@website}" if @website and @website != ""
       res += ">"
     end
   end
@@ -103,6 +103,7 @@ class Userdb
   #
   def initialize
     @dbpath = "users.db"
+    @errors = []
     first_one = File.exist? @dbpath
     ActiveRecord::Base.logger = Logger.new(File.open('database.log', 'w'))
     ActiveRecord::Base.establish_connection :adapter => "sqlite3", :database => @dbpath
@@ -110,8 +111,19 @@ class Userdb
     unless first_one
       CreateUsers.up
       AddUniquenessIndex.up
-      rootUser = User.create :id => 0, :name => "root", :pass => "toor", :email => "user@localhost", :isAdmin => 1
+      rootUser = User.create :name => "root", :pass => "toor", :email => "user@localhost", :isAdmin => 1
     end
+  end
+
+  #
+  # Stores database error messages in @errors
+  #
+  def updateErrors user
+    @errors = []
+    user.errors.messages.each do |key, value|
+      @errors << "#{key} #{value[0]}"
+    end
+    false
   end
 
   #
@@ -147,7 +159,9 @@ class Userdb
   #
   def addUser username, pass, mail, site="", isAdmin=0
     user = User.new :name => username, :pass => pass, :email => mail, :website => site, :isAdmin => isAdmin
-    user.save
+    ret = user.save
+    updateErrors user unless ret
+    ret
   end
 
   #
@@ -168,7 +182,9 @@ class Userdb
     else
       return false
     end
-    user.save
+    ret = user.save
+    updateErrors user unless ret
+    ret
   end
 end
 
