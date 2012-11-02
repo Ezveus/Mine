@@ -5,21 +5,39 @@ require 'logger'
 require 'rbcurse'
 require 'rbcurse/core/widgets/rwidget'
 
-# We'll send a request to the server for curs_move and curs_delch
-# to get the new position.
-# ------------------------
-
-# move the cursor
+# move the cursor ... twice otherwise it doesn't work
 def curs_move x, y
   @window.wmove x, y
   @window.wmove @window.x, @window.y
 end
 
-# delete one character. To delete a character, we need to move the cursor on it
+# Delete one character. To delete a character, we need to move the cursor on it
 # and then to delete it.
+# Do not forget to decrement the line index or the line_size counter.
 def curs_delch
-  curs_move @window.x - 1, @window.y
-  @window.delch
+  unless (@window.x == 0 and @window.y == 0)
+    if @window.x > 0
+      curs_move @window.x - 1, @window.y
+      @window.delch
+      @line_sizes[@line] -= 1
+    else
+      @line -= 1
+      curs_move @line_sizes[@line], @window.y - 1
+    end
+  end
+end
+
+# Add one character and increment the line_size counter
+def curs_addch ch
+  @window.addch ch
+  @line_sizes[@line] += 1
+end
+
+# Add a new line and increment the line index
+def curs_nl
+  @window.addch 10
+  @line += 1
+  @line_sizes << 0
 end
 
 ## ---------------------
@@ -31,18 +49,20 @@ end
 begin
   VER::start_ncurses
   @window = VER::Window.root_window
+  @line = 0
+  @line_sizes = [0]
   Ncurses.nl
   catch(:close) do
     loop do
       ch = @window.getch()
       next if ch == -1
       break if (ch == FFI::NCurses::KEY_CTRL_X and @window.getch() == FFI::NCurses::KEY_CTRL_C)
-      if (ch == 127)
+      if (ch == Ncurses::KEY_BSPACE)
         curs_delch
-      elsif (ch == FFI::NCurses::KEY_ENTER)
-        curs_move 0, @window.y + 1
+      elsif (ch == 10) # FFI::NCurses::KEY_ENTER do not return 10 ('\n') even if we expect it ...
+        curs_nl
       else
-        @window.addch ch
+        curs_addch ch
       end
     end
   end
