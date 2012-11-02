@@ -8,4 +8,5 @@ module Constant
   UnknownRequest = 2
   JSONParserError = 3
   UnknownUser = 4
+  BadRegistration = 5
 end

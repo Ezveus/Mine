@@ -1,53 +1,53 @@
 #!/usr/bin/env ruby
 
 require 'ffi-ncurses'
+require 'logger'
+require 'rbcurse'
+require 'rbcurse/core/widgets/rwidget'
 
-def save file, buf
-  file.write buf
+# We'll send a request to the server for curs_move and curs_delch
+# to get the new position.
+# ------------------------
+
+# move the cursor
+def curs_move x, y
+  @window.wmove x, y
+  @window.wmove @window.x, @window.y
 end
 
-def read_init buf
-  FFI::NCurses.initscr
-  FFI::NCurses.noecho
-  FFI::NCurses.raw
-  FFI::NCurses.addstr buf
-  FFI::NCurses.move 0, 0
+# delete one character. To delete a character, we need to move the cursor on it
+# and then to delete it.
+def curs_delch
+  curs_move @window.x - 1, @window.y
+  @window.delch
 end
 
-def move key, buf
-  if key == FFI::NCurses::KEY_UP and getcury > 0
-    FFI::NCurses.move(getcurx, getcury - 1)
-  elsif key == FFI::NCurses::KEY_DOWN and getcury < getmaxy
-    FFI::NCurses.move(getcurx, getcury + 1)
-  else
-    return false
-  end
-  return true
-end
-
-def reading file, buf
-  key = FFI::NCurses.getch
-  if key == FFI::NCurses::KEY_CTRL_X
-    key = FFI::NCurses.getch
-    if key == FFI::NCurses::KEY_CTRL_S
-      save file, buf
-    elsif key == FFI::NCurses::KEY_CTRL_C
-      return
+## ---------------------
+## Mine client
+## - Curses and window initialisation
+## - event loop to get characters (C-x C-c to quit)
+## - print characters or delete it
+## TODO-001 : print only printables characters
+begin
+  VER::start_ncurses
+  @window = VER::Window.root_window
+  Ncurses.nl
+  catch(:close) do
+    loop do
+      ch = @window.getch()
+      next if ch == -1
+      break if (ch == FFI::NCurses::KEY_CTRL_X and @window.getch() == FFI::NCurses::KEY_CTRL_C)
+      if (ch == 127)
+        curs_delch
+      elsif (ch == FFI::NCurses::KEY_ENTER)
+        curs_move 0, @window.y + 1
+      else
+        @window.addch ch
+      end
     end
-  else
-    if not move key, buf
-      FFI::NCurses.addch key
-      buf += FFI::NCurses::keyname key
-    end
   end
-  reading file, buf
-end
-
-if ARGV.count > 0
-  file = File.open ARGV[0], "a+"
-  buf = file.read
-  read_init buf
-  reading file, buf
-  file.close
-  FFI::NCurses.endwin
+rescue => ex
+ensure
+  #  @window.destroy if !@window.nill?
+  VER::stop_ncurses
 end

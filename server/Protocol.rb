@@ -8,7 +8,7 @@ module Protocol
   Requests = [
               Authenticate = "AUTHENTICATE",
               Signup = "SIGNUP",
-              Minibuffer = "MINIBUFFER"
+              Exec = "EXEC"
              ]
 
   def self.authenticate postContent, response, client
@@ -43,14 +43,36 @@ module Protocol
     Constant::Success
   end
 
-  def self.signup postContent, response, args
-    userdb = args[0]
-    puts "Here should JSON argument be parsed"
-    puts "NOT Parsing #{postContent.split('=')[1]}"
+  def self.signup postContent, response, client
+    puts "Parsing #{postContent.split('=')[1]}"
+    object = {}
+    begin
+      object = JSON.parse postContent.split('=')[1]
+    rescue JSON::ParserError => error
+      $stderr.puts "Error : #{error}"
+      response.status = Constant::JSONParserError
+      return Constant::Fail
+    end
+    name = object["name"]
+    pass = object["pass"]
+    email = object["email"]
+    website = object["website"]
+    unless name and pass and email
+      $stderr.puts "Error : Field(s) name and/or pass and/or email can't be found"
+      response.status = Constant::JSONParserError
+      return Constant::Fail
+    end
+    unless client.userdb.addUser name, pass, email, website
+      client.userdb.errors.each do |err|
+        $stderr.puts err
+      end
+      response.status = Constant::BadRegistration
+      return Constant::Fail
+    end
     Constant::Success
   end
 
-  def self.minibuffer postContent, response
+  def self.exec postContent, response, client
     puts "Here should JSON argument be parsed"
     puts "NOT Parsing #{postContent.split('=')[1]}"
     Constant::Success
@@ -58,6 +80,7 @@ module Protocol
 
   Commands = {
     Authenticate.to_sym => Proc.new { |postContent, response, client| self.authenticate postContent, response, client },
-    Signup.to_sym => Proc.new { |postContent, response, args| self.signup postContent, response, args }
+    Signup.to_sym => Proc.new { |postContent, response, client| self.signup postContent, response, client },
+    Exec.to_sym => Proc.new { |postContent, response, client| self.exec postContent, response, client }
   }
 end
