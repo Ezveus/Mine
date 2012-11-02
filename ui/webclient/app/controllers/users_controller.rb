@@ -11,9 +11,10 @@ class UsersController < ApplicationController
   end
 
   def create
+    @title = "Creation"
     @user = User.new(params[:user])
     if @user.save
-      1
+      redirect_to @user
     else
       @titre = "Inscription"
       render 'new'

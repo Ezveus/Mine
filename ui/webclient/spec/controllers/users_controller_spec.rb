@@ -10,10 +10,6 @@ ezveusUserPar = "Ezveus # <@ : ciappam@gmail.com, web : http://localhost:3000>"
 describe UsersController do
   render_views
 
-  before :each do
-    @user = FactoryGirl.create :user
-  end
-
   describe "New tests" do
     before :each do
       get :new
@@ -31,6 +27,7 @@ describe UsersController do
 
   describe "Show tests" do
     before :each do
+      @user = FactoryGirl.create :user
       get :show, :id => @user
     end
 
@@ -78,6 +75,27 @@ describe UsersController do
       it "should return to signup page" do
         post :create, :user => @attr
         response.should render_template('new')
+      end
+    end
+
+    describe "Success" do
+        before(:each) do
+          @attr = {
+            :name => "Ezveus",
+            :email => "ciappam@gmail.com",
+            :password => "plopitude",
+            :password_confirmation => "plopitude" }
+        end
+
+        it "should create a user" do
+          lambda do
+            post :create, :user => @attr
+          end.should change(User, :count).by(1)
+        end
+
+        it "should redirect to show page" do
+          post :create, :user => @attr
+          response.should redirect_to(user_path(assigns(:user)))
       end
     end
   end
