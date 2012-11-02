@@ -14,6 +14,10 @@ def exitServer exitType
   exit 0
 end
 
+port = 8080
+
+port = ARGV[0].to_i if ARGV[0]
+
 Signal.trap "INT" do
   exitServer :signalCatch
 end
@@ -24,7 +28,7 @@ end
 
 begin
   EM.run do
-    EM.start_server '0.0.0.0', 8080, Client
+    EM.start_server '0.0.0.0', port, Client
   end
 rescue Interrupt
   puts "\rOn operating systems where Signal.trap doesn't work,"
