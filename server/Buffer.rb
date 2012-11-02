@@ -260,7 +260,7 @@ class Buffer
     if @diffHistoryPosition < @diffHistory.size
       @diffHistoryPosition = 0 if @diffHistoryPosition < 0
       diff = @diffHistory[@diffHistoryPosition]
-      patch :patch, diff
+      patch diff
       cursor.moveToLine diff.cursorBefore[0]
       cursor.moveToColumn diff.cursorBefore[1]
       @diffHistoryPosition += 1
@@ -276,7 +276,7 @@ class Buffer
   def redo cursor
     if @diffHistoryPosition > 0
       diff = @diffHistory[@diffHistoryPosition - 1]
-      patch :unpatch, diff
+      unpatch diff
       cursor.moveToLine diff.cursorAfter[0]
       cursor.moveToColumn diff.cursorAfter[1]
       @diffHistoryPosition -= 1
@@ -294,10 +294,10 @@ class Buffer
   #
   # Function to apply the changes wether you called undo or redo
   #
-  def patch direction, diff
+  def patch diff
     i = j = 0
     diff.diff.each do |change|
-      action = PATCHHASH[direction][change.action]
+      action = PATCHHASH[:patch][change.action]
       case action
       when '-'
         while i < change.position
@@ -313,6 +313,29 @@ class Buffer
         end
         @fileContent.insert j, change.element
         j += 1
+      end
+    end
+  end
+
+  def unpatch diff
+    i = j = 0
+    diff.diff.reverse_each do |change|
+      action = PATCHHASH[:unpatch][change.action]
+      case action
+      when '+'
+        while j < change.position
+          i += 1
+          j += 1
+        end
+        @fileContent.insert j, change.element
+        j += 1
+      when '-'
+        while i < change.position
+          i += 1
+          j += 1
+        end
+        @fileContent.delete_at(i)
+        i += 1
       end
     end
   end
