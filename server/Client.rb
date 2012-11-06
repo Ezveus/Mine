@@ -6,6 +6,7 @@ require 'evma_httpserver'
 load "server/Constant.rb"
 load "server/Protocol.rb"
 load "server/Userdb.rb"
+load "server/Log.rb"
 
 class Client < EM::Connection
   attr_accessor :userdb
@@ -31,7 +32,7 @@ class Client < EM::Connection
   end
 
   def process_http_request
-    puts "Received new response"
+    Log::Client.log "Received new response"
     response = EM::DelegatedHttpResponse.new self
     response.content_type 'text/plain'
     response.status = Constant::Ok
@@ -47,10 +48,10 @@ class Client < EM::Connection
 
   def exit exitType
     if exitType == :signalCatch
-      puts "Sending exit message"
-      puts "Sent"
+      Log::Client.log "Sending exit message"
+      Log::Client.log "Sent"
     else
-      puts "Doing what we can do"
+      Log::Client.log "Doing what we can do"
     end
   end
 
@@ -83,12 +84,12 @@ class Client < EM::Connection
 
   def unvalidRequest? response
     if @http_protocol != "HTTP/1.1" or @http_request_method != "POST" or @http_path_info != "/mine/protocol/request" or @http_content_type != "application/x-www-form-urlencoded"
-      $stderr.puts "Error : Unvalid request : bad header"
+      Log::Client.error "Unvalid request : bad header"
       response.status = Constant::UnvalidRequest
       return true
     end
     unless (@http_post_content =~ /.+={.*}/) == 0
-      $stderr.puts "Error : Unvalid request : bad body"
+      Log::Client.error "Unvalid request : bad body"
       response.status = Constant::UnvalidRequest
       return true
     end
@@ -97,7 +98,7 @@ class Client < EM::Connection
 
   def unknownRequest? response
     unless Requests.index @http_post_content.split('=')[0]
-      $stderr.puts "Error : Unknown request"
+      Log::Client.error "Unknown request"
       response.status = Constant::UnknownRequest
       return true
     end
