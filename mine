@@ -1,6 +1,10 @@
 #!/usr/bin/env ruby
 
+require 'eventmachine'
+require 'evma_httpserver'
+
 load "server/Client.rb"
+load "server/WSClient.rb"
 
 puts "Launching server"
 
@@ -21,9 +25,18 @@ def exitServer exitType
 end
 
 launchRails = true              # Set to false with options
-port = 8080
 
-port = ARGV[0].to_i if ARGV[0]
+opts = {
+  :host => "0.0.0.0",
+  :port => 8080,
+  :wshost => "0.0.0.0",
+  :wsport => 8081,
+  :railshost => "0.0.0.0",
+  :railsport => 3000
+}
+
+opts[:port] = ARGV[0].to_i if ARGV[0]
+opts[:wsport] = opts[:port] + 1
 
 Signal.trap "INT" do
   exitServer :signalCatch
@@ -36,14 +49,17 @@ end
 if launchRails
   Process.fork do
     Dir.chdir "ui/webclient"
-    puts "Executing rails server -d"
-    Process.exec "rails server -d"
+    puts "Executing rails server -d -b #{opts[:railshost]} -p #{opts[:railsport]}"
+    Process.exec "rails server -d -b #{opts[:railshost]} -p #{opts[:railsport]}"
   end
 end
 
 begin
   EM.run do
-    EM.start_server '0.0.0.0', port, Client
+    EM.start_server opts[:host], opts[:port], Client
+    EM.start_server(opts[:wshost], opts[:wsport], WSClient,
+                    :host => opts[:wshost],
+                    :port => opts[:wsport])
   end
 rescue Interrupt
   puts "\rOn operating systems where Signal.trap doesn't work,"
