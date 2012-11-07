@@ -96,22 +96,16 @@ class Cursor
   # Moves the cursor to the specified index on the same line
   #
   def moveToColumn index
-    if index > @column
-      moveRight index - @column
-    elsif index < @column
-      moveLeft @column - index
-    end
+    @column = index
+    [@line, @column]
   end
 
   #
   # Moves the cursor to the specified line
   #
   def moveToLine index
-    if index > @line
-      moveDown index - @line
-    elsif index < @line
-      moveUp @line - index
-    end
+    @line = index
+    [@line, @column]
   end
 
   #
@@ -145,4 +139,17 @@ class Cursor
     @column == 0
   end
 
+  #
+  # Check if the cursor is at the end of file
+  #
+  def isAtEOF?
+    @line == @file.size - 1 and isAtEOL?
+  end
+
+  #
+  # Check if the cursor is at the beginning of file
+  #
+  def isAtBOF?
+    @line == 0 and isAtBOL?
+  end
 end
