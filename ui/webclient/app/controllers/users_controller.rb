@@ -16,7 +16,8 @@ class UsersController < ApplicationController
     if @user.save
       redirect_to @user
     else
-      @titre = "Inscription"
+      @title = "Signup"
+      @active = :signup
       render 'new'
     end
   end
