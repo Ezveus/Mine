@@ -36,11 +36,7 @@ class Frame
   # Function to switch the overWrite mode on or off
   #
   def switchOverWrite
-    if @overWrite
-      @overWrite = false
-    else
-      @overwrite = true
-    end
+    @overWrite = !@overWrite
   end
 
   #
@@ -50,8 +46,11 @@ class Frame
   def fillBuffer buffer, text
     bufferBefore = Array.new(buffer.fileContent)
     cursorBefore = [@cursor.line, @cursor.column]
-    buffer.insertText @cursor, text
-    # Think about a method to manage the overwrite with multiples lines passed
+    if isOverWrite?
+      buffer.overwriteText @cursor, text
+    else
+      buffer.insertText @cursor, text
+    end
     bufferAfter = Array.new(buffer.fileContent)
     cursorAfter = [@cursor.line, @cursor.column]
     d = Diff::LCS.diff(bufferAfter, bufferBefore)
