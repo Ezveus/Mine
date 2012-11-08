@@ -67,7 +67,7 @@ class Frame
   def backspaceBuffer buffer, nb
     bufferBefore = Array.new(buffer.fileContent)
     cursorBefore = [@cursor.line, @cursor.column]
-    buffer.deleteTextBackspace @cursor, nb
+    buffer.deleteTextBackspace @cursor, isOverWrite?, nb
     bufferAfter = Array.new(buffer.fileContent)
     cursorAfter = [@cursor.line, @cursor.column]
     d = Diff::LCS.diff(bufferAfter, bufferBefore)

@@ -172,12 +172,12 @@ class Buffer
   # Delete some characters at the position given by the cursor
   # Moves the cursor in consequence
   #
-  def deleteTextBackspace cursor, nbToDelete = 1
+  def deleteTextBackspace cursor, overwrite, nbToDelete = 1
     nbToDelete = deleteTextBackspaceTooBig cursor, nbToDelete
     while cursor.column < nbToDelete
-      nbToDelete = deleteTextBackspaceConcatLine cursor, nbToDelete
+      nbToDelete = deleteTextBackspaceConcatLine cursor, nbToDelete, overwrite
     end
-    deleteTextBackspaceSameLine cursor, nbToDelete
+    deleteTextBackspaceSameLine cursor, nbToDelete, overwrite
     eofNewLine?
   end
   
@@ -199,15 +199,21 @@ class Buffer
     end
   end
 
-  def deleteTextBackspaceSameLine c, nbToDelete
+  def deleteTextBackspaceSameLine c, nbToDelete, overwrite
     if nbToDelete > 0
       if c.isAtEOL?
         eol = true
       else
         eol = false
       end
-      @fileContent[c.line] = @fileContent[c.line][0, c.column - nbToDelete] +
-        @fileContent[c.line][c.column, @fileContent[c.line].size]
+      if overwrite
+        @fileContent[c.line] = @fileContent[c.line][0, c.column - nbToDelete] +
+          String.new(" " * nbToDelete) +
+          @fileContent[c.line][c.column, @fileContent[c.line].size]
+      else
+        @fileContent[c.line] = @fileContent[c.line][0, c.column - nbToDelete] +
+          @fileContent[c.line][c.column, @fileContent[c.line].size]
+      end
       if eol
         c.moveToEnd
       else
@@ -216,10 +222,16 @@ class Buffer
     end
   end
 
-  def deleteTextBackspaceConcatLine c, nbToDelete
+  def deleteTextBackspaceConcatLine c, nbToDelete, overwrite
     column = @fileContent [c.line - 1].size
-    @fileContent[c.line - 1] = @fileContent[c.line - 1] <<
-      @fileContent[c.line][c.column, @fileContent[c.line].size]
+    if overwrite
+      @fileContent[c.line - 1] = @fileContent[c.line - 1] <<
+        String.new(" " * c.column) <<
+        @fileContent[c.line][c.column, @fileContent[c.line].size]
+    else
+      @fileContent[c.line - 1] = @fileContent[c.line - 1] <<
+        @fileContent[c.line][c.column, @fileContent[c.line].size]
+    end
     nbToDelete -= c.column + 1
     @fileContent.delete_at c.line
     c.moveUp
