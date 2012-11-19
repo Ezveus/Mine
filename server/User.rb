@@ -42,7 +42,7 @@ class User
                         rights, serverSide, self)
     cursor = Cursor.new(self, buffer.fileContent, line)
     frame = Frame.new(cursor, overWrite)
-    @frames[buffer, frame]
+    @frames[buffer] = frame
   end
 
   #
@@ -52,7 +52,7 @@ class User
     cursor = Cursor.new(self, buffer.fileContent, line)
     frame = Frame.new(cursor, overWrite)
     buffer.addWorkingUser self
-    @frames[buffer, frame]
+    @frames[buffer] = frame
   end
 
   #
