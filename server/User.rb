@@ -3,22 +3,110 @@
 load "server/Userdb.rb"
 load "server/Frame.rb"
 
+#
+# Class to manage all the operations a user can do
+#
+
 class User
   attr_reader :userInfo, :frames, :cmdHistory, :killRing
 
-  def initialize username, userdb
-    @clients = []
+  #
+  # Initializes the user with
+  #  - it's username
+  #  - the client that connected the user to the server
+  #
+  def initialize username, userdb, client
+    @clients = [client]
     @cmdHistory = []
     @killRing = []
     @killRingPosition = 0
     @frames = {}
     @userInfo = userdb.selectUser username
+    @lastClient = client
   end
 
-  def to_s
-    @userInfo.to_s
+  #
+  # Method to call when needed to update any information to the clients of the user
+  #
+  def updateClients bufferName, diff
+    @clients.each do |client|
+      # send sync client, bufferName, diff unless client == @lastClient
+    end
   end
 
+  #
+  # Method to call when a new file is opened by the user
+  #
+  def addFrame fileLocation, fileName, fileContent, rights, serverSide, line, overWrite
+    buffer = Buffer.new(fileLocation, fileName, fileContent,
+                        rights, serverSide, self)
+    cursor = Cursor.new(self, buffer.fileContent, line)
+    frame = Frame.new(cursor, overWrite)
+    @frames[buffer, frame]
+  end
+
+  #
+  # Method to call when a user joins an other user to edit a buffer already opened
+  #
+  def addFrameExistingBuffer buffer, line, overWrite
+    cursor = Cursor.new(self, buffer.fileContent, line)
+    frame = Frame.new(cursor, overWrite)
+    buffer.addWorkingUser self
+    @frames[buffer, frame]
+  end
+
+  #
+  # Method to call to switch on/off the overWrite mode
+  #
+  def swithOverwrite buffer
+    @frames[buffer].switchOverWrite
+  end
+
+  #
+  # Method to call to insert text on a given buffer
+  #
+  def insert buffer, text
+    @frames[buffer].fillBuffer buffer, text
+  end
+
+  #
+  # Method to call to delete text using backspace on a given buffer
+  #
+  def backspace buffer, nb
+    @frames[buffer].backspaceBuffer buffer, nb
+  end
+
+  #
+  # Method to call to delete text using delete on a given buffer
+  #
+  def delete buffer, nb
+    @frames[buffer].deleteBuffer buffer, nb
+  end
+
+  #
+  # Method to call to move the cursor in any direction in a given buffer
+  #
+  def moveCursor buffer, direction, nb
+    @frames[buffer].moveCursor direction, nb
+  end
+
+  #
+  # Method to call to undo the last change on a given buffer
+  #
+  def undo buffer
+    @frames[buffer].undo buffer
+  end
+
+  #
+  # Method to call to redo the last undone change on a given buffer
+  #
+  def redo buffer
+    @frames[buffer].redo buffer
+  end
+
+  #
+  # Method to call everytime an EXEC command is received
+  #
   def addCmdToHistory cmd
     @cmdHistory.insert(0, cmd)
     if @cmdHistory.size > 100
@@ -28,6 +116,9 @@ class User
   end
 
   public
+  #
+  # Method to manage the killing of line (aka C-k)
+  #
   def killLine buffer
     if @frames[buffer].lastCmd.start_with? "kill"
       killLineConcat buffer
@@ -38,6 +129,9 @@ class User
   end
 
   private
+  #
+  # Bunch of methods to manage the killLine
+  #
   def killLineConcat buffer
     c = @frames[buffer].cursor
     if c.isAtEOL?
@@ -59,4 +153,5 @@ class User
     @killRing[0] = "\n" if @killRing[0] == ""
     @frames[buffer].deleteBuffer buffer, @killRing[0].size
   end
+
 end
