@@ -8,6 +8,7 @@
 
 require 'diff/lcs'
 load 'server/Change.rb'
+load 'server/LockString.rb'
 
 class Buffer
 
@@ -19,18 +20,16 @@ class Buffer
   #  - the file's name
   #  - the File's content
   #  - if the file is hosted by the server or the client
-  #  - if the file is terminated by a new line
   #  - the diffHistory of the buffer (common to each user on buffer)
   #
-  def initialize fileLocation, fileName, fileContent, serverSide, eofnewline = true
+  def initialize fileLocation, fileName, fileContent, rights, serverSide, user
     @fileLocation = fileLocation
     @fileName = fileName
+    @fileContent = splitText fileContent
     @id = Random.rand.to_i
-    @rights = {}
+    @rights = rights
     @serverSide = serverSide
-    @workingUsers = []
-    @fileContent = fileContent
-    @eofNewLine = eofnewline
+    @workingUsers = [user]
     @diffHistory = []
     @diffHistoryPosition = 0
   end
@@ -53,13 +52,11 @@ class Buffer
 
   public
   #
-  # Test if the Buffer is terminated by a new line or not
+  # Method to call every time a diff is generated
   #
-  def eofNewLine?
-    if @fileContent.last == "" and @fileContent.size > 1
-      @eofNewLine = true
-    else
-      @eofNewLine = false
+  def updateClients diff
+    @workingUsers.each do |user|
+      user.updateClients @fileName, diff
     end
   end
 
@@ -116,7 +113,7 @@ class Buffer
     end
     splitSize = insertTextSplitFlatten cursor
     insertTextCursorReplacement text, cursor, splitSize, dataStr
-    insertTextNewLineHandler text, cursor
+    # insertTextNewLineHandler text, cursor
   end
 
   private
@@ -157,15 +154,15 @@ class Buffer
     end
   end
 
-  def insertTextNewLineHandler text, cursor
-    if text.end_with? "\n" and cursor.column == @fileContent[cursor.line].size and
-        cursor.line == @fileContent.rindex(@fileContent.last)
-      @eofNewLine = true
-      cursor.moveRight
-    else
-      @eofNewLine = false
-    end
-  end
+  # def insertTextNewLineHandler text, cursor
+  #   if text.end_with? "\n" and cursor.column == @fileContent[cursor.line].size and
+  #       cursor.line == @fileContent.rindex(@fileContent.last)
+  #     @eofNewLine = true
+  #     cursor.moveRight
+  #   else
+  #     @eofNewLine = false
+  #   end
+  # end
 
   public
   #
@@ -373,7 +370,7 @@ class Buffer
 
   private
   def splitText text
-    res = Array.new(text.count("\n") + 1) {String.new}
+    res = Array.new(text.count("\n") + 1) {LockString.new}
     i = 0
     text.each_char do |c|
       if c == "\n"
