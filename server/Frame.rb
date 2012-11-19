@@ -40,6 +40,13 @@ class Frame
   end
 
   #
+  # Method to call every time a diff is generated
+  #
+  def updateClients buffer, diff
+    buffer.updateClients diff
+  end
+
+  #
   # Function to insert text in the given buffer
   # Also creates a diff
   #
@@ -108,5 +115,19 @@ class Frame
                      else [@cursor.line, @cursor.column]
                      end
     cursorPosition
+  end
+
+  #
+  # Undoes the last change on the buffer
+  #
+  def undo buffer
+    buffer.undo @cursor
+  end
+
+  #
+  # Redoes the last undone change on the buffer
+  #
+  def redo buffer
+    buffer.redo @cursor
   end
 end
