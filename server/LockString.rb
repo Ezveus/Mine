@@ -12,30 +12,30 @@ class LockString < String
   #  - content is used to initialize the String
   #  - if the LockString is locked or not at it construction
   #
-  def initialize content, locked = false
+  def initialize content = "", locked = nil
     super content
     @locked = locked
   end
 
   #
-  # Locks the LockString
+  # Locks the LockString by the user
   #
-  def lock
-    @locked = true
+  def lock user
+    @locked = user
   end
 
   #
   # Unlocks the LockString
   #
   def unlock
-    @locked = false
+    @locked = nil
   end
 
   #
   # Checks if the LockString is locked or not
   #
   def isLock?
-    @locked
+    @locked != nil
   end
 
 end
