@@ -117,6 +117,46 @@ class User
 
   public
   #
+  # Method to yank a line or multiple lines
+  #
+  def yank buffer
+    @frames[buffer].switchOverWrite if overwrite = @frames[buffer].isOverWrite?
+    @frames[buffer].fillBuffer buffer, @killRing[0]
+    @frames[buffer].switchOverWrite if overwrite
+  end
+
+  public
+  #
+  # Method to unfold the killRing
+  #
+  def yankPop buffer
+    if @frames[buffer].lastCmd.start_with? "yank"
+      # some initialization for the diff insertion
+      cursor = @frames[buffer].cursor
+      bufferBefore = Array.new(buffer.fileContent)
+      cursorBefore = [cursor.line, cursor.column]
+
+      # the piece o really interresting code here
+      @frames[buffer].backspaceBuffer buffer, @killRing[@killRingPosition].size, false
+      if @killRingPosition < @killRing.size
+        @killRingPosition += 1
+      else
+        @killRingPosition = 0
+      end
+      @frames[buffer].fillBuffer buffer, @killRing[@killRingPosition]
+      # the end of the diff management
+      bufferAfter = Array.new(buffer.fileContent)
+      cursorAfter = [@cursor.line, @cursor.column]
+      d = Diff::LCS.diff(bufferAfter, bufferBefore)
+      diff = Change.new(self, cursorBefore, cursorAfter, d)
+      buffer.insertDiff diff
+    else
+      # Doesn't do anything
+    end
+  end
+
+  public
+  #
   # Method to manage the killing of line (aka C-k)
   #
   def killLine buffer
