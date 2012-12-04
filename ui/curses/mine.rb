@@ -1,94 +1,94 @@
 #!/usr/bin/env ruby
 
 require 'ffi-ncurses'
-require 'logger'
 require 'rbcurse'
+require 'logger'
 require 'rbcurse/core/widgets/rwidget'
+require 'rbcurse/core/widgets/rtextarea'
+load    "MTextArea.rb"
 
-# move the cursor ... twice otherwise it doesn't work
-def curs_move x, y
-  @window.wmove x, y
-  @window.wmove @window.x, @window.y
+
+## exit if there is no param
+exit if ARGV.size == 0
+FILE_NAME = ARGV[0]
+
+## error if open file is a directory
+def err_directory
+  puts FILE_NAME + " is an existing directory."
+  file.close
+  exit
 end
 
-# Move the cursor
-def curs_moveLeft
-  unless (@window.x == 0 and @window.y == 0)
-    if @window.x > 0
-      curs_move @window.x - 1, @window.y
-      return 0
-    else
-      curs_move @line_sizes[@line - 1], @window.y - 1
-      return 1
-    end
-  end
-  return -1
-end
-
-
-# Delete one character. To delete a character, we need to move the cursor on it
-# and then to delete it.
-# Do not forget to decrement the line index or the line_size counter.
-def curs_delch
-  mv = curs_moveLeft
-  if mv == 0
-    @window.delch
-    @line_sizes[@line] -= 1
-  elsif mv == 1
-    @line -= 1
-  end
-end
-
-# Add one character and increment the line_size counter
-def curs_addch ch
-#  @window.mvcur @window.y, @window.x, @window.y + 1, @window.x + 1
-  @window.addch ch
-  @line_sizes[@line] += 1
-end
-
-# Add a new line and increment the line index
-def curs_nl
-  @window.addch 10
-  @line += 1
-  if @line_sizes.size > @line
-    @line_sizes.insert(@line + 1, 0)
-  else
-    @line_sizes << 0
-  end
-end
-
-## ---------------------
-## Mine client
-## - Curses and window initialisation
-## - event loop to get characters (C-x C-c to quit)
-## - print characters or delete it
-## TODO-001 : print only printables characters
-begin
+## init curses
+def init_curses
   VER::start_ncurses
+  $log = Logger.new nil # "log"
+  # $log.level = Logger::DEBUG
+end
+
+## init the window, a form and the textArea
+def init_MineWin
   @window = VER::Window.root_window
-  @line = 0
-  @line_sizes = [0]
   Ncurses.nl
+
+  @form = Form.new @window do
+    modified = true
+  end
+
+  @textArea = TextArea.new @form do
+    name FILE_NAME
+    row  0
+    col  0
+    width FFI::NCurses.getmaxx FFI::NCurses.stdscr
+    height FFI::NCurses.getmaxy FFI::NCurses.stdscr
+    title FILE_NAME
+    title_attrib Ncurses::A_BOLD
+  end
+  @textArea << @buf
+
   Ncurses.use_default_colors
-  @window.refresh
+  @window.wrefresh
+end
+
+## binding
+def init_binding
+  $key_map = :emacs
+  @textArea.bind_key [?\C-x, ?\C-c] do
+    exit
+  end
+  @textArea.bind_key [?\C-x, ?\C-s] do
+    @file.write @textArea.get_text
+  end
+end
+
+## open a file and save contents in buf
+@buf = ""
+if File.exist? FILE_NAME
+  err_directory(file) if File.directory?(file = File.new(FILE_NAME, "r"))
+  @buf = file.read
+  file.close
+end
+@file = File.new FILE_NAME, "w"
+
+## Mine
+begin
+  init_curses
   catch(:close) do
+    init_MineWin
+    init_binding
+
     loop do
-      ch = @window.getch()
-      next if ch == -1
-      break if (ch == FFI::NCurses::KEY_CTRL_X and @window.getch() == FFI::NCurses::KEY_CTRL_C)
-      if (ch == Ncurses::KEY_BSPACE)
-        curs_delch
-      elsif (ch == 10) # FFI::NCurses::KEY_ENTER do not return 10 ('\n') even if we expect it ...
-        curs_nl
-      elsif (ch == FFI::NCurses::KEY_LEFT)
-        curs_moveLeft
+      ch = @window.getch
+      if ch == FFI::NCurses::KEY_RESIZE
+        @textArea.resize
       else
-        curs_addch ch
+        @form.handle_key ch
       end
     end
   end
 rescue => ex
 ensure
-  #  @window.destroy if !@window.nill?
+  @file.close
+  @window.destroy if !@window.nil?
   VER::stop_ncurses
 end
