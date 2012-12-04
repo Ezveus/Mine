@@ -8,6 +8,7 @@
 
 require 'diff/lcs'
 load 'server/Change.rb'
+load 'server/LockString.rb'
 
 class Buffer
 
@@ -19,18 +20,16 @@ class Buffer
   #  - the file's name
   #  - the File's content
   #  - if the file is hosted by the server or the client
-  #  - if the file is terminated by a new line
   #  - the diffHistory of the buffer (common to each user on buffer)
   #
-  def initialize fileLocation, fileName, fileContent, serverSide, eofnewline = true
+  def initialize fileLocation, fileName, fileContent, rights, serverSide, user
     @fileLocation = fileLocation
     @fileName = fileName
+    @fileContent = splitText fileContent
     @id = Random.rand.to_i
-    @rights = {}
+    @rights = rights
     @serverSide = serverSide
-    @workingUsers = []
-    @fileContent = fileContent
-    @eofNewLine = eofnewline
+    @workingUsers = [user]
     @diffHistory = []
     @diffHistoryPosition = 0
   end
@@ -53,51 +52,53 @@ class Buffer
 
   public
   #
-  # Test if the Buffer is terminated by a new line or not
+  # Method to call every time a diff is generated
   #
-  def eofNewLine?
-    if @fileContent.last == "" and @fileContent.size > 1
-      @eofNewLine = true
-    else
-      @eofNewLine = false
+  def updateClients diff
+    @workingUsers.each do |user|
+      user.updateClients @fileName, diff
     end
   end
 
-  # public
-  # #
-  # #
-  # #
-  # def overwriteText cursor, text
-  #   if cursor.isAtEOL? or cursor.isAtEOF?
-  #     insertText cursor, text
-  #   else
+  public
+  #
+  # Method to call when the user inserts text on overwrite mode
+  #
+  def overwriteText cursor, text
+    if cursor.isAtEOL? or cursor.isAtEOF?
+      insertText cursor, text
+    else
+      overwrite cursor, text
+    end
+  end 
 
-  #   end
-  # end 
-
-  # private
-  # #
-  # #
-  # #
-  # def overwrite c, text
-  #   pos = text =~ /\n/
-  #   unless pos
-  #     @fileContent[c.line].replace (@fileContent[c.line][0, c.column]
-  #                                   << text
-  #                                   << @fileContent[c.line][c.column + text.size,
-  #                                                           @fileContent[c.line].size])
-  #     c.moveToColumn c.column + text.size
-  #   else
-  #     if @fileContent[c.line][c.column, @fileContent[c.line].size].size > pos
-  #       # we are fucked
-  #     else
-  #       @fileContent[c.line].replace (@fileContent[c.line][0, c.column]
-  #                                     << text[0, pos])
-  #       c.moveToColumn c.column + pos
-  #       insertText cursor, text[pos, text.size]
-  #     end
-  #   end
-  # end
+  private
+  #
+  # Method to manage overWrite of a part of a text
+  #
+  def overwrite c, text
+    pos = text =~ /\n/
+    unless pos
+      if text.size > @fileContent[c.line][c.column, @fileContent[c.line].size].size
+        @fileContent[c.line] = @fileContent[c.line][0, c.column] + text
+      else
+        @fileContent[c.line] =  @fileContent[c.line][0, c.column] +
+          text + @fileContent[c.line][c.column + text.size,
+                                      @fileContent[c.line].size]
+      end
+      c.moveToColumn c.column + text.size
+    else
+      if @fileContent[c.line][c.column, @fileContent[c.line].size].size > pos
+        nbToDelete = text[pos, text.size].count "^\n"
+        insertText c, text
+        deleteTextDelete c, nbToDelete
+      else
+        @fileContent[c.line] = @fileContent[c.line][0, c.column] + text[0, pos]
+        c.moveToColumn c.column + pos
+        insertText c, text[pos, text.size]
+      end
+    end
+  end
 
   public
   #
@@ -112,7 +113,7 @@ class Buffer
     end
     splitSize = insertTextSplitFlatten cursor
     insertTextCursorReplacement text, cursor, splitSize, dataStr
-    insertTextNewLineHandler text, cursor
+    # insertTextNewLineHandler text, cursor
   end
 
   private
@@ -153,27 +154,27 @@ class Buffer
     end
   end
 
-  def insertTextNewLineHandler text, cursor
-    if text.end_with? "\n" and cursor.column == @fileContent[cursor.line].size and
-        cursor.line == @fileContent.rindex(@fileContent.last)
-      @eofNewLine = true
-      cursor.moveRight
-    else
-      @eofNewLine = false
-    end
-  end
+  # def insertTextNewLineHandler text, cursor
+  #   if text.end_with? "\n" and cursor.column == @fileContent[cursor.line].size and
+  #       cursor.line == @fileContent.rindex(@fileContent.last)
+  #     @eofNewLine = true
+  #     cursor.moveRight
+  #   else
+  #     @eofNewLine = false
+  #   end
+  # end
 
   public
   #
   # Delete some characters at the position given by the cursor
   # Moves the cursor in consequence
   #
-  def deleteTextBackspace cursor, nbToDelete = 1
+  def deleteTextBackspace cursor, overwrite, nbToDelete = 1
     nbToDelete = deleteTextBackspaceTooBig cursor, nbToDelete
     while cursor.column < nbToDelete
-      nbToDelete = deleteTextBackspaceConcatLine cursor, nbToDelete
+      nbToDelete = deleteTextBackspaceConcatLine cursor, nbToDelete, overwrite
     end
-    deleteTextBackspaceSameLine cursor, nbToDelete
+    deleteTextBackspaceSameLine cursor, nbToDelete, overwrite
     eofNewLine?
   end
   
@@ -195,15 +196,21 @@ class Buffer
     end
   end
 
-  def deleteTextBackspaceSameLine c, nbToDelete
+  def deleteTextBackspaceSameLine c, nbToDelete, overwrite
     if nbToDelete > 0
       if c.isAtEOL?
         eol = true
       else
         eol = false
       end
-      @fileContent[c.line] = @fileContent[c.line][0, c.column - nbToDelete] +
-        @fileContent[c.line][c.column, @fileContent[c.line].size]
+      if overwrite
+        @fileContent[c.line] = @fileContent[c.line][0, c.column - nbToDelete] +
+          String.new(" " * nbToDelete) +
+          @fileContent[c.line][c.column, @fileContent[c.line].size]
+      else
+        @fileContent[c.line] = @fileContent[c.line][0, c.column - nbToDelete] +
+          @fileContent[c.line][c.column, @fileContent[c.line].size]
+      end
       if eol
         c.moveToEnd
       else
@@ -212,10 +219,16 @@ class Buffer
     end
   end
 
-  def deleteTextBackspaceConcatLine c, nbToDelete
+  def deleteTextBackspaceConcatLine c, nbToDelete, overwrite
     column = @fileContent [c.line - 1].size
-    @fileContent[c.line - 1] = @fileContent[c.line - 1] <<
-      @fileContent[c.line][c.column, @fileContent[c.line].size]
+    if overwrite
+      @fileContent[c.line - 1] = @fileContent[c.line - 1] <<
+        String.new(" " * c.column) <<
+        @fileContent[c.line][c.column, @fileContent[c.line].size]
+    else
+      @fileContent[c.line - 1] = @fileContent[c.line - 1] <<
+        @fileContent[c.line][c.column, @fileContent[c.line].size]
+    end
     nbToDelete -= c.column + 1
     @fileContent.delete_at c.line
     c.moveUp
@@ -295,7 +308,7 @@ class Buffer
     if @diffHistoryPosition < @diffHistory.size
       @diffHistoryPosition = 0 if @diffHistoryPosition < 0
       diff = @diffHistory[@diffHistoryPosition]
-      Diff::LCS.patch!(@fileContent, diff.diff)
+      patch diff, :patch
       cursor.moveToLine diff.cursorBefore[0]
       cursor.moveToColumn diff.cursorBefore[1]
       @diffHistoryPosition += 1
@@ -311,7 +324,7 @@ class Buffer
   def redo cursor
     if @diffHistoryPosition > 0
       diff = @diffHistory[@diffHistoryPosition - 1]
-      Diff::LCS.unpatch!(@fileContent, diff.diff)
+      patch diff, :unpatch
       cursor.moveToLine diff.cursorAfter[0]
       cursor.moveToColumn diff.cursorAfter[1]
       @diffHistoryPosition -= 1
@@ -321,8 +334,43 @@ class Buffer
   end
 
   private
+  PATCHHASH = {
+    :patch => {'+' => '+', '-' => '-'},
+    :unpatch => {'+' => '-', '-' => '+'}
+  } unless const_defined? :PATCHHASH
+  #
+  # Function to apply the changes wether you called undo or redo
+  #
+  def patch diff, direction
+    i = j = 0
+    diff.diff.each do |change|
+      action = PATCHHASH[direction][change.action]
+      case action
+      when '-'
+        while i < change.position
+          i += 1
+          j += 1
+        end
+        if direction == :patch
+          @fileContent.delete_at(i)
+        else
+          @fileContent.delete_at(i + 1)
+        end
+        i += 1
+      when '+'
+        while j < change.position
+          i += 1
+          j += 1
+        end
+        @fileContent.insert j, change.element
+        j += 1
+      end
+    end
+  end
+
+  private
   def splitText text
-    res = Array.new(text.count("\n") + 1) {String.new}
+    res = Array.new(text.count("\n") + 1) {LockString.new}
     i = 0
     text.each_char do |c|
       if c == "\n"

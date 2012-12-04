@@ -36,45 +36,59 @@ class Frame
   # Function to switch the overWrite mode on or off
   #
   def switchOverWrite
-    if @overWrite
-      @overWrite = false
-    else
-      @overwrite = true
-    end
+    @overWrite = !@overWrite
+  end
+
+  #
+  # Method to call every time a diff is generated
+  #
+  def updateClients buffer, diff
+    buffer.updateClients diff
   end
 
   #
   # Function to insert text in the given buffer
-  # Also creates a diff
+  # Also creates a diff if insertDiff is true
   #
-  def fillBuffer buffer, text
-    bufferBefore = Array.new(buffer.fileContent)
-    cursorBefore = [@cursor.line, @cursor.column]
-    buffer.insertText @cursor, text
-    # Think about a method to manage the overwrite with multiples lines passed
-    bufferAfter = Array.new(buffer.fileContent)
-    cursorAfter = [@cursor.line, @cursor.column]
-    d = Diff::LCS.diff(bufferAfter, bufferBefore)
-    diff = Change.new(@cursor.owner, cursorBefore, cursorAfter, d)
-    buffer.insertDiff diff
-    # call the method to update the clients
+  def fillBuffer buffer, text, insertDiff = true
+    if insertDiff
+      bufferBefore = Array.new(buffer.fileContent)
+      cursorBefore = [@cursor.line, @cursor.column]
+    end
+    if isOverWrite?
+      buffer.overwriteText @cursor, text
+    else
+      buffer.insertText @cursor, text
+    end
+    if insertDiff
+      bufferAfter = Array.new(buffer.fileContent)
+      cursorAfter = [@cursor.line, @cursor.column]
+      d = Diff::LCS.diff(bufferAfter, bufferBefore)
+      diff = Change.new(@cursor.owner, cursorBefore, cursorAfter, d)
+      buffer.insertDiff diff
+      # call the method to update the clients
+    end
   end
 
   #
   # Function to delete text in the given buffer
   # This one is to call when you type backspace
-  # Also creates a diff
+  # Also creates a diff if insertDiff is true
   #
-  def backspaceBuffer buffer, nb
-    bufferBefore = Array.new(buffer.fileContent)
-    cursorBefore = [@cursor.line, @cursor.column]
-    buffer.deleteTextBackspace @cursor, nb
-    bufferAfter = Array.new(buffer.fileContent)
-    cursorAfter = [@cursor.line, @cursor.column]
-    d = Diff::LCS.diff(bufferAfter, bufferBefore)
-    diff = Change.new(@cursor.owner, cursorBefore, cursorAfter, d)
-    buffer.insertDiff diff
-    # call the method to update the clients
+  def backspaceBuffer buffer, nb, insertDiff
+    if insertDiff
+      bufferBefore = Array.new(buffer.fileContent)
+      cursorBefore = [@cursor.line, @cursor.column]
+    end
+    buffer.deleteTextBackspace @cursor, isOverWrite?, nb
+    if insertDiff
+      bufferAfter = Array.new(buffer.fileContent)
+      cursorAfter = [@cursor.line, @cursor.column]
+      d = Diff::LCS.diff(bufferAfter, bufferBefore)
+      diff = Change.new(@cursor.owner, cursorBefore, cursorAfter, d)
+      buffer.insertDiff diff
+      # call the method to update the clients
+    end
   end
 
   #
@@ -109,5 +123,19 @@ class Frame
                      else [@cursor.line, @cursor.column]
                      end
     cursorPosition
+  end
+
+  #
+  # Undoes the last change on the buffer
+  #
+  def undo buffer
+    buffer.undo @cursor
+  end
+
+  #
+  # Redoes the last undone change on the buffer
+  #
+  def redo buffer
+    buffer.redo @cursor
   end
 end

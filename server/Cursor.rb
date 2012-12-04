@@ -7,10 +7,7 @@
 # 
 
 class Cursor
-  attr_reader :line
-  attr_reader :column
-  attr_reader :owner
-  attr_accessor :file
+  attr_reader :line, :column, :owner, :file
 
   # 
   # Initializes the cursor assigning to it :
