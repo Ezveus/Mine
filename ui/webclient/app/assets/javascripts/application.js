@@ -12,4 +12,5 @@
 //
 //= require jquery
 //= require jquery_ujs
-//= require_tree .
+//= require static_pages.js.coffee
+//= require users.js.coffee

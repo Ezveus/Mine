@@ -10,6 +10,10 @@ puts "Launching server"
 
 def exitServer exitType
   printf "\r"
+  begin
+    File.delete "ui/webclient/.port"
+  rescue
+  end
   Client.clients.each do |client|
     client.exit exitType
   end
@@ -49,6 +53,9 @@ end
 if launchRails
   Process.fork do
     Dir.chdir "ui/webclient"
+    File.open("./.port", "w") do |f|
+      f.puts "#{opts[:port]}|#{opts[:wsport]}"
+    end
     puts "Executing rails server -d -b #{opts[:railshost]} -p #{opts[:railsport]}"
     Process.exec "rails server -d -b #{opts[:railshost]} -p #{opts[:railsport]}"
   end
@@ -58,8 +65,8 @@ begin
   EM.run do
     EM.start_server opts[:host], opts[:port], Client
     EM.start_server(opts[:wshost], opts[:wsport], WSClient,
-                    :host => opts[:wshost],
-                    :port => opts[:wsport])
+                    :host => opts[:host],
+                    :port => opts[:port])
   end
 rescue Interrupt
   puts "\rOn operating systems where Signal.trap doesn't work,"
