@@ -36,4 +36,4 @@ COMMAND =  AUTHENTICATE = { "name" : ".+" , "pass" : ".+" }
 
 	 | DELETE = { "buffer" : ".+" , "number" : value }
 
-	 | SYNC = { [ ["buffer" : ".+" , "diff" : ".+"]* ]}
+	 | SYNC = [ \[{"buffer" : ".+" , "diff" : ".+"}\]* ]

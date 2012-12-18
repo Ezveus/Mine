@@ -1,5 +1,5 @@
 config/CGIHandlers.json
-ui/webclient
+*.xcf
 *.gem
 *.rbc
 .bundle
@@ -16,6 +16,9 @@ test*.rb
 tmp
 *.db
 *.log
+*.sqlite3
+ui/webclient/.README.rdoc
+.sass-cache/
 
 # YARD artifacts
 .yardoc

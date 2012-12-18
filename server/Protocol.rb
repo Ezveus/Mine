@@ -3,6 +3,7 @@
 require 'json'
 
 load "server/User.rb"
+load "server/Log.rb"
 
 module Protocol
   Requests = [
@@ -13,43 +14,43 @@ module Protocol
 
   def self.authenticate postContent, response, client
     if client.user and client.user.authenticated
-      $stderr.puts "Error : #{client.user} already logged"
+      Log::Client.error "#{client.user} already logged"
       response.status = Constant::AlreadyLogged
       return Constant::Fail
     end
-    puts "Parsing #{postContent.split('=')[1]}"
+    Log::Client.log "Parsing #{postContent.split('=')[1]}"
     object = {}
     begin
       object = JSON.parse postContent.split('=')[1]
     rescue JSON::ParserError => error
-      $stderr.puts "Error : #{error}"
+      Log::Client.error "#{error}"
       response.status = Constant::JSONParserError
       return Constant::Fail
     end
     name = object["name"]
     pass = object["pass"]
     unless name and pass
-      $stderr.puts "Error : Field(s) name and/or pass can't be found"
+      Log::Client.error "Field(s) name and/or pass can't be found"
       response.status = Constant::JSONParserError
       return Constant::Fail
     end
     unless client.userdb.matchPass name, pass
-      $stderr.puts "Error : Unknown user"
+      Log::Client.error "Unknown user"
       response.status = Constant::UnknownUser
       return Constant::Fail
     end
     client.user = User.new name, client.userdb
-    puts "User logged : #{client.user.userInfo}"
+    Log::Client.log "User logged : #{client.user.userInfo}"
     Constant::Success
   end
 
   def self.signup postContent, response, client
-    puts "Parsing #{postContent.split('=')[1]}"
+    Log::Client.log "Parsing #{postContent.split('=')[1]}"
     object = {}
     begin
       object = JSON.parse postContent.split('=')[1]
     rescue JSON::ParserError => error
-      $stderr.puts "Error : #{error}"
+      Log::Client.error "#{error}"
       response.status = Constant::JSONParserError
       return Constant::Fail
     end
@@ -58,13 +59,13 @@ module Protocol
     email = object["email"]
     website = object["website"]
     unless name and pass and email
-      $stderr.puts "Error : Field(s) name and/or pass and/or email can't be found"
+      Log::Client.error "Field(s) name and/or pass and/or email can't be found"
       response.status = Constant::JSONParserError
       return Constant::Fail
     end
     unless client.userdb.addUser name, pass, email, website
       client.userdb.errors.each do |err|
-        $stderr.puts err
+        Log::Client.error err
       end
       response.status = Constant::BadRegistration
       return Constant::Fail
@@ -73,8 +74,8 @@ module Protocol
   end
 
   def self.exec postContent, response, client
-    puts "Here should JSON argument be parsed"
-    puts "NOT Parsing #{postContent.split('=')[1]}"
+    Log::Client.info "Here should JSON argument be parsed"
+    Log::Client.info "NOT Parsing #{postContent.split('=')[1]}"
     Constant::Success
   end
 
