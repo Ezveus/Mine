@@ -1,0 +1,18 @@
+Concerning the "when" to send any request to the server
+
+When inserting text send a package for every 5 or 6 letters typed.
+Except if an other action than typing is performed for example typing a backspace after having tiped "pony" will cause an insert request to be sent containing the buffer name & the chain "pony".
+
+Concerning the backspace & delete editing actions, they should not be sent until an other action is performed.
+For example when typing multiples backspace then the request should be sent when an other action is performed such as inserting a letter.
+
+For the previous actions if there is data to send and if it makes more than a minute that nothing happenned, then send the request.
+
+
+When moving the cursor when moving on the same axis such as going right or left it should be stocked and sent when an other action is performed, for example going up just after going right.
+
+The moving cursor action is not subject to the timeout of the editing actions.
+
+the only exception to that is when typing the origin or end key they should be sent at the moment they are typed.
+
+For other actions such as cut, copy, paste, they also should be sent at the moment they are performed.
