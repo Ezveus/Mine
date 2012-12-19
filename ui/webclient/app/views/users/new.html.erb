@@ -1,0 +1,30 @@
+<%= render 'layouts/maintitle' %>
+<p>
+  <%= form_for @user do |f| %>
+    <%= render 'shared/error_messages' %>
+    <fieldset>
+      <legend id="formlegend">Sign up</legend>
+      <%= f.label :name, "Name :" %>
+      <%= f.text_field :name,
+          :autofocus => "", :required => "",
+          :size => 50 %>
+      <br />
+      <%= f.label :password, "Password :" %>
+      <%= f.password_field :password,
+          :required => "", :size => 40 %>
+      <br />
+      <%= f.label :password_confirmation, "Password confirmation :" %>
+      <%= f.password_field :password_confirmation,
+          :required => "", :size => 40 %>
+      <br />
+      <%= f.label :email, "Mail :" %>
+      <%= f.email_field :email, :required => "" %>
+      <br />
+      <%= f.label :website, "Website :" %>
+      <%= f.text_field :website %>
+      <br />
+      <%= f.submit "Send", :class => "btn btn-primary" %>
+      <%= f.submit "Reset", :class => "btn", :type => "reset" %>
+    </fieldset>
+  <% end %>
+</p>

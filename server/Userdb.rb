@@ -90,7 +90,7 @@ class Userdb
       res += " # " if @isAdmin == 1
       res += " $ " unless @isAdmin == 1
       res += "<"
-      res += "@ : #{@mail}"# if @mail and @mail != ""
+      res += "@ : #{@mail}"
       res += ", web : #{@website}" if @website and @website != ""
       res += ">"
     end
