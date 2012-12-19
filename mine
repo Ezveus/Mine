@@ -3,8 +3,8 @@
 require 'eventmachine'
 require 'evma_httpserver'
 
-load "server/Client.rb"
-load "server/WSClient.rb"
+load "server/HTTPHandler.rb"
+load "server/WSHandler.rb"
 
 puts "Launching server"
 
@@ -28,7 +28,7 @@ def exitServer exitType
   exit 0
 end
 
-launchRails = true              # Set to false with options
+launchRails = false              # Set to false with options
 
 opts = {
   :host => "0.0.0.0",
@@ -63,8 +63,8 @@ end
 
 begin
   EM.run do
-    EM.start_server opts[:host], opts[:port], Client
-    EM.start_server(opts[:wshost], opts[:wsport], WSClient,
+    EM.start_server opts[:host], opts[:port], HTTPHandler
+    EM.start_server(opts[:wshost], opts[:wsport], WSHandler,
                     :host => opts[:host],
                     :port => opts[:port])
   end
