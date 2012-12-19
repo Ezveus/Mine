@@ -9,4 +9,6 @@ module Constant
   JSONParserError = 3
   UnknownUser = 4
   BadRegistration = 5
+  ForbiddenAction = 6
+  UnknownBuffer = 7
 end

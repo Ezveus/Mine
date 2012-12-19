@@ -78,9 +78,36 @@ module Protocol
     Constant::Success
   end
 
+  def self.insert postContent, response, client
+    puts "Parsing #{postContent.split('=')[1]}"
+    object = {}
+    begin
+      object = JSON.parse postContent.split('=')[1]
+    rescue JSON::ParserError => error
+      $stderr.puts "Error : #{error}"
+      response.status = Constant::JSONParserError
+      return Constant::Fail
+    end
+    if client.user.nil?
+      $stderr.puts "A client is trying to edit a buffer without a user logged in."
+      response.status = Constant::ForbiddenAction
+      return Constant::Fail
+    end
+    buffer = client.user.findBuffer object[buffer]
+    if buffer.nil?
+      $stderr.puts "Unknown buffer"
+      response.status = Constant::UnknownBuffer
+      return Constant::Fail
+    end
+    text = object[text]
+    client.user.insert buffer, text
+    Constant::Success
+  end
+
   Commands = {
     Authenticate.to_sym => Proc.new { |postContent, response, client| self.authenticate postContent, response, client },
     Signup.to_sym => Proc.new { |postContent, response, client| self.signup postContent, response, client },
-    Exec.to_sym => Proc.new { |postContent, response, client| self.exec postContent, response, client }
+    Exec.to_sym => Proc.new { |postContent, response, client| self.exec postContent, response, client },
+    Insert.to_sym => Proc.new { |postContent, response, client| self.insert postContent, response, client }
   }
 end

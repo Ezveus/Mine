@@ -12,7 +12,7 @@ load 'server/LockString.rb'
 
 class Buffer
 
-  attr_reader :fileContent
+  attr_reader :fileContent, :filename, :id
 
   #
   # Initializes the buffer assigning to it

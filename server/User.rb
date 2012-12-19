@@ -55,6 +55,17 @@ class User
     @frames[buffer] = frame
   end
 
+  def findBuffer buffername
+    buf = nil
+    @frames.each do |buffer, frame|
+      if buffername == "#{buffer.filename}<#{buffer.id}>"
+        buf = buffer
+        break
+      end
+    end
+    buf
+  end
+
   #
   # Method to call to switch on/off the overWrite mode
   #
@@ -136,7 +147,7 @@ class User
       bufferBefore = Array.new(buffer.fileContent)
       cursorBefore = [cursor.line, cursor.column]
 
-      # the piece o really interresting code here
+      # the piece of really interresting code here
       @frames[buffer].backspaceBuffer buffer, @killRing[@killRingPosition].size, false
       if @killRingPosition < @killRing.size
         @killRingPosition += 1
