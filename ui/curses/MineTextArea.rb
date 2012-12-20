@@ -5,15 +5,16 @@ module Mine
   class TextArea < Widget
     attr_accessor :title, :title_attrib, :borders
 
-    def initialize(x = 0, y = 0, width = max_x,
-                   height = max_y, title = nil, text = nil)
+    def initialize(x = 0, y = 0, width = max_width,
+                   height = max_height, title = nil, text = nil)
       super(x, y, width, height, text)
       @title = title
       @title_attrib = nil
       @borders = true
     end
 
-    def repaint
+    # init a Mine TextArea
+    def init
       y = @y
       x = @x
       width = @width
@@ -40,6 +41,14 @@ module Mine
       true
     end
 
+    # Repaint the widget
+    def repaint
+      @rbc_text_area.print_borders
+      @rbc_text_area.set_modified
+      @rbc_text_area.repaint
+    end
+
+    # Binding
     def bind
       @bindings.each do |b|
         @rbc_text_area.bind_key b.key do
@@ -50,6 +59,11 @@ module Mine
 
     def update_text
       @text = @rbc_text_area.list
+    end
+
+    def width= w
+      @width = w
+      @rbc_text_area.width = w
     end
 
   end

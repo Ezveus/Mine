@@ -41,7 +41,6 @@ module Mine
       # Init widgets.
       return self unless mine_widgets
       self.widgets = mine_widgets
-      #      self.widgets = widgets
       @index = 0
 
       # Refresh.
@@ -70,27 +69,11 @@ module Mine
     end
 
     # This function resize a widget.
-    def resize(width = max_x, height = max_y)
-      @rbc_widgets[@index].width = width
+    def resize(width = max_width, height = max_height)
       @widgets[@index].width = width
-      @rbc_widgets[@index].height = height
       @widgets[@index].height = height
-      @rbc_widget[@index].print_borders
-      @rbc_widget[@index].set_modified
-      @rbc_widget[@index].repaint
+      @widgets[@index].repaint
       self.write Mine::Key.RESIZE
-    end
-
-    # This function refresh bindings of all widgets.
-    def rebind_all
-      @widgets.each_index { |i| rebind i }
-    end
-
-    # This function refresh bindings of the target widget.
-    def rebind(i)
-      @widgets[i].bindings.each do |b|
-        @rbc_widgets[i].bind_key(b.key, &method(b.call))
-      end
     end
 
     # This function write the corresponding buffer to the target file.
@@ -138,34 +121,22 @@ module Mine
       mine_widgets.each { |widget| self.add_widget widget }
     end
 
-    def max_x
+    # This function return the Mine Window max width
+    def max_width
       FFI::NCurses.getmaxx(FFI::NCurses.stdscr)
     end
 
-    def max_y
+    # This function return the Mine Window max height
+    def max_height
       FFI::NCurses.getmaxy(FFI::NCurses.stdscr)
     end
 
     private
 
+    # This function initialize a widget and bind
     def init_widget(widget)
-      widget.repaint
+      widget.init
       widget.bind if widget.bindings
-    end
-
-    def refresh
-      @widgets.each { |widget| widget.refresh @form if TAB.index(widget.class.name) }
-    end
-
-    # This function return the name of the Widget independently of its Module.
-    def widget_name(widget)
-      widget.class.name.partition("::").at(-1)
-    end
-
-    # This function convert a Mine Widget to a rbcurse Widget
-    # and return the rbcurse Widget.
-    def rbcurse_widget(widget)
-      eval("RubyCurses::" + widget_name(widget)).new @form, &widget.proc
     end
   end
 end

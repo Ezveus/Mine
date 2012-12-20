@@ -4,7 +4,8 @@ module Mine
   class Widget
     attr_accessor :x, :y, :width, :height, :text, :editable, :focusable
 
-    def initialize(x = 0, y = 0, width = max_x, height = max_y, text = nil)
+    def initialize(x = 0, y = 0, width = max_width,
+                   height = max_height, text = nil)
       @x = x
       @y = y
       @width = width
@@ -37,12 +38,12 @@ module Mine
       @bindings = bindings_tab.uniq { |binding| binding.call }
     end
 
-    def max_x
-      Window.instance.max_x
+    def max_width
+      Window.instance.max_width
     end
 
-    def max_y
-      Window.instance.max_y
+    def max_height
+      Window.instance.max_height
     end
 
     def bind
