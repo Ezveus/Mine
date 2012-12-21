@@ -5,7 +5,7 @@ require 'celluloid/io'
 load 'server/Log.rb'
 load "server/Client.rb"
 
-class WSHandler
+class TCPHandler
   include Celluloid::IO
 
   def initialize host, port
