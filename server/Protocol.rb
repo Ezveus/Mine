@@ -6,22 +6,22 @@ load "server/User.rb"
 load "server/Log.rb"
 
 module Protocol
-  Requests = [
-              Authenticate = "AUTHENTICATE",
-              Signup = "SIGNUP",
-              Exec = "EXEC"
-             ]
+  Requests ||= [
+                Authenticate = "AUTHENTICATE",
+                Signup = "SIGNUP",
+                Exec = "EXEC"
+               ]
 
-  def self.authenticate postContent, response, client
+  def self.authenticate jsonRqst, response, client
     if client.user and client.user.authenticated
       Log::Client.error "#{client.user} already logged"
       response.status = Constant::AlreadyLogged
       return Constant::Fail
     end
-    Log::Client.log "Parsing #{postContent.split('=')[1]}"
+    Log::Client.log "Parsing #{jsonRqst}"
     object = {}
     begin
-      object = JSON.parse postContent.split('=')[1]
+      object = JSON.parse jsonRqst
     rescue JSON::ParserError => error
       Log::Client.error "#{error}"
       response.status = Constant::JSONParserError
@@ -39,16 +39,16 @@ module Protocol
       response.status = Constant::UnknownUser
       return Constant::Fail
     end
-    client.user = User.new name, client.userdb
+    client.user = User.new name, client.userdb, client
     Log::Client.log "User logged : #{client.user.userInfo}"
     Constant::Success
   end
 
-  def self.signup postContent, response, client
-    Log::Client.log "Parsing #{postContent.split('=')[1]}"
+  def self.signup jsonRqst, response, client
+    Log::Client.log "Parsing #{jsonRqst}"
     object = {}
     begin
-      object = JSON.parse postContent.split('=')[1]
+      object = JSON.parse jsonRqst
     rescue JSON::ParserError => error
       Log::Client.error "#{error}"
       response.status = Constant::JSONParserError
@@ -73,15 +73,15 @@ module Protocol
     Constant::Success
   end
 
-  def self.exec postContent, response, client
+  def self.exec jsonRqst, response, client
     Log::Client.info "Here should JSON argument be parsed"
-    Log::Client.info "NOT Parsing #{postContent.split('=')[1]}"
+    Log::Client.info "NOT Parsing #{jsonRqst}"
     Constant::Success
   end
 
-  Commands = {
-    Authenticate.to_sym => Proc.new { |postContent, response, client| self.authenticate postContent, response, client },
-    Signup.to_sym => Proc.new { |postContent, response, client| self.signup postContent, response, client },
-    Exec.to_sym => Proc.new { |postContent, response, client| self.exec postContent, response, client }
+  Commands ||= {
+    Authenticate.to_sym => Proc.new { |jsonRqst, response, client| self.authenticate jsonRqst, response, client },
+    Signup.to_sym => Proc.new { |jsonRqst, response, client| self.signup jsonRqst, response, client },
+    Exec.to_sym => Proc.new { |jsonRqst, response, client| self.exec jsonRqst, response, client }
   }
 end

@@ -1,14 +1,11 @@
 #!/usr/bin/env ruby
 
-require 'eventmachine'
-require 'evma_httpserver'
-
-load "server/Client.rb"
-load "server/WSClient.rb"
+load "server/TCPHandler.rb"
+load "server/WSHandler.rb"
 
 puts "Launching server"
 
-def exitServer exitType
+def exitServer exitType, tcpSupervisor, wsSupervisor
   printf "\r"
   begin
     File.delete "ui/webclient/.port"
@@ -17,7 +14,8 @@ def exitServer exitType
   Client.clients.each do |client|
     client.exit exitType
   end
-  EM.stop_event_loop if exitType == :signalCatch
+  tcpSupervisor.terminate if exitType == :signalCatch
+  wsSupervisor.terminate if exitType == :signalCatch
   begin
     $railsPID = File.new("ui/webclient/tmp/pids/server.pid").read.to_i
   rescue Errno::ENOENT
@@ -28,7 +26,7 @@ def exitServer exitType
   exit 0
 end
 
-launchRails = true              # Set to false with options
+launchRails = false              # Set to false with options
 
 opts = {
   :host => "0.0.0.0",
@@ -42,14 +40,6 @@ opts = {
 opts[:port] = ARGV[0].to_i if ARGV[0]
 opts[:wsport] = opts[:port] + 1
 
-Signal.trap "INT" do
-  exitServer :signalCatch
-end
-
-Signal.trap "TERM" do
-  exitServer :signalCatch
-end
-
 if launchRails
   Process.fork do
     Dir.chdir "ui/webclient"
@@ -62,14 +52,21 @@ if launchRails
 end
 
 begin
-  EM.run do
-    EM.start_server opts[:host], opts[:port], Client
-    EM.start_server(opts[:wshost], opts[:wsport], WSClient,
-                    :host => opts[:host],
-                    :port => opts[:port])
+
+  tcpSupervisor = TCPHandler.supervise opts[:host], opts[:port]
+  wsSupervisor = WSHandler.supervise opts[:wshost], opts[:wsport]
+  
+  Signal.trap "INT" do
+    exitServer :signalCatch, tcpSupervisor, wsSupervisor
   end
+
+  Signal.trap "TERM" do
+    exitServer :signalCatch, tcpSupervisor, wsSupervisor
+  end
+
+  sleep
 rescue Interrupt
   puts "\rOn operating systems where Signal.trap doesn't work,"
   puts "catch Interrupt works."
-  exitServer :exceptionCatch
+  exitServer :exceptionCatch, tcpSupervisor, wsSupervisor
 end
