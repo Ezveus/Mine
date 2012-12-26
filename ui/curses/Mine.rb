@@ -1,6 +1,6 @@
 module Mine
 
-  # This function init fbuffers.
+  # This function inits fbuffers.
   def init_fbuffers
     files_name = []
     buffers = []
@@ -19,6 +19,7 @@ module Mine
     @fbuffers
   end
 
+  # This function is the Mine Client's main loop.
   def run
     begin
       catch :close do
@@ -30,6 +31,7 @@ module Mine
     end
   end
 
+  # This function returns the Mine Window's instance.
   def window(widgets = nil)
     win = Window.instance
     win.init(widgets)

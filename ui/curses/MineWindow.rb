@@ -2,28 +2,29 @@ require 'ffi-ncurses'
 require 'rbcurse'
 require 'logger'
 require 'singleton'
+load 'MineForm.rb'
 load 'MineKey.rb'
 
 module Mine
   ##
-  ## This class represent the Mine Window.
-  ## It's composed of a rbcurse Window and a rbcurse Form and a Widgets tab.
+  ## This class represents the Mine Window.
+  ## It's composed of a rbcurse Window and a Mine Form which is composed of
+  ## Mine Widgets and a rbcurse Form.
   ## The rbcurse Form is a container which uses the rbcurse Window to write to.
   ## The Widgets Tab contains rbcurse Widgets created thanks to the widgets tab parameter
-  ## at the initilisation of the Mine WIndow.
+  ## at the initilisation of the Mine Window.
   ##
   public
   class Window
     include Singleton
 
-    attr_reader :form, :index
-
     BOLD = Ncurses::A_BOLD
 
-    # This function initilialize the Mine Window the first time.
+    # This function initilializes the Mine Window the first time.
     # It is composed of Mine Widgets.
     def init(mine_widgets = nil)
       unless @window
+        # First call
         # Init curses.
         VER::start_ncurses
         $log = Logger.new(nil)
@@ -31,56 +32,57 @@ module Mine
         # Init rbcurse Window.
         @window = VER::Window.root_window
         Ncurses.nl
+      else
+        # Init Form and Widgets
+        return self unless mine_widgets
+        @form = Mine::Form.new @window
+        @form.init_widgets mine_widgets
 
-        # Init Form.
-        @form = Form.new @window do modified = true end
-
-        return self
+        # Refresh.
+        @form.write 0
+        Ncurses.use_default_colors
+        @window.wrefresh
       end
-
-      # Init widgets.
-      return self unless mine_widgets
-      self.widgets = mine_widgets
-      @index = 0
-
-      # Refresh.
-      @form.handle_key 0
-      Ncurses.use_default_colors
-      @window.wrefresh
-
       self
     end
 
-    # This function close the Mine Window.
+    # This function returns the Mine Window max width
+    def max_width
+      FFI::NCurses.getmaxx(FFI::NCurses.stdscr)
+    end
+
+    # This function returns the Mine Window max height
+    def max_height
+      FFI::NCurses.getmaxy(FFI::NCurses.stdscr)
+    end
+
+    # This function closes the Mine Window.
     def close
       @window.destroy if @window
       VER::stop_ncurses
     end
 
-    # This function read a character.
+    # This function resizes a widget.
+    def resize(width = max_width, height = max_height)
+      @form.resize(width, height)
+      self.write Mine::Key.RESIZE
+    end
+
+    # This function reads a character.
     def read
       @window.getch
     end
 
-    # This function write a character.
+    # This function writes a character.
     def write(ch)
-      @form.handle_key ch
-      @widgets[@index].update_text
+      @form.write ch
     end
 
-    # This function resize a widget.
-    def resize(width = max_width, height = max_height)
-      @widgets[@index].width = width
-      @widgets[@index].height = height
-      @widgets[@index].repaint
-      self.write Mine::Key.RESIZE
-    end
-
-    # This function write the corresponding buffer to the target file.
-    def >> (file_name, i = @index)
+    # This function writes the corresponding buffer to the target file.
+    def >> (file_name, i = index)
       if ((File.writable? file_name or not File.exists? file_name) and not
           File.directory? (file = File.new(file_name, 'w')))
-        buff = @widgets[i].update_text
+        buff = @form[i].update_text
         i = 1
         size = buff.length
         buff.each do |line|
@@ -93,50 +95,83 @@ module Mine
       file.close if file
     end
 
-    # This function return the corresponding Mine Widget.
+    # This function returns the rbcurse Form.
+    def form
+      @form.rbc_form
+    end
+
+    # This function returns the corresponding Mine Widget.
     def [](i)
-      @widgets[i]
+      @form[i]
     end
 
-    # This function update the corresponding Mine Widget.
+    # This function updates the corresponding Mine Widget.
     def []=(i, widget)
-      init_widget
-      @widgets[i] = widget
+      @form[i] = widget
     end
 
-    # This function add a Mine Widget.
+    # This function adds a Mine Widget.
     def add_widget(widget)
-      init_widget widget
-      @widgets << widget
+      @form.add_widget
     end
 
-    # This function return a Mine Widget.
+    # This function adds a Mine Widget at the index i.
+    # If the index is greater than the Widget tab size,
+    # it adds it at the end.
+    def add_widget_at(widget, i)
+      @form.add_widget_at widget, i
+    end
+
+    # This function deletes a Mine Widget.
+    def delete_widget(widget)
+      @widgets.delete widget
+    end
+
+    # This function deletes the Mine Widget at the corresponding index.
+    def delete_widget_at(i)
+      @widgets.delete_at i
+    end
+
+    # This function returns the Mine Widget which corresponds to the given hash.
+    # Returns nil if fails.
+    def find_widget(widget_description)
+      @form.find_widget(widget_description)
+    end
+
+    # This function returns an Array of the Mine Widgets
+    # which correspond to the given hash.
+    # Returns nil if fails.
+    def find_widgets(widgets_description)
+      @form.find_widgets(widgets_description)
+    end
+
+    # This function returns the index of the Mine Widget
+    # which corresponds to the given hash.
+    # Returns nil if fails.
+    def find_widget_index(widget_description)
+      @form.find_widget_index(widget_description)
+    end
+
+    # This function returns an Array of the index of the Mine Widgets
+    # which correspond to the given hash.
+    # Returns nil if fails.
+    def find_widgets_index(widgets_description)
+      @form.find_widgets_index(widgets_description)
+    end
+
+    # This function returns a Mine Widget.
     def widgets
-      @widgets
+      @form.widgets
     end
 
-    # This function initialise the Mine Widget tab.
+    # This function initialises the Mine Widget tab.
     def widgets=(mine_widgets)
-      @widgets = []
-      mine_widgets.each { |widget| self.add_widget widget }
+      @form.wigets = mine_widgets
     end
 
-    # This function return the Mine Window max width
-    def max_width
-      FFI::NCurses.getmaxx(FFI::NCurses.stdscr)
-    end
-
-    # This function return the Mine Window max height
-    def max_height
-      FFI::NCurses.getmaxy(FFI::NCurses.stdscr)
-    end
-
-    private
-
-    # This function initialize a widget and bind
-    def init_widget(widget)
-      widget.init
-      widget.bind if widget.bindings
+    # This function returns the index of the current Widget.
+    def index
+      @form.index
     end
   end
 end

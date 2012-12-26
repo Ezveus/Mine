@@ -13,7 +13,7 @@ module Mine
       @borders = true
     end
 
-    # init a Mine TextArea
+    # Inits a Mine TextArea
     def init
       y = @y
       x = @x
@@ -41,7 +41,7 @@ module Mine
       true
     end
 
-    # Repaint the widget
+    # Repaints the widget
     def repaint
       @rbc_text_area.print_borders
       @rbc_text_area.set_modified
