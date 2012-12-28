@@ -1,27 +1,30 @@
 module Mine
+  class Code
+    attr_accessor :code
+
+    def initialize
+      @code = 0
+    end
+  end
+
   class WSConnection < EM::WebSocketClient
     def onError err # errback
-      puts "Error : #{err}"
     end
 
     def onOpen # callback
-      puts "Sending PONG"
       self.send_msg "PONG"
     end
 
     def onRead msg # stream
-      request = msg.split('->')[0]
-      puts "Request : #{request}"
-      puts "Msg : #{msg}"
+      request = msg.split('=')[0]
       if request == "WAIT_REQUEST"
-        puts "Was a \"WAIT_REQUEST\""
         unless @user.website.nil?
-          self.send_msg "TRANSFER->SIGNUP={\"name\":\"#{@user.name}\",\"pass\":\"#{@user.password}\",\"email\":\"#{@user.email}\",\"website\":\"#{@user.website}\"}"
+          self.send_msg "SIGNUP={\"name\":\"#{@user.name}\",\"pass\":\"#{@user.password}\",\"email\":\"#{@user.email}\",\"website\":\"#{@user.website}\"}"
         else
-          self.send_msg "TRANSFER->SIGNUP={\"name\":\"#{@user.name}\",\"pass\":\"#{@user.password}\",\"email\":\"#{@user.email}\"}"
+          self.send_msg "SIGNUP={\"name\":\"#{@user.name}\",\"pass\":\"#{@user.password}\",\"email\":\"#{@user.email}\"}"
         end
       elsif request == "CODE"
-        errCode = msg.split('->')[1].to_i
+        @errCode.code = msg.split('=')[1].to_i
         self.send_msg "DISCONNECT"
       elsif request == "DISCONNECT"
         EM::stop_event_loop
@@ -29,14 +32,14 @@ module Mine
     end
 
     def onDisconnection # disconnect
-      puts "Disconnected"
       EM::stop_event_loop
     end
 
-    def initialize user
+    def initialize user, errCode
       super
 
       @user = user
+      @errCode = errCode
       self.callback do
         self.onOpen
       end
@@ -69,7 +72,7 @@ class UsersController < ApplicationController
     @title = "Creation"
     @user = User.new params[:user]
     ret = sendSignup getWSPort
-    if ret = true and @user.save
+    if ret and @user.save
       redirect_to @user
     else
       @title = "Signup"
@@ -87,11 +90,12 @@ class UsersController < ApplicationController
   end
 
   def sendSignup wsport
-    errCode = 0
-    EventMachine.run do
-      # ws = EventMachine::WebSocketClient.connect("ws://localhost:#{wsport}")
-      EM.connect "localhost", wsport, Mine::WSConnection, @user
+    errCode = Mine::Code.new
+    EM.run do
+      EM.connect "localhost", wsport, Mine::WSConnection, @user, errCode do |c|
+        c.url = "ws://#{"localhost"}:#{wsport}"
+      end
     end
-    errCode
+    errCode.code
   end
 end

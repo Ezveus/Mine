@@ -1,0 +1,10 @@
+#!/usr/bin/env ruby
+
+load 'Mine.rb'
+load 'MineWindow.rb'
+load 'MineBinding.rb'
+load 'MineModes.rb'
+load 'UserModes.rb'
+
+Mine.window(@widgets)
+Mine.run
