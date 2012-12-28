@@ -11,7 +11,7 @@ def exitServer exitType, tcpSupervisor, wsSupervisor
     File.delete "ui/webclient/.port"
   rescue
   end
-  Client.clients.each do |client|
+  Mine::Client.clients.each do |client|
     client.exit exitType
   end
   tcpSupervisor.terminate if exitType == :signalCatch
@@ -53,8 +53,8 @@ end
 
 begin
 
-  tcpSupervisor = TCPHandler.supervise opts[:host], opts[:port]
-  wsSupervisor = WSHandler.supervise opts[:wshost], opts[:wsport]
+  tcpSupervisor = Mine::TCPHandler.supervise opts[:host], opts[:port]
+  wsSupervisor = Mine::WSHandler.supervise opts[:wshost], opts[:wsport]
   
   Signal.trap "INT" do
     exitServer :signalCatch, tcpSupervisor, wsSupervisor
