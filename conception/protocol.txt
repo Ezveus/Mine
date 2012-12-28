@@ -1,39 +1,24 @@
-POST /mine/protocol/request HTTP/1.1			|
-Host: localhost						|
-Connection: Close					|=> HTTP_HEADER
-Content-type: application/x-www-form-urlencoded		|
-Content-Length: 42					|
+MESSAGE ::= REQUEST = { ARGUMENTS[, ARGUMENTS]* }
 
-AUTHENTICATE={"name":"root","pass":"toor"}
+REQUEST = AUTHENTICATE | SIGNUP | EXEC | INSERT | MOVE | BACKSPACE | DELETE | SYNC
 
-=> http_request_method = POST												|
-=> http_path_info = /mine/protocol/request										|
-=> http_request_uri = /mine/protocol/request										|=> result
-=> http_content_type = application/x-www-form-urlencoded								|
-=> http_post_content = AUTHENTICATE={"name":"root","pass":"toor"}							|
-=> http_headers = Host: localhostConnection: CloseContent-type: application/x-www-form-urlencodedContent-Length: 42	|
+ARGUMENTS ::= " VALUE " : " VALUE "
 
-------------------------------------
+VALUE ::= .
 
-REQUEST = HTTP_HEADER NEWLINE COMMAND
+Command List and Arguments :
+-> AUTHENTICATE : name pass
 
-NEWLINE = "\n"
+-> SIGNUP : name pass email (website)
 
-HTTP_HEADER = see above
+-> EXEC : buffer command (args[array[value]])
 
-COMMAND =  AUTHENTICATE = { "name" : ".+" , "pass" : ".+" }
+-> INSERT : buffer text
 
-	 | SIGNUP = { "name" : ".+" , "pass" : ".+" , "email" : ".+" \[, "website" : ".+"\]? }
+-> MOVE : buffer direction[up | right | down | left | origin | end] number[integer]
 
-	 | EXEC = { "buffer" : ".+" , "command" : ".+" , "args" : [value*] }
+-> BACKSPACE : buffer number[integer]
 
-	 | INSERT = { "buffer" : ".+" , "text" : ".+" }
+-> DELETE : buffer number[integer]
 
-	 | MOVE = { "buffer" : ".+" , "direction" : value , "number" : value }
-	   (up, right, down, left, origin, end)
-
-	 | BACKSPACE = { "buffer" : ".+" , "number" : value }
-
-	 | DELETE = { "buffer" : ".+" , "number" : value }
-
-	 | SYNC = [ \[{"buffer" : ".+" , "diff" : ".+"}\]* ]
+-> SYNC : array[(buffer diff)]
