@@ -1,5 +1,19 @@
 module Mine
   module Log
+    module Server
+      def self.log str
+        puts "--> #{str}"
+      end
+
+      def self.error errMsg
+        $stderr.puts "!! => #{errMsg}"
+      end
+
+      def self.info info
+        puts "==> #{info}"
+      end
+    end
+
     module Client
       def self.log str
         puts "[Client] #{str}"
