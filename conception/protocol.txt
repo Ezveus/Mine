@@ -22,3 +22,5 @@ Command List and Arguments :
 -> DELETE : buffer number[integer]
 
 -> SYNC : array[(buffer diff)]
+
+-> FILE : path size content
