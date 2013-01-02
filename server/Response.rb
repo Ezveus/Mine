@@ -2,10 +2,12 @@
 
 load 'server/Constant.rb'
 
-class Response
-  attr_accessor :status
+module Mine
+  class Response
+    attr_accessor :status
   
-  def initialize
-    @status = Constant::Ok
+    def initialize
+      @status = Constant::Ok
+    end
   end
 end
