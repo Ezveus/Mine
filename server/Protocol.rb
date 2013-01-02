@@ -10,7 +10,8 @@ module Mine
     Requests ||= [
                   Authenticate = "AUTHENTICATE",
                   Signup = "SIGNUP",
-                  Exec = "EXEC"
+                  Exec = "EXEC",
+                  Insert = "INSERT"
                  ]
 
     def self.authenticate jsonRqst, response, client
@@ -80,10 +81,63 @@ module Mine
       Constant::Success
     end
 
+    def self.insert jsonRqst, response, client
+      Log.Client.log "Parsing #{jsonRqst}"
+      object = {}
+      begin
+        object = JSON.parse jsonRqst
+      rescue JSON::ParserError => error
+        Log.Client.error "Error : #{error}"
+        response.status = Constant::JSONParserError
+        return Constant::Fail
+      end
+      if client.user.nil?
+        Log.Client.error "Try of edition on a buffer without a user logged in."
+        response.status = Constant::ForbiddenAction
+        return Constant::Fail
+      end
+      buffer = client.user.findBuffer object[buffer]
+      if buffer.nil?
+        Log.Client.error "Unknown buffer"
+        response.status = Constant::UnknownBuffer
+        return Constant::Fail
+      end
+      text = object[text]
+      client.user.insert buffer, text
+      Constant::Success
+    end
+
+    def self.backspace jsonRqst, response, client
+      Log.Client.log "Parsing #{jsonRqst}"
+      object = {}
+      begin
+        object = JSON.parse jsonRqst
+      rescue JSON::ParserError => error
+        Log.Client.error "Error : #{error}"
+        response.status = Constant::JSONParserError
+        return Constant::Fail
+      end
+      if client.user.nil?
+        Log.Client.error "Try of edition on a buffer without a user logged in."
+        response.status = Constant::ForbiddenAction
+        return Constant::Fail
+      end
+      buffer = client.user.findBuffer object[buffer]
+      if buffer.nil?
+        Log.Client.error "Unknown buffer"
+        response.status = Constant::UnknownBuffer
+        return Constant::Fail
+      end
+      number = object[number]
+      client.user.backspace buffer, number
+      Constant::Success
+    end
+
     Commands ||= {
       Authenticate.to_sym => Proc.new { |jsonRqst, response, client| self.authenticate jsonRqst, response, client },
       Signup.to_sym => Proc.new { |jsonRqst, response, client| self.signup jsonRqst, response, client },
-      Exec.to_sym => Proc.new { |jsonRqst, response, client| self.exec jsonRqst, response, client }
+      Exec.to_sym => Proc.new { |jsonRqst, response, client| self.exec jsonRqst, response, client },
+      Insert.to_sym => Proc.new { |jsonRqst, response, client| self.insert jsonRqst, response, client }
     }
   end
 end

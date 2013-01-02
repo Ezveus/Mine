@@ -62,6 +62,17 @@ module Mine
       @frames[buffer] = frame
     end
 
+    def findBuffer buffername
+      buf = nil
+      @frames.each do |buffer, frame|
+        if buffername == "#{buffer.filename}<#{buffer.id}>"
+          buf = buffer
+          break
+        end
+      end
+      buf
+    end
+
     #
     # Method to call to switch on/off the overWrite mode
     #

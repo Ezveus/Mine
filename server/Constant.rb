@@ -13,6 +13,7 @@ module Mine
     JSONParserError ||= 3
     UnknownUser ||= 4
     BadRegistration ||= 5
-    AlreadyLogged ||= 6
+    ForbiddenAction ||= 6
+    UnknownBuffer ||= 7
   end
 end

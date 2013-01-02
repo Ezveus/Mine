@@ -11,7 +11,7 @@ module Mine
     include Protocol
 
     attr_accessor :userdb
-    attr_reader :user, :authenticated
+    attr_reader :user, :socket, :authenticated
 
     @@clients = []
 
