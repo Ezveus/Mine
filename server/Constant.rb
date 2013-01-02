@@ -15,5 +15,6 @@ module Mine
     BadRegistration ||= 5
     ForbiddenAction ||= 6
     UnknownBuffer ||= 7
+    AlreadyLogged ||= 8
   end
 end
