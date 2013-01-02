@@ -4,26 +4,28 @@ require 'optparse'
 load "server/TCPHandler.rb"
 load "server/WSHandler.rb"
 
-def exitServer options, exitType, tcpSupervisor, wsSupervisor
-  printf "\r"
+def exitRailsServer
   begin
     File.delete "ui/webclient/.port"
   rescue
   end
+  railsPID = -42
+  begin
+    railsPID = File.new("ui/webclient/tmp/pids/server.pid").read.to_i
+  rescue Errno::ENOENT
+    railsPID = -42
+  end
+  Process.kill "INT", railsPID if railsPID > 1
+end
+
+def exitServer options, exitType, tcpSupervisor, wsSupervisor
+  printf "\r"
   Mine::Client.clients.each do |client|
     client.exit exitType
   end
   tcpSupervisor.terminate if exitType == :signalCatch
   wsSupervisor.terminate if exitType == :signalCatch
-  railsPID = -42
-  if options[:withRails]
-    begin
-      railsPID = File.new("ui/webclient/tmp/pids/server.pid").read.to_i
-    rescue Errno::ENOENT
-      railsPID = -42
-    end
-    Process.kill "INT", railsPID if railsPID > 1
-  end
+  exitRailsServer if options[:withRails]
   Mine::Log::Server.info "Terminating server"
   exit 0
 end
