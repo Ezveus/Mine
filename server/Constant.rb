@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 
 module Constant
-<<<<<<< HEAD
   RequestSize ||= 4096
 
   Success ||= "OK"

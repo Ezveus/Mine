@@ -10,7 +10,7 @@ class Client
   include Protocol
 
   attr_accessor :userdb
-  attr_reader :user
+  attr_reader :user, :socket
 
   @@clients = []
 
