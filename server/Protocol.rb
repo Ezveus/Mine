@@ -20,7 +20,7 @@ module Mine
         response.status = Constant::AlreadyLogged
         return Constant::Fail
       end
-      Log::Client.log "Parsing #{jsonRqst}"
+      Log::Client.debug "Parsing #{jsonRqst}"
       object = {}
       begin
         object = JSON.parse jsonRqst
@@ -47,7 +47,7 @@ module Mine
     end
 
     def self.signup jsonRqst, response, client
-      Log::Client.log "Parsing #{jsonRqst}"
+      Log::Client.debug "Parsing #{jsonRqst}"
       object = {}
       begin
         object = JSON.parse jsonRqst
@@ -72,6 +72,7 @@ module Mine
         response.status = Constant::BadRegistration
         return Constant::Fail
       end
+      Log::Client.log "New user : #{client.userdb.selectUser name}"
       Constant::Success
     end
 
@@ -82,7 +83,7 @@ module Mine
     end
 
     def self.insert jsonRqst, response, client
-      Log::Client.log "Parsing #{jsonRqst}"
+      Log::Client.debug "Parsing #{jsonRqst}"
       object = {}
       begin
         object = JSON.parse jsonRqst
@@ -104,11 +105,12 @@ module Mine
       end
       text = object[text]
       client.user.insert buffer, text
+      Log::Client.debug "Inserted #{text} in #{buffer}"
       Constant::Success
     end
 
     def self.backspace jsonRqst, response, client
-      Log::Client.log "Parsing #{jsonRqst}"
+      Log::Client.debug "Parsing #{jsonRqst}"
       object = {}
       begin
         object = JSON.parse jsonRqst
@@ -130,6 +132,7 @@ module Mine
       end
       number = object[number]
       client.user.backspace buffer, number
+      Log::Client.debug "Erased #{number} characters in #{buffer}"
       Constant::Success
     end
 

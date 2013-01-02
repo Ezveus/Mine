@@ -12,6 +12,10 @@ module Mine
       def self.info info
         puts "==> #{info}"
       end
+
+      def self.debug msg
+        $stderr.puts "--> #{str}"
+      end
     end
 
     module Client
@@ -26,6 +30,10 @@ module Mine
       def self.info info
         puts "[Client] Info : #{info}"
       end
+
+      def self.debug str
+        $stderr.puts "[Client] #{str}"
+      end
     end
 
     module WSClient
@@ -39,6 +47,10 @@ module Mine
 
       def self.info info
         puts "[WSClient] Info : #{info}"
+      end
+
+      def self.debug str
+        $stderr.puts "[WSClient] #{str}"
       end
     end
   end
