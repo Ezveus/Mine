@@ -114,7 +114,6 @@ module Mine
       end
       splitSize = insertTextSplitFlatten cursor
       insertTextCursorReplacement text, cursor, splitSize, dataStr
-      # insertTextNewLineHandler text, cursor
     end
 
     private
@@ -154,16 +153,6 @@ module Mine
         cursor.moveRight text.size
       end
     end
-
-    # def insertTextNewLineHandler text, cursor
-    #   if text.end_with? "\n" and cursor.column == @fileContent[cursor.line].size and
-    #       cursor.line == @fileContent.rindex(@fileContent.last)
-    #     @eofNewLine = true
-    #     cursor.moveRight
-    #   else
-    #     @eofNewLine = false
-    #   end
-    # end
 
     public
     #
