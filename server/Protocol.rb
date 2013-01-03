@@ -221,7 +221,7 @@ module Mine
       Signup.to_sym => Proc.new { |jsonRqst, response, client| self.signup jsonRqst, response, client },
       Exec.to_sym => Proc.new { |jsonRqst, response, client| self.exec jsonRqst, response, client },
       Insert.to_sym => Proc.new { |jsonRqst, response, client| self.insert jsonRqst, response, client },
-      Backspace.to_sym => Proc.new { |jsonRqst, response, client| self.backspace jsonRqst, response, client }
+      Backspace.to_sym => Proc.new { |jsonRqst, response, client| self.backspace jsonRqst, response, client },
       Delete.to_sym => Proc.new { |jsonRqst, response, client| self.delete jsonRqst, response, client },
       Move.to_sym => Proc.new { |jsonRqst, response, client| self.move jsonRqst, response, client },
       File.to_sym => Proc.new { |jsonRqst, response, client| self.file jsonRqst, response, client }
