@@ -23,4 +23,4 @@ Command List and Arguments :
 
 -> SYNC : array[(buffer diff)]
 
--> FILE : path size line[integer] content
+-> FILE : path size[integer] line[integer] port[integer]
