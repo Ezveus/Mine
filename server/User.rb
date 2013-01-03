@@ -44,7 +44,7 @@ module Mine
     #
     # Method to call when a new file is opened by the user
     #
-    def addFrame fileLocation, fileName, fileContent, rights, serverSide, line, overWrite
+    def addFrame fileLocation, fileName, fileContent, rights, serverSide, line, overWrite = false
       buffer = Buffer.new(fileLocation, fileName, fileContent,
                           rights, serverSide, self)
       cursor = Cursor.new(self, buffer.fileContent, line)
