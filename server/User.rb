@@ -62,10 +62,10 @@ module Mine
       @frames[buffer] = frame
     end
 
-    def findBuffer buffername
+    def findBuffer bufferid
       buf = nil
       @frames.each do |buffer, frame|
-        if buffername == "#{buffer.filename}<#{buffer.id}>"
+        if buffername == buffer.id
           buf = buffer
           break
         end

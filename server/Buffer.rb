@@ -7,6 +7,7 @@
 # 
 
 require 'diff/lcs'
+require 'securerandom'
 load 'server/Change.rb'
 load 'server/LockString.rb'
 
@@ -27,7 +28,7 @@ module Mine
       @fileLocation = fileLocation
       @fileName = fileName
       @fileContent = splitText fileContent
-      @id = Random.rand.to_i
+      @id = SecureRandom.uuid
       @rights = rights
       @serverSide = serverSide
       @workingUsers = [user]
