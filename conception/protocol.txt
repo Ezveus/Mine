@@ -6,21 +6,26 @@ ARGUMENTS ::= " VALUE " : " VALUE "
 
 VALUE ::= .
 
-Command List and Arguments :
--> AUTHENTICATE : name pass
+Command List and Arguments Sent by Clients :
+-> AUTHENTICATE : ReqId name pass
 
--> SIGNUP : name pass email (website)
+-> SIGNUP : ReqId name pass email (website)
 
--> EXEC : buffer command (args[array[value]])
+-> EXEC : ReqId buffer command (args[array[value]])
 
--> INSERT : buffer text
+-> INSERT : ReqId buffer text
 
--> MOVE : buffer direction[up | right | down | left | origin | end] number[integer]
+-> MOVE : ReqId buffer direction[up | right | down | left | origin | end] number[integer]
 
--> BACKSPACE : buffer number[integer]
+-> BACKSPACE : ReqId buffer number[integer]
 
--> DELETE : buffer number[integer]
+-> DELETE : ReqId buffer number[integer]
+
+-> FILE : ReqId path size[integer] line[integer] port[integer]
+
+
+Command List and Arguments sent by Server :
 
 -> SYNC : array[(buffer diff)]
 
--> FILE : path size[integer] line[integer] port[integer]
+-> RESPONSE : id status[integer] {object}
