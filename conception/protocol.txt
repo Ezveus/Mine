@@ -21,7 +21,7 @@ Command List and Arguments Sent by Clients :
 
 -> DELETE : ReqId buffer number[integer]
 
--> FILE : ReqId path size[integer] line[integer] port[integer]
+-> LOAD : ReqId path size[integer] line[integer] port[integer]
 
 
 Command List and Arguments sent by Server :
