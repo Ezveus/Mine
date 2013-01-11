@@ -1,10 +1,10 @@
 #!/usr/bin/env ruby
 
 require 'celluloid/io'
+require 'WEBSocket'
 
 load 'server/Log.rb'
 load "server/Client.rb"
-load 'server/Socket.rb'
 
 module Mine
   class WSHandler
@@ -12,7 +12,7 @@ module Mine
 
     def initialize host, port
       @host, @port = host, port
-      @server = TCPServer.new @host, @port
+      @server = WEBSocket::Server.new @host, @port
       run!
     end
 
@@ -29,14 +29,8 @@ module Mine
     def handle_connection socket
       _, port, host = socket.peeraddr
       puts "*** Received connection from #{host}:#{port}"
-      msock = Socket.new socket
-      client = Client.new msock
       loop do
-        if msock.status == :disconnected
-          msock.connect
-        elsif msock.status == :connected
-          client.readAndProcessRequest
-        end
+        client.readAndProcessRequest
       end
     rescue EOFError
       puts "*** #{host}:#{port} disconnected"
