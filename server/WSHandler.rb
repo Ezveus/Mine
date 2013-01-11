@@ -29,6 +29,7 @@ module Mine
     def handle_connection socket
       _, port, host = socket.peeraddr
       puts "*** Received connection from #{host}:#{port}"
+      client = Client.new socket
       loop do
         client.readAndProcessRequest
       end
