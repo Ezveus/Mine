@@ -11,16 +11,18 @@ module Mine
     include Protocol
 
     attr_accessor :userdb
-    attr_reader :user, :socket, :authenticated
+    attr_reader :user, :socket, :authenticated, :remoteHost, :socketType
 
     @@clients = []
 
-    def initialize sock
+    def initialize sock, remoteHost, socketType
       @authenticated = false
       @user = nil
       @userdb = Userdb.new
       @@clients << self
       @socket = sock
+      @remoteHost = remoteHost
+      @socketType = socketType
     end
 
     def user= user

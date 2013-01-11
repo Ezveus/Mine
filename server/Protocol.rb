@@ -210,9 +210,10 @@ module Mine
       end
       path = object[path]
       fileName = File.basename path
-      Log::Client.log "not creating the frame"
-      # Socket.new
-      # client.user.addFrame path, fileName, fileContent, {}, false, object[line]
+      Log::Client.log "Creating the frame : #{path}"
+      socket = Socket.new client.remoteHost, object[port], client.socketType
+      fileContent = socket.read object[size]
+      client.user.addFrame path, fileName, fileContent, {}, false, object[line]
       Constant::Success
     end
 
