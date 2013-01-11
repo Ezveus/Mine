@@ -3,7 +3,7 @@ require 'WEBSocket'
 
 module Mine
   module Socket
-    def self.new rhost, rport, type = :tcp
+    def self.create rhost, rport, type = :tcp
       if type == :tcp
         Celluloid::IO::TCPSocket.new rhost, rport
       elsif type == :wsp

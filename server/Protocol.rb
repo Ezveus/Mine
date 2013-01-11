@@ -3,6 +3,7 @@
 require 'json'
 
 load "server/User.rb"
+load "server/Socket.rb"
 load "server/Log.rb"
 
 module Mine
@@ -15,7 +16,7 @@ module Mine
                   Backspace = "BACKSPACE",
                   Delete = "DELETE",
                   Move = "MOVE",
-                  File = "FILE"
+                  Load = "LOAD"
                  ]
 
     def self.authenticate jsonRqst, response, client
@@ -101,13 +102,13 @@ module Mine
         response.status = Constant::ForbiddenAction
         return Constant::Fail
       end
-      buffer = client.user.findBuffer object[buffer]
+      buffer = client.user.findBuffer object["buffer"]
       if buffer.nil?
         Log::Client.error "Unknown buffer"
         response.status = Constant::UnknownBuffer
         return Constant::Fail
       end
-      text = object[text]
+      text = object["text"]
       client.user.insert buffer, text
       Log::Client.debug "Inserted #{text} in #{buffer}"
       Constant::Success
@@ -128,13 +129,13 @@ module Mine
         response.status = Constant::ForbiddenAction
         return Constant::Fail
       end
-      buffer = client.user.findBuffer object[buffer]
+      buffer = client.user.findBuffer object["buffer"]
       if buffer.nil?
         Log::Client.error "Unknown buffer"
         response.status = Constant::UnknownBuffer
         return Constant::Fail
       end
-      number = object[number]
+      number = object["number"]
       client.user.backspace buffer, number
       Log::Client.debug "Erased #{number} characters in #{buffer}"
       Constant::Success
@@ -155,13 +156,13 @@ module Mine
         response.status = Constant::ForbiddenAction
         return Constant::Fail
       end
-      buffer = client.user.findBuffer object[buffer]
+      buffer = client.user.findBuffer object["buffer"]
       if buffer.nil?
         Log::Client.error "Unknown buffer"
         response.status = Constant::UnknownBuffer
         return Constant::Fail
       end
-      number = object[number]
+      number = object["number"]
       client.user.delete buffer, number
       Constant::Success
     end
@@ -181,19 +182,19 @@ module Mine
         response.status = Constant::ForbiddenAction
         return Constant::Fail
       end
-      buffer = client.user.findBuffer object[buffer]
+      buffer = client.user.findBuffer object["buffer"]
       if buffer.nil?
         Log::Client.error "Unknown buffer"
         response.status = Constant::UnknownBuffer
         return Constant::Fail
       end
-      direction = object[direction]
-      number = object[number]
+      direction = object["direction"]
+      number = object["number"]
       client.user.moveCursor buffer, direction, number
       Constant::Success
     end
 
-    def self.file jsonRqst, response, client
+    def self.load jsonRqst, response, client
       Log::Client.log "Parsing #{jsonRqst}"
       object = {}
       begin
@@ -208,12 +209,12 @@ module Mine
         response.status = Constant::ForbiddenAction
         return Constant::Fail
       end
-      path = object[path]
+      path = object["path"]
       fileName = File.basename path
+      socket = Mine::Socket.create client.remoteHost, object["port"], client.socketType
+      fileContent = socket.read object["size"]
       Log::Client.log "Creating the frame : #{path}"
-      socket = Socket.new client.remoteHost, object[port], client.socketType
-      fileContent = socket.read object[size]
-      client.user.addFrame path, fileName, fileContent, {}, false, object[line]
+      client.user.addFrame path, fileName, fileContent, {}, false, object["line"]
       Constant::Success
     end
 
@@ -225,7 +226,7 @@ module Mine
       Backspace.to_sym => Proc.new { |jsonRqst, response, client| self.backspace jsonRqst, response, client },
       Delete.to_sym => Proc.new { |jsonRqst, response, client| self.delete jsonRqst, response, client },
       Move.to_sym => Proc.new { |jsonRqst, response, client| self.move jsonRqst, response, client },
-      File.to_sym => Proc.new { |jsonRqst, response, client| self.file jsonRqst, response, client }
+      Load.to_sym => Proc.new { |jsonRqst, response, client| self.load jsonRqst, response, client }
     }
   end
 end
