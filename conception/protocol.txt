@@ -7,21 +7,22 @@ ARGUMENTS ::= " VALUE " : " VALUE "
 VALUE ::= .
 
 Command List and Arguments Sent by Clients :
--> AUTHENTICATE : ReqId name pass
+-> AUTHENTICATE : id name pass
 
--> SIGNUP : ReqId name pass email (website)
+-> SIGNUP : id name pass email (website)
 
--> EXEC : ReqId buffer command (args[array[value]])
+-> EXEC : id buffer command (args[array[value]])
 
--> INSERT : ReqId buffer text
+-> INSERT : id buffer text
 
--> MOVE : ReqId buffer direction[up | right | down | left | origin | end] number[integer]
+-> MOVE : id buffer direction[up | right | down | left | origin | end] number[integer]
 
--> BACKSPACE : ReqId buffer number[integer]
+-> BACKSPACE : id buffer number[integer]
 
--> DELETE : ReqId buffer number[integer]
+-> DELETE : id buffer number[integer]
 
--> LOAD : ReqId path size[integer] line[integer] port[integer]
+-> LOAD : id path size[integer] line[integer] port[integer]
+        => RESPONSE info : uuid
 
 
 Command List and Arguments sent by Server :

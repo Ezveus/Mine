@@ -54,10 +54,10 @@ module Mine
       buffer = buffer.strip
       response = Response.new
       request = buffer.split '='
-      puts "buf : #{buffer}, rqst : #{request}"
       return Constant::Fail if unvalidRequest? buffer, response
       return Constant::Fail if unknownRequest? request[0], response
       Commands[request[0].to_sym].call request[1], response, self
+      @socket.write "RESPONSE=#{JSON.dump response}"
     end
 
     private

@@ -19,12 +19,7 @@ module Mine
                   Load = "LOAD"
                  ]
 
-    def self.authenticate jsonRqst, response, client
-      if client.authenticated
-        Log::Client.error "#{client.user} already logged"
-        response.status = Constant::AlreadyLogged
-        return Constant::Fail
-      end
+    def self.getObjectFromJSON jsonRqst, response
       Log::Client.debug "Parsing #{jsonRqst}"
       object = {}
       begin
@@ -34,6 +29,24 @@ module Mine
         response.status = Constant::JSONParserError
         return Constant::Fail
       end
+      id = object["id"]
+      unless id
+        Log::Client.error "No request ID"
+        response.status = Constant::MissingIDError
+        return nil
+      end
+      response.id = object["id"]
+      object
+    end
+
+    def self.authenticate jsonRqst, response, client
+      if client.authenticated
+        Log::Client.error "#{client.user} already logged"
+        response.status = Constant::AlreadyLogged
+        return Constant::Fail
+      end
+      object = getObjectFromJSON jsonRqst, response
+      return Constant::Fail if object.nil?
       name = object["name"]
       pass = object["pass"]
       unless name and pass
@@ -52,15 +65,8 @@ module Mine
     end
 
     def self.signup jsonRqst, response, client
-      Log::Client.debug "Parsing #{jsonRqst}"
-      object = {}
-      begin
-        object = JSON.parse jsonRqst
-      rescue JSON::ParserError => error
-        Log::Client.error "#{error}"
-        response.status = Constant::JSONParserError
-        return Constant::Fail
-      end
+      object = getObjectFromJSON jsonRqst, response
+      return Constant::Fail if object.nil?
       name = object["name"]
       pass = object["pass"]
       email = object["email"]
@@ -88,16 +94,9 @@ module Mine
     end
 
     def self.insert jsonRqst, response, client
-      Log::Client.debug "Parsing #{jsonRqst}"
-      object = {}
-      begin
-        object = JSON.parse jsonRqst
-      rescue JSON::ParserError => error
-        Log::Client.error "Error : #{error}"
-        response.status = Constant::JSONParserError
-        return Constant::Fail
-      end
-      if client.user.nil?
+      object = getObjectFromJSON jsonRqst, response
+      return Constant::Fail if object.nil?
+      unless client.authenticated
         Log::Client.error "Insert : not logged"
         response.status = Constant::ForbiddenAction
         return Constant::Fail
@@ -115,16 +114,9 @@ module Mine
     end
 
     def self.backspace jsonRqst, response, client
-      Log::Client.debug "Parsing #{jsonRqst}"
-      object = {}
-      begin
-        object = JSON.parse jsonRqst
-      rescue JSON::ParserError => error
-        Log::Client.error "Error : #{error}"
-        response.status = Constant::JSONParserError
-        return Constant::Fail
-      end
-      if client.user.nil?
+      object = getObjectFromJSON jsonRqst, response
+      return Constant::Fail if object.nil?
+      unless client.authenticated
         Log::Client.error "Backspace : not logged"
         response.status = Constant::ForbiddenAction
         return Constant::Fail
@@ -142,16 +134,9 @@ module Mine
     end
 
     def self.delete jsonRqst, response, client
-      Log::Client.log "Parsing #{jsonRqst}"
-      object = {}
-      begin
-        object = JSON.parse jsonRqst
-      rescue JSON::ParserError => error
-        Log::Client.error "Error : #{error}"
-        response.status = Constant::JSONParserError
-        return Constant::Fail
-      end
-      if client.user.nil?
+      object = getObjectFromJSON jsonRqst, response
+      return Constant::Fail if object.nil?
+      unless client.authenticated
         Log::Client.error "Delete : not logged"
         response.status = Constant::ForbiddenAction
         return Constant::Fail
@@ -168,16 +153,9 @@ module Mine
     end
 
     def self.move jsonRqst, response, client
-      Log::Client.log "Parsing #{jsonRqst}"
-      object = {}
-      begin
-        object = JSON.parse jsonRqst
-      rescue JSON::ParserError => error
-        Log::Client.error "Error : #{error}"
-        response.status = Constant::JSONParserError
-        return Constant::Fail
-      end
-      if client.user.nil?
+      object = getObjectFromJSON jsonRqst, response
+      return Constant::Fail if object.nil?
+      unless client.authenticated
         Log::Client.error "Move : not logged"
         response.status = Constant::ForbiddenAction
         return Constant::Fail
@@ -195,16 +173,9 @@ module Mine
     end
 
     def self.load jsonRqst, response, client
-      Log::Client.log "Parsing #{jsonRqst}"
-      object = {}
-      begin
-        object = JSON.parse jsonRqst
-      rescue JSON::ParserError => error
-        Log::Client.error "Error : #{error}"
-        response.status = Constant::JSONParserError
-        return Constant::Fail
-      end
-      if client.user.nil?
+      object = getObjectFromJSON jsonRqst, response
+      return Constant::Fail if object.nil?
+      unless client.authenticated
         Log::Client.error "File : not logged"
         response.status = Constant::ForbiddenAction
         return Constant::Fail
@@ -214,7 +185,8 @@ module Mine
       socket = Mine::Socket.create client.remoteHost, object["port"], client.socketType
       fileContent = socket.read object["size"]
       Log::Client.log "Creating the frame : #{path}"
-      client.user.addFrame path, fileName, fileContent, {}, false, object["line"]
+      uuid = client.user.addFrame path, fileName, fileContent, {}, false, object["line"]
+      response.info["uuid"] = uuid
       Constant::Success
     end
 

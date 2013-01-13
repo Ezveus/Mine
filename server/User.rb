@@ -50,6 +50,7 @@ module Mine
       cursor = Cursor.new(self, buffer.fileContent, line)
       frame = Frame.new(cursor, overWrite)
       @frames[buffer] = frame
+      buffer.id
     end
 
     #
