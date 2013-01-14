@@ -166,7 +166,7 @@ module Mine
         nbToDelete = deleteTextBackspaceConcatLine cursor, nbToDelete, overwrite
       end
       deleteTextBackspaceSameLine cursor, nbToDelete, overwrite
-      eofNewLine?
+      nil
     end
     
     private
@@ -237,7 +237,7 @@ module Mine
         nbToDelete = deleteTextDeleteConcatLine c, nbToDelete
       end
       deleteTextDeleteSameLine c, nbToDelete
-      eofNewLine?
+      nil
     end
 
     private
