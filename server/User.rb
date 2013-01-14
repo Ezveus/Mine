@@ -66,7 +66,7 @@ module Mine
     def findBuffer bufferid
       buf = nil
       @frames.each do |buffer, frame|
-        if buffername == buffer.id
+        if bufferid == buffer.id
           buf = buffer
           break
         end

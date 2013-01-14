@@ -75,7 +75,7 @@ module Mine
     # This one is to call when you type backspace
     # Also creates a diff if insertDiff is true
     #
-    def backspaceBuffer buffer, nb, insertDiff
+    def backspaceBuffer buffer, nb, insertDiff = true
       if insertDiff
         bufferBefore = Array.new(buffer.fileContent)
         cursorBefore = [@cursor.line, @cursor.column]
