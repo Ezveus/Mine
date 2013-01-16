@@ -14,7 +14,7 @@ load 'server/LockString.rb'
 module Mine
   class Buffer
 
-    attr_reader :fileContent, :filename, :id
+    attr_reader :fileContent, :fileName, :id, :fileLocation
 
     #
     # Initializes the buffer assigning to it
@@ -42,6 +42,7 @@ module Mine
     #
     def addWorkingUser user
       @workingUsers << user
+      @workingUsers.uniq!
     end
 
     public
@@ -57,8 +58,9 @@ module Mine
     # Method to call every time a diff is generated
     #
     def updateClients diff
+      req = diff.to_request @id
       @workingUsers.each do |user|
-        user.updateClients @fileName, diff
+        user.updateClients req
       end
     end
 

@@ -9,6 +9,21 @@ load "server/Frame.rb"
 module Mine
   class User
     attr_reader :userInfo, :frames, :cmdHistory, :killRing
+    attr_accessor :lastClient, :clients
+
+    @@users = {}
+
+    def self.getInstance username, userdb, client
+      user = @@users[username]
+      if user.nil?
+        user = User.new username, userdb, client
+        @@users[username] = user
+        user
+      else
+        user.clients << client
+        user
+      end
+    end
 
     #
     # Initializes the user with
@@ -35,16 +50,33 @@ module Mine
     #
     # Method to call when needed to update any information to the clients of the user
     #
-    def updateClients bufferName, diff
+    def updateClients request
       @clients.each do |client|
-        # send sync client, bufferName, diff unless client == @lastClient
+        unless client == @lastClient
+          client.socket.write request
+        end
+      end
+    end
+
+    def addFrame fileLocation, fileName, fileContent, rights, serverSide, line, overWrite = false
+      buf = nil
+      @frames.each do |buffer, frame|
+        if buffer.fileLocation == fileLocation
+          buf = buffer
+          break
+        end
+      end
+      if buf.nil?
+        addFrameNewBuffer fileLocation, fileName, fileContent, rights, serverSide, line
+      else
+        addFrameExistingBuffer buf, line, overWrite
       end
     end
 
     #
     # Method to call when a new file is opened by the user
     #
-    def addFrame fileLocation, fileName, fileContent, rights, serverSide, line, overWrite = false
+    def addFrameNewBuffer fileLocation, fileName, fileContent, rights, serverSide, line, overWrite = false
       buffer = Buffer.new(fileLocation, fileName, fileContent,
                           rights, serverSide, self)
       cursor = Cursor.new(self, buffer.fileContent, line)
@@ -61,6 +93,7 @@ module Mine
       frame = Frame.new(cursor, overWrite)
       buffer.addWorkingUser self
       @frames[buffer] = frame
+      buffer.id
     end
 
     def findBuffer bufferid

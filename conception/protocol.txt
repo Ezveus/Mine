@@ -27,6 +27,6 @@ Command List and Arguments Sent by Clients :
 
 Command List and Arguments sent by Server :
 
--> SYNC : array[(buffer diff)]
+-> SYNC : buffer diff
 
 -> RESPONSE : id status[integer] {object}

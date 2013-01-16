@@ -66,7 +66,7 @@ module Mine
         d = Diff::LCS.diff(bufferAfter, bufferBefore)
         diff = Change.new(@cursor.owner, cursorBefore, cursorAfter, d)
         buffer.insertDiff diff
-        # call the method to update the clients
+        buffer.updateClients diff
       end
     end
 
@@ -87,7 +87,7 @@ module Mine
         d = Diff::LCS.diff(bufferAfter, bufferBefore)
         diff = Change.new(@cursor.owner, cursorBefore, cursorAfter, d)
         buffer.insertDiff diff
-        # call the method to update the clients
+        buffer.updateClients diff
       end
     end
 
@@ -105,7 +105,7 @@ module Mine
       d = Diff::LCS.diff(bufferAfter, bufferBefore)
       diff = Change.new(@cursor.owner, cursorBefore, cursorAfter, d)
       buffer.insertDiff diff
-      # call the method to update the clients
+      buffer.updateClients diff
     end
 
     #
@@ -130,6 +130,7 @@ module Mine
     #
     def undo buffer
       buffer.undo @cursor
+      # send sync
     end
 
     #
@@ -137,6 +138,7 @@ module Mine
     #
     def redo buffer
       buffer.redo @cursor
+      # send sync
     end
   end
 end

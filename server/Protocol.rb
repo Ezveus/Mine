@@ -59,7 +59,7 @@ module Mine
         response.status = Constant::UnknownUser
         return Constant::Fail
       end
-      client.user = User.new name, client.userdb, client
+      client.user = User.getInstance name, client.userdb, client
       Log::Client.log "User logged : #{client.user.userInfo}"
       Constant::Success
     end

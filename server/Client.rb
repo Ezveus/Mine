@@ -56,6 +56,7 @@ module Mine
       request = buffer.split '='
       return Constant::Fail if unvalidRequest? buffer, response
       return Constant::Fail if unknownRequest? request[0], response
+      @user.lastClient = self unless @user.nil?
       Commands[request[0].to_sym].call request[1], response, self
       @socket.write "RESPONSE=#{JSON.dump response}"
     end
