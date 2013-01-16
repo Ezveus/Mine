@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'json'
+require 'base64'
 
 load "server/User.rb"
 load "server/Socket.rb"
@@ -107,7 +108,7 @@ module Mine
         response.status = Constant::UnknownBuffer
         return Constant::Fail
       end
-      text = object["text"]
+      text = Base64.decode64 object["text"]
       client.user.insert buffer, text
       Log::Client.debug "Inserted #{text} in #{buffer}"
       Constant::Success

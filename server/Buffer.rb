@@ -124,6 +124,7 @@ module Mine
     # Here is a bunch of function to insert what we want where we want
     #
     def insertTextEmptyFile cursor, text
+      puts "\t\t#{text.inspect}"
       @fileContent[cursor.line].replace splitText text
       text
     end
@@ -372,6 +373,7 @@ module Mine
           res[i] << c
         end
       end
+      puts res.inspect
       res
     end
 

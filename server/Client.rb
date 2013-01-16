@@ -53,7 +53,7 @@ module Mine
       buffer = @socket.readpartial Constant::RequestSize
       buffer = buffer.strip
       response = Response.new
-      request = buffer.split '='
+      request = buffer.split '=', 2
       return Constant::Fail if unvalidRequest? buffer, response
       return Constant::Fail if unknownRequest? request[0], response
       @user.lastClient = self unless @user.nil?
