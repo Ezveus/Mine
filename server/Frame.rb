@@ -129,16 +129,28 @@ module Mine
     # Undoes the last change on the buffer
     #
     def undo buffer
+      bufferBefore = Array.new(buffer.fileContent)
+      cursorBefore = [@cursor.line, @cursor.column]
       buffer.undo @cursor
-      # send sync
+      bufferAfter = Array.new(buffer.fileContent)
+      cursorAfter = [@cursor.line, @cursor.column]
+      d = Diff::LCS.diff(bufferBefore, bufferAfter)
+      diff = Change.new(@cursor.owner, cursorBefore, cursorAfter, d)
+      buffer.updateClients diff
     end
 
     #
     # Redoes the last undone change on the buffer
     #
     def redo buffer
+      bufferBefore = Array.new(buffer.fileContent)
+      cursorBefore = [@cursor.line, @cursor.column]
       buffer.redo @cursor
-      # send sync
+      bufferAfter = Array.new(buffer.fileContent)
+      cursorAfter = [@cursor.line, @cursor.column]
+      d = Diff::LCS.diff(bufferBefore, bufferAfter)
+      diff = Change.new(@cursor.owner, cursorBefore, cursorAfter, d)
+      buffer.updateClients diff
     end
   end
 end
