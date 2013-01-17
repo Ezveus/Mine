@@ -302,7 +302,7 @@ module Mine
       if @diffHistoryPosition < @diffHistory.size
         @diffHistoryPosition = 0 if @diffHistoryPosition < 0
         diff = @diffHistory[@diffHistoryPosition]
-        patch diff, :patch
+        patch diff, :unpatch
         cursor.moveToLine diff.cursorBefore[0]
         cursor.moveToColumn diff.cursorBefore[1]
         @diffHistoryPosition += 1
@@ -318,7 +318,7 @@ module Mine
     def redo cursor
       if @diffHistoryPosition > 0
         diff = @diffHistory[@diffHistoryPosition - 1]
-        patch diff, :unpatch
+        patch diff, :patch
         cursor.moveToLine diff.cursorAfter[0]
         cursor.moveToColumn diff.cursorAfter[1]
         @diffHistoryPosition -= 1

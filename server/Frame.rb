@@ -63,7 +63,7 @@ module Mine
       if insertDiff
         bufferAfter = Array.new(buffer.fileContent)
         cursorAfter = [@cursor.line, @cursor.column]
-        d = Diff::LCS.diff(bufferAfter, bufferBefore)
+        d = Diff::LCS.diff(bufferBefore, bufferAfter)
         diff = Change.new(@cursor.owner, cursorBefore, cursorAfter, d)
         buffer.insertDiff diff
         buffer.updateClients diff
@@ -84,7 +84,7 @@ module Mine
       if insertDiff
         bufferAfter = Array.new(buffer.fileContent)
         cursorAfter = [@cursor.line, @cursor.column]
-        d = Diff::LCS.diff(bufferAfter, bufferBefore)
+        d = Diff::LCS.diff(bufferBefore, bufferAfter)
         diff = Change.new(@cursor.owner, cursorBefore, cursorAfter, d)
         buffer.insertDiff diff
         buffer.updateClients diff
@@ -102,7 +102,7 @@ module Mine
       buffer.deleteTextDelete @cursor, nb
       bufferAfter = Array.new(buffer.fileContent)
       cursorAfter = [@cursor.line, @cursor.column]
-      d = Diff::LCS.diff(bufferAfter, bufferBefore)
+      d = Diff::LCS.diff(bufferBefore, bufferAfter)
       diff = Change.new(@cursor.owner, cursorBefore, cursorAfter, d)
       buffer.insertDiff diff
       buffer.updateClients diff
