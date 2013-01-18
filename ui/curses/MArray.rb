@@ -1,4 +1,11 @@
 class Array
+  # For all find functions, a hash is expected.
+  # The keys corresponds to the class methods which will be called
+  # and the result of these functions will be compared with the
+  # corresponding values.
+  # To find a Integer, use 'to_i' method and the searched Integer.
+  # For Strings, use 'to_s' method etc ...
+
   # This function returns the element which corresponds to the given hash.
   # Returns nil if fails.
   def find hash
