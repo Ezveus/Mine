@@ -194,17 +194,6 @@ module Mine
       Constant::Success
     end
 
-    # Commands ||= {
-    #   Authenticate.to_sym => Proc.new { |jsonRqst, response, client| self.authenticate jsonRqst, response, client },
-    #   Signup.to_sym => Proc.new { |jsonRqst, response, client| self.signup jsonRqst, response, client },
-    #   Exec.to_sym => Proc.new { |jsonRqst, response, client| self.exec jsonRqst, response, client },
-    #   Insert.to_sym => Proc.new { |jsonRqst, response, client| self.insert jsonRqst, response, client },
-    #   Backspace.to_sym => Proc.new { |jsonRqst, response, client| self.backspace jsonRqst, response, client },
-    #   Delete.to_sym => Proc.new { |jsonRqst, response, client| self.delete jsonRqst, response, client },
-    #   Move.to_sym => Proc.new { |jsonRqst, response, client| self.move jsonRqst, response, client },
-    #   Load.to_sym => Proc.new { |jsonRqst, response, client| self.load jsonRqst, response, client }
-    # }
-
     Commands ||= {
       "AUTHENTICATE".to_sym => Proc.new { |jsonRqst, response, client| self.authenticate jsonRqst, response, client },
       "SIGNUP".to_sym => Proc.new { |jsonRqst, response, client| self.signup jsonRqst, response, client },

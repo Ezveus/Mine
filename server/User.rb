@@ -107,6 +107,10 @@ module Mine
       buf
     end
 
+    def killBuffer buffer
+      @frames.delete buffer
+    end
+
     #
     # Method to call to switch on/off the overWrite mode
     #
@@ -175,6 +179,7 @@ module Mine
       @frames[buffer].switchOverWrite if overwrite = @frames[buffer].isOverWrite?
       @frames[buffer].fillBuffer buffer, @killRing[0]
       @frames[buffer].switchOverWrite if overwrite
+      @frames[buffer].updateLastCmd "Yank"
     end
 
     public
@@ -182,7 +187,7 @@ module Mine
     # Method to unfold the killRing
     #
     def yankPop buffer
-      if @frames[buffer].lastCmd.start_with? "yank"
+      if @frames[buffer].lastCmd.start_with? "Yank"
         # some initialization for the diff insertion
         cursor = @frames[buffer].cursor
         bufferBefore = Array.new(buffer.fileContent)
@@ -202,9 +207,8 @@ module Mine
         d = Diff::LCS.diff(bufferAfter, bufferBefore)
         diff = Change.new(self, cursorBefore, cursorAfter, d)
         buffer.insertDiff diff
-      else
-        # Doesn't do anything
       end
+      @frames[buffer].updateLastCmd "YankPop"
     end
 
     public
@@ -212,12 +216,12 @@ module Mine
     # Method to manage the killing of line (aka C-k)
     #
     def killLine buffer
-      puts "#{buffer}"
-      if @frames[buffer].lastCmd.start_with? "kill"
+      if @frames[buffer].lastCmd.start_with? "Kill"
         killLineConcat buffer
       else
         killLineNewEntry buffer
       end
+      @frames[buffer].updateLastCmd "KillLine"
       @killRingPosition = 0
     end
 

@@ -32,11 +32,17 @@ module Mine
       @overWrite
     end
 
+    def updateLastCmd newCmd
+      @lastCmd = newCmd
+      nil
+    end
+
     #
     # Function to switch the overWrite mode on or off
     #
     def switchOverWrite
       @overWrite = !@overWrite
+      updateLastCmd "OverWriteMode"
     end
 
     #
@@ -68,6 +74,7 @@ module Mine
         buffer.insertDiff diff
         buffer.updateClients diff
       end
+      updateLastCmd "Insert"
     end
 
     #
@@ -89,6 +96,7 @@ module Mine
         buffer.insertDiff diff
         buffer.updateClients diff
       end
+      updateLastCmd "Backspace"
     end
 
     #
@@ -106,6 +114,7 @@ module Mine
       diff = Change.new(@cursor.owner, cursorBefore, cursorAfter, d)
       buffer.insertDiff diff
       buffer.updateClients diff
+      updateLastCmd "Delete"
     end
 
     #
@@ -122,6 +131,7 @@ module Mine
                        when :end then @cursor.moveToEnd
                        else [@cursor.line, @cursor.column]
                        end
+      updateLastCmd "Move"
       cursorPosition
     end
 
@@ -137,6 +147,7 @@ module Mine
       d = Diff::LCS.diff(bufferBefore, bufferAfter)
       diff = Change.new(@cursor.owner, cursorBefore, cursorAfter, d)
       buffer.updateClients diff
+      updateLastCmd "Undo"
     end
 
     #
@@ -151,6 +162,7 @@ module Mine
       d = Diff::LCS.diff(bufferBefore, bufferAfter)
       diff = Change.new(@cursor.owner, cursorBefore, cursorAfter, d)
       buffer.updateClients diff
+      updateLastCmd "Redo"
     end
   end
 end
