@@ -6,19 +6,10 @@ require 'base64'
 load "server/User.rb"
 load "server/Socket.rb"
 load "server/Log.rb"
+load "server/Exec.rb"
 
 module Mine
   module Protocol
-    Requests ||= [
-                  Authenticate = "AUTHENTICATE",
-                  Signup = "SIGNUP",
-                  Exec = "EXEC",
-                  Insert = "INSERT",
-                  Backspace = "BACKSPACE",
-                  Delete = "DELETE",
-                  Move = "MOVE",
-                  Load = "LOAD"
-                 ]
 
     def self.getObjectFromJSON jsonRqst, response
       Log::Client.debug "Parsing #{jsonRqst}"
@@ -89,8 +80,20 @@ module Mine
     end
 
     def self.exec jsonRqst, response, client
-      Log::Client.info "Here should JSON argument be parsed"
-      Log::Client.info "NOT Parsing #{jsonRqst}"
+      object = getObjectFromJSON jsonRqst, response
+      return Constant::Fail if object.nil?
+      unless client.authenticated
+        Log::Client.error "Exec : not logged"
+        response.status = Constant::ForbiddenAction
+        return Constant::Fail
+      end
+      buffer = client.user.findBuffer object["buffer"]
+      if buffer.nil?
+        Log::Client.error "Unknown buffer"
+        response .status = Constant::ForbiddenAction
+        return Constant::Fail
+      end
+      Exec::ExecCommands[object["command"].to_sym].call buffer, object["args"], response, client
       Constant::Success
     end
 
@@ -191,15 +194,27 @@ module Mine
       Constant::Success
     end
 
+    # Commands ||= {
+    #   Authenticate.to_sym => Proc.new { |jsonRqst, response, client| self.authenticate jsonRqst, response, client },
+    #   Signup.to_sym => Proc.new { |jsonRqst, response, client| self.signup jsonRqst, response, client },
+    #   Exec.to_sym => Proc.new { |jsonRqst, response, client| self.exec jsonRqst, response, client },
+    #   Insert.to_sym => Proc.new { |jsonRqst, response, client| self.insert jsonRqst, response, client },
+    #   Backspace.to_sym => Proc.new { |jsonRqst, response, client| self.backspace jsonRqst, response, client },
+    #   Delete.to_sym => Proc.new { |jsonRqst, response, client| self.delete jsonRqst, response, client },
+    #   Move.to_sym => Proc.new { |jsonRqst, response, client| self.move jsonRqst, response, client },
+    #   Load.to_sym => Proc.new { |jsonRqst, response, client| self.load jsonRqst, response, client }
+    # }
+
     Commands ||= {
-      Authenticate.to_sym => Proc.new { |jsonRqst, response, client| self.authenticate jsonRqst, response, client },
-      Signup.to_sym => Proc.new { |jsonRqst, response, client| self.signup jsonRqst, response, client },
-      Exec.to_sym => Proc.new { |jsonRqst, response, client| self.exec jsonRqst, response, client },
-      Insert.to_sym => Proc.new { |jsonRqst, response, client| self.insert jsonRqst, response, client },
-      Backspace.to_sym => Proc.new { |jsonRqst, response, client| self.backspace jsonRqst, response, client },
-      Delete.to_sym => Proc.new { |jsonRqst, response, client| self.delete jsonRqst, response, client },
-      Move.to_sym => Proc.new { |jsonRqst, response, client| self.move jsonRqst, response, client },
-      Load.to_sym => Proc.new { |jsonRqst, response, client| self.load jsonRqst, response, client }
+      "AUTHENTICATE".to_sym => Proc.new { |jsonRqst, response, client| self.authenticate jsonRqst, response, client },
+      "SIGNUP".to_sym => Proc.new { |jsonRqst, response, client| self.signup jsonRqst, response, client },
+      "EXEC".to_sym => Proc.new { |jsonRqst, response, client| self.exec jsonRqst, response, client },
+      "INSERT".to_sym => Proc.new { |jsonRqst, response, client| self.insert jsonRqst, response, client },
+      "BACKSPACE".to_sym => Proc.new { |jsonRqst, response, client| self.backspace jsonRqst, response, client },
+      "DELETE".to_sym => Proc.new { |jsonRqst, response, client| self.delete jsonRqst, response, client },
+      "MOVE".to_sym => Proc.new { |jsonRqst, response, client| self.move jsonRqst, response, client },
+      "LOAD".to_sym => Proc.new { |jsonRqst, response, client| self.load jsonRqst, response, client }
     }
+
   end
 end

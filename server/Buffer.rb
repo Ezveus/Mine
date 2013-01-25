@@ -6,7 +6,6 @@
 # Also managing the diffHistory
 # 
 
-require 'diff/lcs'
 require 'securerandom'
 load 'server/Change.rb'
 load 'server/LockString.rb'

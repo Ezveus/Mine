@@ -212,6 +212,7 @@ module Mine
     # Method to manage the killing of line (aka C-k)
     #
     def killLine buffer
+      puts "#{buffer}"
       if @frames[buffer].lastCmd.start_with? "kill"
         killLineConcat buffer
       else

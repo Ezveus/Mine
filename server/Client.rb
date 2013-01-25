@@ -62,6 +62,17 @@ module Mine
     end
 
     private
+    Requests ||= [
+                  Authenticate = "AUTHENTICATE",
+                  Signup = "SIGNUP",
+                  Exec = "EXEC",
+                  Insert = "INSERT",
+                  Backspace = "BACKSPACE",
+                  Delete = "DELETE",
+                  Move = "MOVE",
+                  Load = "LOAD"
+                 ]
+
     def unknownRequest? request, response
       unless Requests.index request
         Log::Client.error "Unknown request"

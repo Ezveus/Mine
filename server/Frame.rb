@@ -11,7 +11,7 @@ load 'server/Buffer.rb'
 #
 module Mine
   class Frame
-    attr_reader :cursor, :overWrite
+    attr_reader :cursor, :overWrite, :lastCmd
 
     #
     # Initializes the class with :

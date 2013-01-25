@@ -11,7 +11,7 @@ module Mine
     attr_reader :cursorBefore, :cursorAfter, :user, :diff
 
     def initialize user, cursorBefore, cursorAfter, diff
-      @diff = Diff::LCS.__normalize_patchset diff
+      @diff = diff[0]
       @user = user
       @cursorBefore = cursorBefore
       @cursorAfter = cursorAfter
