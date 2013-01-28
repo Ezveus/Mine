@@ -46,9 +46,9 @@ def launchServer options
 
   begin
     Mine::Log::Server.info "Launching TCP Server (#{options[:host]}:#{options[:port]})"
-    tcpSupervisor = Mine::TCPHandler.supervise options[:host], options[:port]
+    tcpSupervisor = Mine::TCPHandler.supervise options[:host], options[:port], options[:userdir]
     Mine::Log::Server.info "Launching WebSocket Server (#{options[:wshost]}:#{options[:wsport]})"
-    wsSupervisor = Mine::WSHandler.supervise options[:wshost], options[:wsport]
+    wsSupervisor = Mine::WSHandler.supervise options[:wshost], options[:wsport], options[:userdir]
     
     Signal.trap "INT" do
       exitServer options, :signalCatch, tcpSupervisor, wsSupervisor
@@ -114,6 +114,10 @@ eos
   end
 end
 
+def createUserDir options
+  Dir.mkdir options[:userdir], 0700 unless Dir.exist? options[:userdir]
+end
+
 def main
   options = {
     :host => "0.0.0.0",
@@ -122,13 +126,15 @@ def main
     :wsport => 8081,
     :withRails => false,
     :railshost => "0.0.0.0",
-    :railsport => 3000
+    :railsport => 3000,
+    :userdir => "./userdata"
   }
 
   # puts "[Debug] Options : #{options}"
   # readConfigFile options
   # puts "[Debug] Options : #{options}"
   parseArgs options
+  createUserDir options
   # puts "[Debug] Options : #{options}"
   launchServer options
   0

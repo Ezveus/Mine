@@ -11,11 +11,11 @@ module Mine
     include Protocol
 
     attr_accessor :userdb
-    attr_reader :user, :socket, :authenticated, :remoteHost, :socketType
+    attr_reader :user, :socket, :authenticated, :remoteHost, :socketType, :userdir
 
     @@clients = []
 
-    def initialize sock, remoteHost, socketType
+    def initialize sock, remoteHost, userdir, socketType
       @authenticated = false
       @user = nil
       @userdb = Userdb.new
@@ -23,6 +23,7 @@ module Mine
       @socket = sock
       @remoteHost = remoteHost
       @socketType = socketType
+      @userdir = userdir
     end
 
     def user= user

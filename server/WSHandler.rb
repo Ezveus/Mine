@@ -10,8 +10,9 @@ module Mine
   class WSHandler
     include Celluloid::IO
 
-    def initialize host, port
+    def initialize host, port, userdir
       @host, @port = host, port
+      @userdir = userdir
       @server = WEBSocket::Server.new @host, @port
       run!
     end
@@ -29,7 +30,7 @@ module Mine
     def handle_connection socket
       _, port, host = socket.peeraddr
       puts "*** Received connection from #{host}:#{port}"
-      client = Client.new socket, host, :wsp
+      client = Client.new socket, host, @userdir, :wsp
       loop do
         client.readAndProcessRequest
       end

@@ -19,6 +19,7 @@ tmp
 *.sqlite3
 ui/webclient/.README.rdoc
 .sass-cache/
+userdata
 
 # YARD artifacts
 .yardoc
