@@ -22,6 +22,8 @@ module Mine
       @file = file
       if line < file.size
         @line = line
+      elsif line < 0
+        @line = 0
       else
         @line = file.size - 1
       end
