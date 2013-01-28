@@ -17,10 +17,14 @@ module Mine
     #  - the column number (0)
     # 
     def initialize owner, file, line = 0
-      @line = line
       @column = 0
       @owner = owner
       @file = file
+      if line < file.size
+        @line = line
+      else
+        @line = file.size - 1
+      end
     end
 
     # 
