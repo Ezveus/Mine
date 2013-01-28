@@ -16,6 +16,7 @@ module Mine
     ForbiddenAction ||= 6
     UnknownBuffer ||= 7
     AlreadyLogged ||= 8
-    MissingIDError ||= 9
+    UnknownCommand ||= 9
+    MissingIDError ||= 10
   end
 end

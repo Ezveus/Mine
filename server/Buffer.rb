@@ -35,6 +35,15 @@ module Mine
       @diffHistoryPosition = 0
     end
 
+    def to_file
+      file = ""
+      @fileContent.each do |line|
+        file << line
+        file << "\n" unless line == @fileContent.last
+      end
+      file
+    end
+
     public
     #
     # Method to add a user to the list of the working users

@@ -38,6 +38,9 @@ module Mine
       @frames = {}
       @userInfo = userdb.selectUser username
       @lastClient = client
+      unless Dir.exist? "#{client.userdir}/#{@userInfo.name}"
+        Dir.mkdir "#{client.userdir}/#{@userInfo.name}", 0700
+      end
     end
 
     #
@@ -249,6 +252,14 @@ module Mine
                                                      buffer.fileContent[c.line].size]
       @killRing[0] = "\n" if @killRing[0] == ""
       @frames[buffer].deleteBuffer buffer, @killRing[0].size
+    end
+
+    public
+    def writeDistantFile buffer, args
+      path = "#{args.last}/#{@userInfo.name}/#{args[0]}"
+      f = File.new path, "w"
+      f.write buffer.to_file
+      f.close
     end
 
   end

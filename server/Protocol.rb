@@ -90,7 +90,12 @@ module Mine
       buffer = client.user.findBuffer object["buffer"]
       if buffer.nil?
         Log::Client.error "Unknown buffer"
-        response .status = Constant::ForbiddenAction
+        response.status = Constant::UnknownBuffer
+        return Constant::Fail
+      end
+      if Exec::ExecCommands[object["command"].to_sym].nil?
+        Log::Client.error "Unknown exec command"
+        response.status = Constant::UnknownCommand
         return Constant::Fail
       end
       Exec::ExecCommands[object["command"].to_sym].call buffer, object["args"], response, client

@@ -34,6 +34,11 @@ module Mine
       client.user.redo buffer
     end
 
+    def self.writeDistantFile buffer, args, response, client
+      args << client.userdir
+      client.user.writeDistantFile buffer, args
+    end
+
     ExecCommands ||= {
       "KillLine".to_sym => Proc.new { |buffer, args, response, client| self.killLine buffer, args, response, client },
       "Yank".to_sym => Proc.new { |buffer, args, response, client| self.yank buffer, args, response, client },
@@ -41,7 +46,8 @@ module Mine
       "OverWriteMode".to_sym => Proc.new { |buffer, args, response, client| self.overWriteMode buffer, args, response, client },
       "KillBuffer".to_sym => Proc.new { |buffer, args, response, client| self.killBuffer buffer, args, response, client },
       "Undo".to_sym => Proc.new { |buffer, args, response, client| self.undo buffer, args, response, client },
-      "Redo".to_sym => Proc.new { |buffer, args, response, client| self.redo buffer, args, response, client }
+      "Redo".to_sym => Proc.new { |buffer, args, response, client| self.redo buffer, args, response, client },
+      "WriteDistantFile".to_sym => Proc.new { |buffer, args, response, client| self.writeDistantFile buffer, args, response, client }
     }
   end
 end
