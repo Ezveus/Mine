@@ -8,15 +8,15 @@ module Mine
     Fail ||= "KO"
 
     Ok ||= 0
-    UnvalidRequest ||= 1
-    UnknownRequest ||= 2
-    JSONParserError ||= 3
-    UnknownUser ||= 4
-    BadRegistration ||= 5
-    ForbiddenAction ||= 6
-    UnknownBuffer ||= 7
-    AlreadyLogged ||= 8
-    UnknownCommand ||= 9
-    MissingIDError ||= 10
+    MissingIDError ||= 1
+    UnvalidRequest ||= 2
+    UnknownRequest ||= 3
+    JSONParserError ||= 4
+    UnknownUser ||= 5
+    BadRegistration ||= 6
+    ForbiddenAction ||= 7
+    UnknownBuffer ||= 8
+    AlreadyLogged ||= 9
+    UnknownCommand ||= 10
   end
 end
