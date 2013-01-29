@@ -9,7 +9,7 @@ load "server/Frame.rb"
 #
 module Mine
   class User
-    attr_reader :userInfo, :frames, :cmdHistory, :killRing
+    attr_reader :userInfo, :frames, :cmdHistory, :killRing, :dir
     attr_accessor :lastClient, :clients
 
     @@users = {}
@@ -39,8 +39,9 @@ module Mine
       @frames = {}
       @userInfo = userdb.selectUser username
       @lastClient = client
-      unless Dir.exist? "#{client.userdir}/#{@userInfo.name}"
-        Dir.mkdir "#{client.userdir}/#{@userInfo.name}", 0700
+      @dir = "#{client.userdir}/#{@userInfo.name}"
+      unless Dir.exist? @dir
+        Dir.mkdir @dir, 0700
       end
     end
 
