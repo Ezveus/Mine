@@ -26,6 +26,7 @@ module Mine
         @line = 0
       else
         @line = file.size - 1
+        @column = file.last.size
       end
     end
 
