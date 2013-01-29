@@ -20,6 +20,7 @@ tmp
 ui/webclient/.README.rdoc
 .sass-cache/
 userdata
+.rvmrc
 
 # YARD artifacts
 .yardoc
