@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 
+load "server/Constant.rb"
 load "server/Userdb.rb"
 load "server/Frame.rb"
 
@@ -257,9 +258,14 @@ module Mine
     public
     def writeDistantFile buffer, args
       path = "#{args.last}/#{@userInfo.name}/#{args[0]}"
+      begin
       f = File.new path, "w"
+      rescue
+        return Constant::Fail
+      end
       f.write buffer.to_file
       f.close
+      Constant::Success
     end
 
   end

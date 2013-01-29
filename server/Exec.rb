@@ -2,6 +2,7 @@
 
 load "server/User.rb"
 load "server/Log.rb"
+load "server/Constant.rb"
 
 module Mine
   module Exec
@@ -36,7 +37,13 @@ module Mine
 
     def self.writeDistantFile buffer, args, response, client
       args << client.userdir
-      client.user.writeDistantFile buffer, args
+      status = client.user.writeDistantFile buffer, args
+      if status == Constant::Fail
+        Log::Client.error "no such directory"
+        response.status = Constant::PathError
+        return Constant::Fail
+      end
+      Constant::Success
     end
 
     ExecCommands ||= {

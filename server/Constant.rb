@@ -18,5 +18,6 @@ module Mine
     UnknownBuffer ||= 8
     AlreadyLogged ||= 9
     UnknownCommand ||= 10
+    PathError ||= 11
   end
 end
