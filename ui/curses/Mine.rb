@@ -2,6 +2,7 @@ module Mine
 
   # This function inits fbuffers.
   def init_fbuffers
+    # here should be MineBuffer
     files_name = []
     buffers = []
     @files = ARGV
@@ -21,9 +22,13 @@ module Mine
 
   # This function is the Mine Client's main loop.
   def run
+    # here should the connection be established
     begin
       catch :close do
-        loop { window.write(window.read) }
+        loop {
+          # here a little magic should be done
+          window.write(window.read)
+        }
       end
     rescue => ex
     ensure
