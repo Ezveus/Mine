@@ -175,7 +175,7 @@ module Mine
         response.status = Constant::UnknownBuffer
         return Constant::Fail
       end
-      direction = object["direction"]
+      direction = object["direction"].to_sym
       number = object["number"]
       client.user.moveCursor buffer, direction, number
       Constant::Success
