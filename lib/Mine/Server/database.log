@@ -1,0 +1,58 @@
+D, [2012-09-28T15:10:01.253214 #18295] DEBUG -- :   [1m[36m (0.8ms)[0m  [1mselect sqlite_version(*)[0m
+D, [2012-09-28T15:10:01.444876 #18295] DEBUG -- :   [1m[35m (190.9ms)[0m  CREATE TABLE "users" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar(255), "pass" varchar(255), "email" varchar(255), "website" varchar(255), "isAdmin" integer, "created_at" datetime NOT NULL, "updated_at" datetime NOT NULL) 
+D, [2012-09-28T15:10:01.445410 #18295] DEBUG -- :   [1m[36m (0.1ms)[0m  [1mPRAGMA index_list("users")[0m
+D, [2012-09-28T15:10:01.611580 #18295] DEBUG -- :   [1m[35m (165.9ms)[0m  CREATE UNIQUE INDEX "index_users_on_email" ON "users" ("email")
+D, [2012-09-28T15:10:01.612146 #18295] DEBUG -- :   [1m[36m (0.1ms)[0m  [1mPRAGMA index_list("users")[0m
+D, [2012-09-28T15:10:01.612369 #18295] DEBUG -- :   [1m[35m (0.1ms)[0m  PRAGMA index_info('index_users_on_email')
+D, [2012-09-28T15:10:01.756391 #18295] DEBUG -- :   [1m[36m (143.6ms)[0m  [1mCREATE UNIQUE INDEX "index_users_on_name" ON "users" ("name")[0m
+D, [2012-09-28T15:10:01.791464 #18295] DEBUG -- : WARNING: Can't mass-assign protected attributes: id
+D, [2012-09-28T15:10:01.800117 #18295] DEBUG -- :   [1m[35m (0.1ms)[0m  begin transaction
+D, [2012-09-28T15:10:01.810782 #18295] DEBUG -- :   [1m[36mUserdb::User Exists (0.6ms)[0m  [1mSELECT 1 AS one FROM "users" WHERE "users"."name" = 'root' LIMIT 1[0m
+D, [2012-09-28T15:10:01.811749 #18295] DEBUG -- :   [1m[35mUserdb::User Exists (0.1ms)[0m  SELECT 1 AS one FROM "users" WHERE LOWER("users"."email") = LOWER('user@localhost') LIMIT 1
+D, [2012-09-28T15:10:01.813375 #18295] DEBUG -- :   [1m[36mSQL (0.5ms)[0m  [1mINSERT INTO "users" ("created_at", "email", "isAdmin", "name", "pass", "updated_at", "website") VALUES (?, ?, ?, ?, ?, ?, ?)[0m  [["created_at", 2012-09-28 15:10:01 +0200], ["email", "user@localhost"], ["isAdmin", 1], ["name", "root"], ["pass", "toor"], ["updated_at", 2012-09-28 15:10:01 +0200], ["website", nil]]
+D, [2012-09-28T15:10:01.967211 #18295] DEBUG -- :   [1m[35m (153.5ms)[0m  commit transaction
+D, [2012-09-28T15:10:01.968764 #18295] DEBUG -- :   [1m[36mUserdb::User Load (0.3ms)[0m  [1mSELECT "users".* FROM "users" [0m
+D, [2012-09-28T15:10:01.978037 #18295] DEBUG -- :   [1m[35mUserdb::User Load (0.2ms)[0m  SELECT "users".* FROM "users" WHERE "users"."name" = 'root' LIMIT 1
+D, [2012-09-28T15:10:01.978989 #18295] DEBUG -- :   [1m[36mUserdb::User Load (0.1ms)[0m  [1mSELECT "users".* FROM "users" WHERE "users"."name" = 'root' LIMIT 1[0m
+D, [2012-09-28T15:10:01.979759 #18295] DEBUG -- :   [1m[35mUserdb::User Load (0.1ms)[0m  SELECT "users".* FROM "users" WHERE "users"."name" = 'root' LIMIT 1
+D, [2012-09-28T15:10:01.980732 #18295] DEBUG -- :   [1m[36m (0.1ms)[0m  [1mbegin transaction[0m
+D, [2012-09-28T15:10:01.982294 #18295] DEBUG -- :   [1m[35mUserdb::User Exists (0.1ms)[0m  SELECT 1 AS one FROM "users" WHERE "users"."name" = 'Plop' LIMIT 1
+D, [2012-09-28T15:10:01.983523 #18295] DEBUG -- :   [1m[36mUserdb::User Exists (0.1ms)[0m  [1mSELECT 1 AS one FROM "users" WHERE LOWER("users"."email") = LOWER('plop@a.net') LIMIT 1[0m
+D, [2012-09-28T15:10:01.985055 #18295] DEBUG -- :   [1m[35mSQL (0.5ms)[0m  INSERT INTO "users" ("created_at", "email", "isAdmin", "name", "pass", "updated_at", "website") VALUES (?, ?, ?, ?, ?, ?, ?)  [["created_at", 2012-09-28 15:10:01 +0200], ["email", "plop@a.net"], ["isAdmin", 0], ["name", "Plop"], ["pass", "plop"], ["updated_at", 2012-09-28 15:10:01 +0200], ["website", "www.plop.org"]]
+D, [2012-09-28T15:10:02.156047 #18295] DEBUG -- :   [1m[36m (170.6ms)[0m  [1mcommit transaction[0m
+D, [2012-09-28T15:10:02.156910 #18295] DEBUG -- :   [1m[35m (0.1ms)[0m  begin transaction
+D, [2012-09-28T15:10:02.158337 #18295] DEBUG -- :   [1m[36mUserdb::User Exists (0.2ms)[0m  [1mSELECT 1 AS one FROM "users" WHERE "users"."name" = 'Plop' LIMIT 1[0m
+D, [2012-09-28T15:10:02.181357 #18295] DEBUG -- :   [1m[35mUserdb::User Exists (0.2ms)[0m  SELECT 1 AS one FROM "users" WHERE LOWER("users"."email") = LOWER('baba@a.net') LIMIT 1
+D, [2012-09-28T15:10:02.181632 #18295] DEBUG -- :   [1m[36m (0.1ms)[0m  [1mrollback transaction[0m
+D, [2012-09-28T15:10:02.182517 #18295] DEBUG -- :   [1m[35m (0.0ms)[0m  begin transaction
+D, [2012-09-28T15:10:02.183503 #18295] DEBUG -- :   [1m[36mUserdb::User Exists (0.1ms)[0m  [1mSELECT 1 AS one FROM "users" WHERE "users"."name" = 'Baba' LIMIT 1[0m
+D, [2012-09-28T15:10:02.184135 #18295] DEBUG -- :   [1m[35mUserdb::User Exists (0.1ms)[0m  SELECT 1 AS one FROM "users" WHERE LOWER("users"."email") = LOWER('plop@a.net') LIMIT 1
+D, [2012-09-28T15:10:02.184922 #18295] DEBUG -- :   [1m[36m (0.0ms)[0m  [1mrollback transaction[0m
+D, [2012-09-28T15:10:02.185347 #18295] DEBUG -- :   [1m[35m (0.0ms)[0m  begin transaction
+D, [2012-09-28T15:10:02.186027 #18295] DEBUG -- :   [1m[36mUserdb::User Exists (0.1ms)[0m  [1mSELECT 1 AS one FROM "users" WHERE "users"."name" = 'Bobo' LIMIT 1[0m
+D, [2012-09-28T15:10:02.186683 #18295] DEBUG -- :   [1m[35mUserdb::User Exists (0.1ms)[0m  SELECT 1 AS one FROM "users" WHERE LOWER("users"."email") = LOWER('boboa.net') LIMIT 1
+D, [2012-09-28T15:10:02.187566 #18295] DEBUG -- :   [1m[36mSQL (0.3ms)[0m  [1mINSERT INTO "users" ("created_at", "email", "isAdmin", "name", "pass", "updated_at", "website") VALUES (?, ?, ?, ?, ?, ?, ?)[0m  [["created_at", 2012-09-28 15:10:02 +0200], ["email", "boboa.net"], ["isAdmin", 0], ["name", "Bobo"], ["pass", "plop"], ["updated_at", 2012-09-28 15:10:02 +0200], ["website", "www.plop.org"]]
+D, [2012-09-28T15:10:02.333698 #18295] DEBUG -- :   [1m[35m (145.8ms)[0m  commit transaction
+D, [2012-09-28T15:10:02.334957 #18295] DEBUG -- :   [1m[36mUserdb::User Load (0.3ms)[0m  [1mSELECT "users".* FROM "users" WHERE "users"."name" = 'Plop' LIMIT 1[0m
+D, [2012-09-28T15:10:02.335454 #18295] DEBUG -- :   [1m[35m (0.1ms)[0m  begin transaction
+D, [2012-09-28T15:10:02.337523 #18295] DEBUG -- :   [1m[36mUserdb::User Exists (0.2ms)[0m  [1mSELECT 1 AS one FROM "users" WHERE ("users"."name" = 'Plop' AND "users"."id" != 2) LIMIT 1[0m
+D, [2012-09-28T15:10:02.338708 #18295] DEBUG -- :   [1m[35mUserdb::User Exists (0.1ms)[0m  SELECT 1 AS one FROM "users" WHERE (LOWER("users"."email") = LOWER('plop@a.net') AND "users"."id" != 2) LIMIT 1
+D, [2012-09-28T15:10:02.341246 #18295] DEBUG -- :   [1m[36m (0.3ms)[0m  [1mUPDATE "users" SET "website" = 'plop.site.net', "updated_at" = '2012-09-28 15:10:02.339244' WHERE "users"."id" = 2[0m
+D, [2012-09-28T15:10:02.445102 #18295] DEBUG -- :   [1m[35m (103.5ms)[0m  commit transaction
+D, [2012-09-28T15:10:02.446501 #18295] DEBUG -- :   [1m[36mUserdb::User Load (0.3ms)[0m  [1mSELECT "users".* FROM "users" WHERE "users"."name" = 'Plop' LIMIT 1[0m
+D, [2012-09-28T15:10:02.447215 #18295] DEBUG -- :   [1m[35mUserdb::User Load (0.1ms)[0m  SELECT "users".* FROM "users" WHERE "users"."name" = 'root' LIMIT 1
+D, [2012-09-28T15:10:02.447687 #18295] DEBUG -- :   [1m[36mUserdb::User Load (0.1ms)[0m  [1mSELECT "users".* FROM "users" WHERE "users"."name" = 'root' LIMIT 1[0m
+D, [2012-09-28T15:10:02.448147 #18295] DEBUG -- :   [1m[35mUserdb::User Load (0.1ms)[0m  SELECT "users".* FROM "users" WHERE "users"."name" = 'Unknown' LIMIT 1
+D, [2012-09-28T15:10:02.448557 #18295] DEBUG -- :   [1m[36mUserdb::User Load (0.1ms)[0m  [1mSELECT "users".* FROM "users" WHERE "users"."name" = 'Unknown' LIMIT 1[0m
+D, [2012-09-28T15:10:02.449037 #18295] DEBUG -- :   [1m[35m (0.0ms)[0m  begin transaction
+D, [2012-09-28T15:10:02.450078 #18295] DEBUG -- :   [1m[36mUserdb::User Exists (0.1ms)[0m  [1mSELECT 1 AS one FROM "users" WHERE "users"."name" = 'Test' LIMIT 1[0m
+D, [2012-09-28T15:10:02.450697 #18295] DEBUG -- :   [1m[35mUserdb::User Exists (0.1ms)[0m  SELECT 1 AS one FROM "users" WHERE LOWER("users"."email") = LOWER('test@a.net') LIMIT 1
+D, [2012-09-28T15:10:02.451534 #18295] DEBUG -- :   [1m[36mSQL (0.3ms)[0m  [1mINSERT INTO "users" ("created_at", "email", "isAdmin", "name", "pass", "updated_at", "website") VALUES (?, ?, ?, ?, ?, ?, ?)[0m  [["created_at", 2012-09-28 15:10:02 +0200], ["email", "test@a.net"], ["isAdmin", 0], ["name", "Test"], ["pass", "plop"], ["updated_at", 2012-09-28 15:10:02 +0200], ["website", ""]]
+D, [2012-09-28T15:10:02.580575 #18295] DEBUG -- :   [1m[35m (128.7ms)[0m  commit transaction
+D, [2012-09-28T15:10:02.581919 #18295] DEBUG -- :   [1m[36mUserdb::User Load (0.3ms)[0m  [1mSELECT "users".* FROM "users" WHERE "users"."name" = 'Test' LIMIT 1[0m
+D, [2012-09-28T15:10:02.582676 #18295] DEBUG -- :   [1m[35m (0.1ms)[0m  begin transaction
+D, [2012-09-28T15:10:02.584033 #18295] DEBUG -- :   [1m[36mUserdb::User Exists (0.2ms)[0m  [1mSELECT 1 AS one FROM "users" WHERE "users"."name" = 'TestAdmin' LIMIT 1[0m
+D, [2012-09-28T15:10:02.585374 #18295] DEBUG -- :   [1m[35mUserdb::User Exists (0.2ms)[0m  SELECT 1 AS one FROM "users" WHERE LOWER("users"."email") = LOWER('admin@plop.net') LIMIT 1
+D, [2012-09-28T15:10:02.586451 #18295] DEBUG -- :   [1m[36mSQL (0.4ms)[0m  [1mINSERT INTO "users" ("created_at", "email", "isAdmin", "name", "pass", "updated_at", "website") VALUES (?, ?, ?, ?, ?, ?, ?)[0m  [["created_at", 2012-09-28 15:10:02 +0200], ["email", "admin@plop.net"], ["isAdmin", 1], ["name", "TestAdmin"], ["pass", "plop"], ["updated_at", 2012-09-28 15:10:02 +0200], ["website", ""]]
+D, [2012-09-28T15:10:02.714182 #18295] DEBUG -- :   [1m[35m (127.4ms)[0m  commit transaction
+D, [2012-09-28T15:10:02.715413 #18295] DEBUG -- :   [1m[36mUserdb::User Load (0.3ms)[0m  [1mSELECT "users".* FROM "users" WHERE "users"."name" = 'TestAdmin' LIMIT 1[0m

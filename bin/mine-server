@@ -1,0 +1,146 @@
+#!/usr/bin/env ruby
+
+require 'optparse'
+
+$:.unshift './lib' unless $:.index './lib'
+$:.unshift './lib/Mine' unless $:.index './lib/Mine'
+require 'Mine'
+require 'Mine/Server'
+
+def exitRailsServer
+  begin
+    File.delete "ui/webclient/.port"
+  rescue
+  end
+  railsPID = -42
+  begin
+    railsPID = File.new("ui/webclient/tmp/pids/server.pid").read.to_i
+  rescue Errno::ENOENT
+    railsPID = -42
+  end
+  Process.kill "INT", railsPID if railsPID > 1
+end
+
+def exitServer options, exitType, tcpSupervisor, wsSupervisor
+  printf "\r"
+  Mine::Client.clients.each do |client|
+    client.exit exitType
+  end
+  tcpSupervisor.terminate if exitType == :signalCatch
+  wsSupervisor.terminate if exitType == :signalCatch
+  exitRailsServer if options[:withRails]
+  Mine::Log::Server.info "Terminating server"
+  exit 0
+end
+
+def launchRailsServer options
+  Process.fork do
+    Dir.chdir "ui/webclient"
+    File.open("./.port", "w") do |f|
+      f.puts "#{options[:port]}|#{options[:wsport]}"
+    end
+    Mine::Log::Server.info "Executing Ruby on Rails server (#{options[:railshost]}:#{options[:railsport]})"
+    Process.exec "rails server -d -b #{options[:railshost]} -p #{options[:railsport]}"
+  end
+end
+
+def launchServer options
+  launchRailsServer options if options[:withRails]
+
+  begin
+    Mine::Log::Server.info "Launching TCP Server (#{options[:host]}:#{options[:port]})"
+    tcpSupervisor = Mine::TCPHandler.supervise options[:host], options[:port], options[:userdir]
+    Mine::Log::Server.info "Launching WebSocket Server (#{options[:wshost]}:#{options[:wsport]})"
+    wsSupervisor = Mine::WSHandler.supervise options[:wshost], options[:wsport], options[:userdir]
+    
+    Signal.trap "INT" do
+      exitServer options, :signalCatch, tcpSupervisor, wsSupervisor
+    end
+
+    Signal.trap "TERM" do
+      exitServer options, :signalCatch, tcpSupervisor, wsSupervisor
+    end
+
+    sleep
+  rescue Interrupt
+    exitServer options, :exceptionCatch, tcpSupervisor, wsSupervisor
+  end
+end
+
+def parseArgs options
+  optparse = OptionParser.new do |opts|
+    opts.banner = <<-eos
+Usage: mine [OPTIONS]
+Launch a mine server
+eos
+
+    opts.on "-h", "--host HOST", "TCP authorized distant hosts" do |h|
+      options[:host] = h
+    end
+
+    opts.on "-p", "--port PORT", Integer, "TCP communication port" do |p|
+      options[:port] = p
+    end
+
+    opts.on "-i", "--wshost HOST", "WebSocket authorized distant hosts" do |h|
+      options[:wshost] = h
+    end
+
+    opts.on "-q", "--wsport PORT", Integer, "WebSocket communication port" do |p|
+      options[:wsport] = p
+    end
+
+    opts.on "-j", "--rhost HOST", "Rails authorized distant hosts" do |h|
+      options[:railshost] = h
+    end
+
+    opts.on "-r", "--rport PORT", Integer, "Rails communication port" do |p|
+      options[:railsport] = p
+    end
+
+    opts.on "-w", "--webclient", "switch to decide if the rails server has to be launched" do |w|
+      options[:withRails] = !options[:withRails]
+    end
+
+    opts.on "--help", "displays this screen" do |h|
+      puts opts
+      exit 1
+    end
+  end
+
+  begin
+    optparse.parse!
+  rescue OptionParser::InvalidOption, OptionParser::MissingArgument, OptionParser::InvalidArgument
+    puts $!.to_s
+    puts optparse
+    exit 1
+  end
+end
+
+def createUserDir options
+  Dir.mkdir options[:userdir], 0700 unless Dir.exist? options[:userdir]
+end
+
+def main
+  options = {
+    :host => "0.0.0.0",
+    :port => 8080,
+    :wshost => "0.0.0.0",
+    :wsport => 8081,
+    :withRails => false,
+    :railshost => "0.0.0.0",
+    :railsport => 3000,
+    :userdir => "./userdata"
+  }
+
+  # puts "[Debug] Options : #{options}"
+  # readConfigFile options
+  # puts "[Debug] Options : #{options}"
+  parseArgs options
+  createUserDir options
+  # puts "[Debug] Options : #{options}"
+  launchServer options
+  0
+end
+
+exit main

@@ -1,0 +1,10 @@
+#!/usr/bin/env ruby
+
+$:.unshift './lib' unless $:.index './lib'
+$:.unshift './lib/Mine' unless $:.index './lib/Mine'
+$:.unshift './lib/Mine/Client' unless $:.index './lib/Mine/Client'
+require 'Mine'
+require 'Mine/Client'
+
+MineClient.window @widgets
+MineClient.run
