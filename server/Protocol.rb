@@ -99,7 +99,6 @@ module Mine
         return Constant::Fail
       end
       Exec::ExecCommands[object["command"].to_sym].call buffer, object["args"], response, client
-      Constant::Success
     end
 
     def self.insert jsonRqst, response, client
@@ -199,6 +198,22 @@ module Mine
       Constant::Success
     end
 
+    def self.shell jsonRqst, response, client
+      object = getOgjectFromJSON jsonRqst, response
+      return Constant::Fail if object.nil?
+      unless client.authenticated
+        Log::Client.error "File : not logged"
+        response.status = Constant::ForbiddenAction
+        return Constant::Fail
+      end
+      if Shell::ShellCommands[object["command"].to_sym].nil?
+        Log::Client.error "Unknown shell command"
+        response.status = Constant::UnknownCommand
+        return Constant::Fail
+      end
+      Shell::ShellCommands[object["command"].to_sym].call buffer, object["args"], response, client
+    end
+
     Commands ||= {
       "AUTHENTICATE".to_sym => Proc.new { |jsonRqst, response, client| self.authenticate jsonRqst, response, client },
       "SIGNUP".to_sym => Proc.new { |jsonRqst, response, client| self.signup jsonRqst, response, client },
@@ -207,7 +222,8 @@ module Mine
       "BACKSPACE".to_sym => Proc.new { |jsonRqst, response, client| self.backspace jsonRqst, response, client },
       "DELETE".to_sym => Proc.new { |jsonRqst, response, client| self.delete jsonRqst, response, client },
       "MOVE".to_sym => Proc.new { |jsonRqst, response, client| self.move jsonRqst, response, client },
-      "LOAD".to_sym => Proc.new { |jsonRqst, response, client| self.load jsonRqst, response, client }
+      "LOAD".to_sym => Proc.new { |jsonRqst, response, client| self.load jsonRqst, response, client },
+      "SHELL".to_sym => Proc.new { |jsonRqst, response, client| self.shell jsonRqst, response, client }
     }
 
   end

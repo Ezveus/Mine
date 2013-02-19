@@ -19,5 +19,8 @@ module Mine
     AlreadyLogged ||= 9
     UnknownCommand ||= 10
     PathError ||= 11
+    AlreadyCreated ||= 12
+    UnknownFile ||= 13
+    DirectoryNotEmpty ||= 14
   end
 end
