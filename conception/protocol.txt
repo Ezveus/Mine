@@ -21,7 +21,7 @@ Command List and Arguments Sent by Clients :
 
 -> DELETE : id buffer number[integer]
 
--> LOAD : id path size[integer] line[integer] port[integer]
+-> LOAD : id type[up | down] path size[integer] line[integer] port[integer]
         => RESPONSE info : uuid
 
 -> SHELL : id command args	
