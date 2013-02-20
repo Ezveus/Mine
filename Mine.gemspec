@@ -31,4 +31,6 @@ EOS
   gem.add_runtime_dependency 'WEBSocket', '~> 0.1', '>= 0.1.1'
   gem.add_runtime_dependency 'diff-lcs', '~> 1.1', '>= 1.1.3'
   gem.add_runtime_dependency 'sqlite3', '~> 1.3', '>= 1.3.7'
+  gem.add_runtime_dependency 'ffi-ncurses', '~> 0.4', '>= 0.4.0'
+  gem.add_runtime_dependency 'rbcurse', '~> 1.5', '>= 1.5.0'
 end
