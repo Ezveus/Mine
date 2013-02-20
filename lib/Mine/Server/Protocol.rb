@@ -180,18 +180,53 @@ module Mine
         response.status = Constant::ForbiddenAction
         return Constant::Fail
       end
+      uuid = ""
+      ret = case object["type"].to_sym
+            when :up then self.uploadFile object, response, client, uuid
+            when :down then self.downloadFile object, reponse, client, uuid
+            else response.status = Constant::UnvalidRequest; Constant::Fail
+            end
+      return ret if ret == Constant::Fail
+      puts uuid
+      response.info["uuid"] = uuid
+      Constant::Success
+    end
+
+    def self.uploadFile object, response, client, uuid
       path = object["path"]
       fileName = File.basename path
       socket = Mine::Socket.create client.remoteHost, object["port"], client.socketType
       fileContent = socket.read object["size"]
       Log::Client.log "Creating the frame : #{path}"
-      uuid = client.user.addFrame path, fileName, fileContent, {}, false, object["line"]
-      response.info["uuid"] = uuid
+      uuid.replace client.user.addFrame path, fileName, fileContent, {}, false, object["line"]
       Constant::Success
     end
 
+    def self.downloadFile object, response, client, uuid
+      path = object["path"]
+      unless File.exist? path
+        response.status = Constant::UnknownFile
+        return Constant::Fail
+      end
+      file = File.new path
+      content = file.read
+      file.close
+      # create the frame
+      server = nil
+      if type == :tcp
+        server = Socket.create client.remoteHost, object["port"], :tcps
+      elsif type == :wsp
+        server = Socket.create client.remoteHost, object["port"], :wsps
+      end
+      socket = server.accept
+      socket.write content
+      socket.shutdown :RDWR
+      socket.close
+      server.close
+    end
+
     def self.shell jsonRqst, response, client
-      object = getOgjectFromJSON jsonRqst, response
+      object = getObjectFromJSON jsonRqst, response
       return Constant::Fail if object.nil?
       unless client.authenticated
         Log::Client.error "File : not logged"
@@ -203,7 +238,7 @@ module Mine
         response.status = Constant::UnknownCommand
         return Constant::Fail
       end
-      Shell::ShellCommands[object["command"].to_sym].call buffer, object["args"], response, client
+      Shell::ShellCommands[object["command"].to_sym].call object["args"], response, client
     end
 
     Commands ||= {
