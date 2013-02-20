@@ -1,13 +1,5 @@
 #!/usr/bin/env ruby
 
-require 'json'
-require 'base64'
-
-load "server/User.rb"
-load "server/Socket.rb"
-load "server/Log.rb"
-load "server/Exec.rb"
-
 module Mine
   module Protocol
 

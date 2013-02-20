@@ -1,8 +1,5 @@
 #!/usr/bin/env ruby
 
-load "server/Constant.rb"
-load "server/Log.rb"
-
 module Mine
   module Shell
     def self.mkdir args, response, client
@@ -58,7 +55,7 @@ module Mine
       unless Dir.exist? "#{client.user.dir}/#{args[0]}"
         ls = Dir.entries "#{client.user.dir}/#{args[0]}"
         ls.size.times do |i|
-          ls[i] = [ls[i], File.directory? ls[i]]
+          ls[i] = [ls[i], File.directory?(ls[i])]
         end
         response.info["ls"] = ls
         return Constant::Success
@@ -131,5 +128,6 @@ module Mine
       "Cp".to_sym       => Proc.new { |args, response, client| self.cp args, response, client },
       "Touch".to_sym    => Proc.new { |args, response, client| self.touch args, response, client },
       "Mv".to_sym       => Proc.new { |args, response, client| self.mv args, response, client }
+    }
   end
 end

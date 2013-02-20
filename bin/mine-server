@@ -5,8 +5,9 @@ require 'optparse'
 $:.unshift './lib' unless $:.index './lib'
 $:.unshift './lib/Mine' unless $:.index './lib/Mine'
 require 'Mine'
+puts "Mine !"
 require 'Mine/Server'
-
+puts "Mine/SErver"
 def exitRailsServer
   begin
     File.delete "ui/webclient/.port"
