@@ -15,7 +15,7 @@ module Mine
         return Constant::Success
       end
       response.status = Constant::AlreadyCreated
-      Constant::Failure
+      Constant::Fail
     end
 
     def self.rmdir args, response, client
@@ -26,15 +26,15 @@ module Mine
           rescue
             Log::Client.error "Directory not empty"
             response.status = Constant::DirectoryNotEmpty
-            return Constant::Failure
+            return Constant::Fail
           end
           return Constant::Success
         end
         response.status = Constant::DirectoryNotEmpty
-        return Constant::Failure
+        return Constant::Fail
       end
       response.status = Constant::PathError
-      Constant::Failure
+      Constant::Fail
     end
 
     def self.rm args, response, client
@@ -43,12 +43,12 @@ module Mine
           File.delete "#{client.user.dir}/#{args[0]}"
         rescue
           response.status =  Constant::UnknownFile
-          return Constant::Failure
+          return Constant::Fail
         end
         return Constant::Success
       end
       response.status = Constant::PathError
-      Constant::Failure
+      Constant::Fail
     end
 
     def self.ls args, response, client
@@ -61,7 +61,7 @@ module Mine
         return Constant::Success
       end
       response.status = Constant::PathError
-      Constant::Failure
+      Constant::Fail
     end
 
     def self.cp args, response, client

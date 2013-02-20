@@ -65,7 +65,8 @@ module Mine
                   Backspace = "BACKSPACE",
                   Delete = "DELETE",
                   Move = "MOVE",
-                  Load = "LOAD"
+                  Load = "LOAD",
+                  Shell = "SHELL"
                  ]
 
     def unknownRequest? request, response
