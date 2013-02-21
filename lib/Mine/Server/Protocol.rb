@@ -183,7 +183,7 @@ module Mine
       uuid = ""
       ret = case object["type"].to_sym
             when :up then self.uploadFile object, response, client, uuid
-            when :down then self.downloadFile object, reponse, client, uuid
+            when :down then self.downloadFile object, response, client, uuid
             else response.status = Constant::UnvalidRequest; Constant::Fail
             end
       return ret if ret == Constant::Fail
@@ -203,26 +203,34 @@ module Mine
     end
 
     def self.downloadFile object, response, client, uuid
-      path = object["path"]
+      path = "#{client.user.dir}/#{object["path"]}"
       unless File.exist? path
         response.status = Constant::UnknownFile
+        return Constant::Fail
+      end
+      begin
+        if type == :tcp
+          server = Socket.create client.remoteHost, object["port"], :tcps
+        elsif type == :wsp
+          server = Socket.create client.remoteHost, object["port"], :wsps
+        end
+      rescue
+        Log::Client.error "Cannot create Server with port : #{object["port"]}"
+        response.status = Constant::PortAlreadyUsed
         return Constant::Fail
       end
       file = File.new path
       content = file.read
       file.close
-      # create the frame
+      Log::Client.log "Creating the frame : #{path}"
+      uuid.replace client.user.addFrame path, File.basename(path), content, {}, true, object["line"]
       server = nil
-      if type == :tcp
-        server = Socket.create client.remoteHost, object["port"], :tcps
-      elsif type == :wsp
-        server = Socket.create client.remoteHost, object["port"], :wsps
-      end
+      type = client.socketType
       socket = server.accept
       socket.write content
-      socket.shutdown :RDWR
       socket.close
       server.close
+      Constant::Success
     end
 
     def self.shell jsonRqst, response, client

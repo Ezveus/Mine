@@ -22,5 +22,6 @@ module Mine
     AlreadyCreated ||= 12
     UnknownFile ||= 13
     DirectoryNotEmpty ||= 14
+    PortAlreadyUsed ||= 15
   end
 end
