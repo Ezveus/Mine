@@ -19,8 +19,8 @@ module Mine
     end
 
     def self.rmdir args, response, client
-      unless Dir.exist? "#{client.user.dir}/#{args[0]}"
-        unless Dir.entries("#{client.user.dir}/#{args[0]}").size == 2
+      if Dir.exist? "#{client.user.dir}/#{args[0]}"
+        if Dir.entries("#{client.user.dir}/#{args[0]}").size == 2
           begin
             Dir.rmdir "#{client.user.dir}/#{args[0]}"
           rescue
@@ -38,7 +38,7 @@ module Mine
     end
 
     def self.rm args, response, client
-      unless File.exist? "#{client.user.dir}/#{args[0]}"
+      if File.exist? "#{client.user.dir}/#{args[0]}"
         begin
           File.delete "#{client.user.dir}/#{args[0]}"
         rescue
@@ -52,7 +52,7 @@ module Mine
     end
 
     def self.ls args, response, client
-      unless Dir.exist? "#{client.user.dir}/#{args[0]}"
+      if Dir.exist? "#{client.user.dir}/#{args[0]}"
         ls = Dir.entries "#{client.user.dir}/#{args[0]}"
         ls.size.times do |i|
           ls[i] = [ls[i], File.directory?(ls[i])]
@@ -65,8 +65,8 @@ module Mine
     end
 
     def self.cp args, response, client
-      unless File.exist? "#{client.user.dir}/#{args[0]}"
-        unless Dir.exist? (File.dirname "#{client.user.dir}/#{args[1]}")
+      if File.exist? "#{client.user.dir}/#{args[0]}"
+        if Dir.exist? (File.dirname "#{client.user.dir}/#{args[1]}")
           self.copyFile args, client
           return Constant::Success
         end
@@ -78,7 +78,7 @@ module Mine
     end
 
     def self.touch args, response, client
-      unless Dir.exist? (File.dirname "#{client.user.dir}/#{args[0]}")
+      unless File.exist? "#{client.user.dir}/#{args[0]}"
         File.new "#{client.user.dir}/#{args[0]}", File::CREAT
         return Constant::Success
       end
@@ -87,9 +87,9 @@ module Mine
     end
 
     def self.mv args, response, client
-      unless File.exist? "#{client.user.dir}/#{args[0]}"
-        unless Dir.exist? (File.dirname "#{client.user.dir}/#{args[1]}")
-          self.copy args, client
+      if File.exist? "#{client.user.dir}/#{args[0]}"
+        unless File.exist? "#{client.user.dir}/#{args[1]}"
+          self.copyFile args, client
           File.delete "#{client.user.dir}/#{args[0]}"
           return Constant::Success
         end
@@ -124,7 +124,7 @@ module Mine
       "Mkdir".to_sym    => Proc.new { |args, response, client| self.mkdir args, response, client },
       "Rmdir".to_sym    => Proc.new { |args, response, client| self.rmdir args, response, client },
       "Rm".to_sym       => Proc.new { |args, response, client| self.rm args, response, client },
-      "Ls".to_sym       => Proc.new { |args, response, client| self.tree args, response, client },
+      "Ls".to_sym       => Proc.new { |args, response, client| self.ls args, response, client },
       "Cp".to_sym       => Proc.new { |args, response, client| self.cp args, response, client },
       "Touch".to_sym    => Proc.new { |args, response, client| self.touch args, response, client },
       "Mv".to_sym       => Proc.new { |args, response, client| self.mv args, response, client }
