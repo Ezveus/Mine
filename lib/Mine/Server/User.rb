@@ -254,10 +254,27 @@ module Mine
 
     public
     def writeDistantFile buffer, args
-      path = "#{args.last}/#{@userInfo.name}/#{args[0]}"
+      path = "#{@dir}/#{args[0]}"
       begin
-      f = File.new path, "w"
+        f = File.new path, "w"
       rescue
+        return Constant::Fail
+      end
+      f.write buffer.to_file
+      f.close
+      Constant::Success
+    end
+
+    public
+    def saveDistantFile buffer, args, response
+      unless buffer.serverSide
+        response.status = Constant::ServerFile
+        return Constant::Fail
+      end
+      begin
+        f = File.new buffer.fileLocation "w"
+      rescue
+        response.status = PathError
         return Constant::Fail
       end
       f.write buffer.to_file

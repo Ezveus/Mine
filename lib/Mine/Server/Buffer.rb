@@ -11,7 +11,7 @@ require 'securerandom'
 module Mine
   class Buffer
 
-    attr_reader :fileContent, :fileName, :id, :fileLocation
+    attr_reader :fileContent, :fileName, :id, :fileLocation, :serverSide
 
     #
     # Initializes the buffer assigning to it

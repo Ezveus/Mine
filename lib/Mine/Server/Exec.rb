@@ -32,12 +32,20 @@ module Mine
     end
 
     def self.writeDistantFile buffer, args, response, client
-      args << client.userdir
       status = client.user.writeDistantFile buffer, args
       if status == Constant::Fail
         Log::Client.error "no such directory"
         response.status = Constant::PathError
         return Constant::Fail
+      end
+      Constant::Success
+    end
+
+    def self.saveDistantFile buffer, args, response, client
+      status = client.user.saveDistantFile buffer, args, response
+      if status == Constant::Fail
+        Log::Client.error "No such file"
+        return status
       end
       Constant::Success
     end
@@ -50,7 +58,8 @@ module Mine
       "KillBuffer".to_sym => Proc.new { |buffer, args, response, client| self.killBuffer buffer, args, response, client },
       "Undo".to_sym => Proc.new { |buffer, args, response, client| self.undo buffer, args, response, client },
       "Redo".to_sym => Proc.new { |buffer, args, response, client| self.redo buffer, args, response, client },
-      "WriteDistantFile".to_sym => Proc.new { |buffer, args, response, client| self.writeDistantFile buffer, args, response, client }
+      "WriteDistantFile".to_sym => Proc.new { |buffer, args, response, client| self.writeDistantFile buffer, args, response, client },
+      "SaveDistantFile".to_sym => Proc.new { |buffer, args, response, client| self.saveDistantFile buffer, args, response, client }
     }
   end
 end

@@ -23,5 +23,6 @@ module Mine
     UnknownFile ||= 13
     DirectoryNotEmpty ||= 14
     PortAlreadyUsed ||= 15
+    ServerFile ||= 16
   end
 end
