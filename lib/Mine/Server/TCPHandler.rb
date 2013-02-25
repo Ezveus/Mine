@@ -29,8 +29,7 @@ module Mine
         client.readAndProcessRequest
       end
     rescue EOFError
-      puts "*** #{host}:#{port} disconnected"
-      client.exit
+      client.exit :clientQuit
     end
   end
 end

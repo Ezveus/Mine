@@ -30,14 +30,17 @@ module Mine
     end
 
     def exit exitType = :signalCatch
-      @socket.close
       @@clients.delete self
       if exitType == :signalCatch
         Log::Client.log "Sending exit message"
+        @socket.write "QUIT={}"
         Log::Client.log "Sent"
+      elsif exitType == :clientQuit
+        Log::Client.log "Client quit"
       else
         Log::Client.log "Doing what we can do"
       end
+      @socket.close
     end
 
     def self.clients
