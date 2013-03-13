@@ -167,4 +167,104 @@ group_userTblTest = Proc.new do |t|
   end
 end
 
-Mine::Test.new [ "Mine User Table", "Mine Group Table", "Mine Group User Join Table" ], [ userTblTest, groupTblTest, group_userTblTest ]
+fileTblTest = Proc.new do |t|
+  files = Mine::FileInfos.getFiles
+  if t.shouldFail("getFilePaths", files != [],
+                  "No files in table")
+    t.shouldFail("selectFile fichierBidon",
+                 Mine::FileInfos.selectFile("fichierBidon", "Plop", "Plip"),
+                 "fichierBidon doesn't exist")
+  end
+  file = Mine::FileInfos.addFile("FileInfos.rb",
+                                 "Ezveus",
+                                 "Mine",
+                                 0751)
+  t.shouldSuccess("addFile FileInfos.rb for Ezveus in Mine",
+                  file)
+  t.shouldFail("addFile FileInfos.rb for Ezveus in Mine",
+               Mine::FileInfos.addFile("FileInfos.rb",
+                                       "Ezveus", "Mine",
+                                       0751),
+               "File FileInfos.rb for Ezveus in Mine " +
+               "already exists")
+  t.shouldSuccess("addFile FileInfos.rb for Nain in Mine",
+                  Mine::FileInfos.addFile("FileInfos.rb",
+                                          "Nain", "Mine",
+                                          0751))
+  t.shouldSuccess("addFile FileInfos.rb for Ezveus in " +
+                  "Ezveus",
+                  Mine::FileInfos.addFile("FileInfos.rb",
+                                          "Ezveus", "Ezveus",
+                                          0751))
+  files = Mine::FileInfos.getFiles
+  if t.shouldSuccess "getFilePaths", files != []
+    files.each do |f|
+      fl = Mine::FileInfos.selectFile f.path, f.user, f.group
+      t.shouldSuccess "selectFile #{f.path}", f == fl
+      puts f.to_s
+    end
+  end
+  
+  file = Mine::FileInfos.addFile("file.rb",
+                                 "Adaedra", "Idea3", 0751)
+  puts "file : #{file}"
+  t.shouldSuccess("file.path = lib/Mn/Srv/a.rb",
+                  (file.path = "lib/Mn/Srv/a.rb"))
+  # Administrator
+  t.shouldSuccess("file.canBeReadBy? Ezveus",
+                  (file.canBeReadBy? "Ezveus"))
+  # Owner
+  t.shouldSuccess("file.canBeReadBy? Adaedra",
+                  (file.canBeReadBy? "Adaedra"))
+  # Group
+  t.shouldSuccess("file.canBeReadBy? Kagnus",
+                  (file.canBeReadBy? "Kagnus"))
+  # Others
+  t.shouldFail("file.canBeReadBy? Plop",
+               (file.canBeReadBy? "Plop"),
+               "Others can only execute")
+  # Administrator
+  t.shouldSuccess("file.canBeWrittenBy? Ezveus",
+                  (file.canBeWrittenBy? "Ezveus"))
+  # Owner
+  t.shouldSuccess("file.canBeWrittenBy? Adaedra",
+                  (file.canBeWrittenBy? "Adaedra"))
+  # Group
+  t.shouldFail("file.canBeWrittenBy? Kagnus",
+               (file.canBeWrittenBy? "Kagnus"),
+               "Group can read and execute")
+  # Others
+  t.shouldFail("file.canBeWrittenBy? Plop",
+               (file.canBeWrittenBy? "Plop"),
+               "Others can only execute")
+  # Administrator
+  t.shouldSuccess("file.canBeExecutedBy? Ezveus",
+                  (file.canBeExecutedBy? "Ezveus"))
+  # Owner
+  t.shouldSuccess("file.canBeExecutedBy? Adaedra",
+                  (file.canBeExecutedBy? "Adaedra"))
+  # Group
+  t.shouldSuccess("file.canBeExecutedBy? Kagnus",
+                  (file.canBeExecutedBy? "Kagnus"))
+  # Others
+  t.shouldSuccess("file.canBeExecutedBy? Plop",
+                  (file.canBeExecutedBy? "Plop"))
+  t.shouldSuccess("file.rights = 0777",
+                  (file.rights = 0777))
+  t.shouldSuccess("file.canBeReadBy? Plop",
+                  (file.canBeReadBy? "Plop"))
+  t.shouldSuccess("file.user = Kagnus",
+                  (file.user = "Kagnus") == file.user)
+  t.shouldFail("file.user = UnknownUser",
+               (file.user = "UnknownUser") == file.user,
+               "UnknownUser doesn't exist")
+  puts "file : #{file}"
+  t.shouldSuccess("file.group = Mine",
+                  (file.group = "Mine") == file.group)
+  t.shouldFail("file.group = UnknownGroup",
+               (file.group = "UnknownGroup") == file.group,
+               "UnknownGroup doesn't exist")
+  puts "file : #{file}"
+end
+
+Mine::Test.new [ "Mine User Table", "Mine Group Table", "Mine Group User Join Table", "Mine File Table" ], [ userTblTest, groupTblTest, group_userTblTest, fileTblTest ]

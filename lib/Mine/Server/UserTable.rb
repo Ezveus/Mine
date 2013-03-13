@@ -83,7 +83,7 @@ module Mine
         if userGroup.nil?
           userGroup = Modeles::Group.new :name => name
         else
-          @@errors << "userGroup already exists"
+          @@errors << "Group #{name} already exists"
           return false
         end
         groups = [ userGroup ]

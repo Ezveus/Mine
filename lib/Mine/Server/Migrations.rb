@@ -71,9 +71,11 @@ module Mine
       def self.up
         create_table :files do |t|
           t.string :path
-          t.integer :user
-          t.integer :group
-          t.integer :others
+          t.integer :userRights
+          t.integer :groupRights
+          t.integer :othersRights
+          t.integer :user_id
+          t.integer :group_id
           t.timestamps
         end
       end

@@ -26,7 +26,7 @@ module Mine
     #
     class User < ActiveRecord::Base
       has_and_belongs_to_many :groups
-      has_many :file
+      has_many :files
 
       attr_accessible :name, :pass, :email, :website, :isAdmin
 
@@ -57,7 +57,7 @@ module Mine
     #
     class Group < ActiveRecord::Base
       has_and_belongs_to_many :users
-      has_many :file
+      has_many :files
 
       attr_accessible :name
       validates :name, :presence => true, :uniqueness => true
@@ -82,7 +82,8 @@ module Mine
       belongs_to :user
       belongs_to :group
 
-      attr_accessible :path, :user_id, :group_id, :user, :group, :others
+      attr_accessible :path, :user_id, :group_id
+      attr_accessible :userRights, :groupRights, :othersRights
       validates :path, :presence => true, :uniqueness => true
       validates :userRights, :presence => true
       validates :groupRights, :presence => true
