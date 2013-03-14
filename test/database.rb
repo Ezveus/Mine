@@ -23,68 +23,46 @@ mydb = Mine::Database.instance dbpath
 
 userTblTest = Proc.new do |t|
   t.shouldSuccess "Mine::Database.instance", Mine::Database.instance == mydb
-  users = Mine::UserTable.getUserNames
-  if t.shouldSuccess "getUserNames", users != []
+  users = Mine::UserInfos.getUsers
+  if t.shouldSuccess "getUsers", users != []
     users.each do |u|
-      t.shouldSuccess("selectUser #{u}",
-                      (us = Mine::UserTable.selectUser(u)))
-      puts "#{us}"
+      us = Mine::UserInfos.selectUser u.name
+      t.shouldSuccess "selectUser #{u}", u == us
+      puts u.to_s
     end
-    t.shouldFail("matchPass root plop",
-                 Mine::UserTable.matchPass("root", "plop"),
+    root = Mine::UserInfos.selectUser "root"
+    t.shouldFail("root.matchPass plop",
+                 (root.matchPass "plop"),
                  "Password isn't right")
-    t.shouldSuccess("matchPass root toor",
-                    Mine::UserTable.matchPass("root", "toor"))
+    t.shouldSuccess "matchPass toor", (root.matchPass "toor")
   end
   t.shouldSuccess("addUser Plop plop plop@a.net www.plop.org",
-                  Mine::UserTable.addUser("Plop", "plop",
+                  Mine::UserInfos.addUser("Plop", "plop",
                                           "plop@a.net",
                                           "www.plop.org"))
   t.shouldFail("addUser Plop plop baba@a.net www.plop.org",
-               Mine::UserTable.addUser("Plop", "plop",
+               Mine::UserInfos.addUser("Plop", "plop",
                                        "baba@a.net",
                                        "www.plop.org"),
                "User Plop already exists")
   t.shouldFail("addUser Baba plop plop@a.net www.plop.org",
-               Mine::UserTable.addUser("Baba", "plop",
+               Mine::UserInfos.addUser("Baba", "plop",
                                        "plop@a.net",
                                        "www.plop.org"),
                "Email plop@a.net already used")
   t.shouldFail("addUser Bobo plop boboa.net www.plop.org",
-               Mine::UserTable.addUser("Bobo", "plop",
+               Mine::UserInfos.addUser("Bobo", "plop",
                                        "boboa.net",
                                        "www.plop.org"),
                "Email isn't well-formated")
-  if t.shouldSuccess("modUser Plop :website plop.site.net",
-                     Mine::UserTable.modUser("Plop", :website,
-                                             "plop.site.net"))
-    t.shouldSuccess("selectUser Plop website = plop.site.net",
-                    (Mine::UserTable.selectUser("Plop").website ==
-                     "plop.site.net"))
+  plop = Mine::UserInfos.selectUser "Plop"
+  if t.shouldSuccess "selectUser Plop", plop
+    t.shouldSuccess("plop.website = plop.site.net",
+                    (plop.website = "plop.site.net") == plop.website)
   end
-  if t.shouldFail("modUser root :something plop.site.net",
-                  Mine::UserTable.modUser("root", :something,
-                                          "plop.site.net"),
-                  ":something isn't a User field")
-    t.shouldSuccess("selectUser root website unchanged",
-                    (Mine::UserTable.selectUser("root").website ==
-                     "" ||
-                     Mine::UserTable.selectUser("root").website.nil?))
-  end
-  if t.shouldFail("modUser Unknown :website plop.site.net",
-                  Mine::UserTable.modUser("Unknown", :website,
-                                          "plop.site.net"),
-                  "User Unknown doesn't exist")
-    t.shouldFail("selectUser Unknown",
-                 Mine::UserTable.selectUser("Unknown"),
-                 "User Unknown doesn't exist")
-  end
-  if t.shouldSuccess("addUser Test plop test@a.net",
-                     Mine::UserTable.addUser("Test", "plop",
-                                             "test@a.net"))
-    t.shouldSuccess("selectUser Test",
-                    Mine::UserTable.selectUser("Test"))
-  end
+  unknown = Mine::UserInfos.selectUser "Unknown"
+  t.shouldFail("selectUser Unknown", unknown,
+               "User Unknown doesn't exist")
 end
 
 groupTblTest = Proc.new do |t|
@@ -126,50 +104,50 @@ groupTblTest = Proc.new do |t|
 end
 
 group_userTblTest = Proc.new do |t|
-  if t.shouldSuccess("addUser Ezveus",
-                     Mine::UserTable.addUser("Ezveus",
-                                             "suevze",
-                                             "ezveus@a.com",
-                                             "www.ezveus.com",
-                                             "root", "Mine",
-                                             "SharpSoul",
-                                             "MLP"))
-    ezveus = Mine::UserTable.selectUser "Ezveus"
-    t.shouldSuccess "selectUser Ezveus", ezveus
-    puts "#{ezveus}"
-  else
-    puts "#{Mine::UserTable.errors}"
+  ezveus = Mine::UserInfos.addUser("Ezveus",
+                                   "suevze",
+                                   "ezveus@a.com",
+                                   "www.ezveus.com",
+                                   "root", "Mine",
+                                   "SharpSoul",
+                                   "MLP")
+  if t.shouldSuccess "addUser Ezveus", ezveus
+    ezveus2 = Mine::UserInfos.selectUser "Ezveus"
+    t.shouldSuccess "ezveus == ezveus2", ezveus == ezveus2
+      puts ezveus.to_s
   end
-  res = Mine::UserTable.addUsers([ "Nain", "nian",
-                                   "nain@a.com",
-                                   "www.nain.com",
-                                   [ "root", "Mine",
-                                     "MyWMP" ] ],
-                                 [ "Kagnus", "sungak",
-                                   "kagnus@a.com",
-                                   "www.kagnus.com",
-                                   [ "Idea3", "MyWMP" ] ],
-                                 [ "Adaedra", "ardeada",
-                                   "adaedra@a.com",
-                                   "www.adaeadra.com",
-                                   [ "Idea3",
-                                     "MLP" ] ])
+  users = Mine::UserInfos.addUsers([ "Nain", "nian",
+                                     "nain@a.com",
+                                     "www.nain.com",
+                                     [ "root", "Mine",
+                                       "MyWMP" ] ],
+                                   [ "Kagnus", "sungak",
+                                     "kagnus@a.com",
+                                     "www.kagnus.com",
+                                     [ "Idea3", "MyWMP" ] ],
+                                   [ "Adaedra", "ardeada",
+                                     "adaedra@a.com",
+                                     "www.adaeadra.com",
+                                     [ "Idea3",
+                                       "MLP" ] ])
   if t.shouldSuccess("addUsers Nain, Kagnus and Adaedra",
-                     res)
-    nain = Mine::UserTable.selectUser "Nain"
+                     users != {})
+    nain = Mine::UserInfos.selectUser "Nain"
     t.shouldSuccess "selectUser Nain", nain
-    puts "#{nain}"
-    [ "Kagnus", "Adaedra" ].each do |user|
-      user = Mine::UserTable.selectUser "#{user}"
-      t.shouldSuccess "selectUser #{user}", user
-      puts "#{user}"
+    puts nain.to_s
+    t.shouldSuccess "nain == users[Nain]", nain == users["Nain"]
+    [ "Kagnus", "Adaedra" ].each do |username|
+      user = Mine::UserInfos.selectUser "#{username}"
+      t.shouldSuccess "selectUser #{username}", user
+      puts user.to_s
+      t.shouldSuccess "#{username} == users[#{username}]", user == users[username]
     end
   end
 end
 
 fileTblTest = Proc.new do |t|
   files = Mine::FileInfos.getFiles
-  if t.shouldFail("getFilePaths", files != [],
+  if t.shouldFail("getFiles", files != [],
                   "No files in table")
     t.shouldFail("selectFile fichierBidon",
                  Mine::FileInfos.selectFile("fichierBidon", "Plop", "Plip"),
@@ -197,7 +175,7 @@ fileTblTest = Proc.new do |t|
                                           "Ezveus", "Ezveus",
                                           0751))
   files = Mine::FileInfos.getFiles
-  if t.shouldSuccess "getFilePaths", files != []
+  if t.shouldSuccess "getFiles", files != []
     files.each do |f|
       fl = Mine::FileInfos.selectFile f.path, f.user, f.group
       t.shouldSuccess "selectFile #{f.path}", f == fl
@@ -209,7 +187,7 @@ fileTblTest = Proc.new do |t|
                                  "Adaedra", "Idea3", 0751)
   puts "file : #{file}"
   t.shouldSuccess("file.path = lib/Mn/Srv/a.rb",
-                  (file.path = "lib/Mn/Srv/a.rb"))
+                  (file.path = "lib/Mn/Srv/a.rb") == file.path)
   # Administrator
   t.shouldSuccess("file.canBeReadBy? Ezveus",
                   (file.canBeReadBy? "Ezveus"))

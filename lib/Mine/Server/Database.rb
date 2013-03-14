@@ -29,7 +29,7 @@ module Mine
 
       unless fileExist
         Migrations.up
-        UserTable.addUser "root", "toor", "root@localhost.localdomain"
+        UserInfos.addUser "root", "toor", "root@localhost.localdomain"
       end
     end
   end

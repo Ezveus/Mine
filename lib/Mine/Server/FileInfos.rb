@@ -52,7 +52,7 @@ module Mine
         file.group = group
         ret = file.save
         if ret
-          finfo = FileInfos.new file
+          FileInfos.new file
         end
       end
 
