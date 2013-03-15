@@ -33,7 +33,7 @@ module Mine
       # create groups if necessary
       # Returns the corresponding UserInfos
       #
-      def addUser name, pass, mail, site="", *groupnames
+      def addUser name, pass, mail, site = "", *groupnames
         groupnames = groupnames.flatten
         userGroup = Modeles::Group.find_by_name name
         if userGroup.nil?
@@ -65,7 +65,8 @@ module Mine
       #
       # Add users in the database and
       # creates groups if necessary
-      # Returns an array with all UserInfos
+      # Returns a hash with all UserInfos where keys are
+      # usernames
       #
       def addUsers *users
         usersInfos = {}

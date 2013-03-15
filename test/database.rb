@@ -66,41 +66,27 @@ userTblTest = Proc.new do |t|
 end
 
 groupTblTest = Proc.new do |t|
-  groups = Mine::GroupTable.getGroupNames
-  if t.shouldSuccess "getGroupNames", groups != []
+  groups = Mine::GroupInfos.getGroups
+  if t.shouldSuccess "getGroups", groups != []
     groups.each do |g|
-      t.shouldSuccess("selectGroup #{g}",
-                      (gr = Mine::GroupTable.selectGroup(g)))
-      puts "#{gr}"
+      gr = Mine::GroupInfos.selectGroup g.name
+      t.shouldSuccess "selectGroup #{g}", g == gr
+      puts g.to_s
     end
   end
   t.shouldSuccess("addGroup Plip",
-                  Mine::GroupTable.addGroup("Plip"))
+                  Mine::GroupInfos.addGroup("Plip"))
   t.shouldFail("addGroup Plip",
-               Mine::GroupTable.addGroup("Plip"),
+               Mine::GroupInfos.addGroup("Plip"),
                "Group Plip already exists")
-  if t.shouldSuccess("modGroup Plip :name PlopV2",
-                     Mine::GroupTable.modGroup("Plip", :name,
-                                               "PlopV2"))
-    t.shouldSuccess("selectGroup PlopV2",
-                    (Mine::GroupTable.selectGroup("PlopV2").name == "PlopV2"))
+  plip = Mine::GroupInfos.selectGroup "Plip"
+  if t.shouldSuccess "selectGroup Plip", plip
+    t.shouldSuccess("plip.name = PlopV2",
+                    (plip.name = "PlopV2") == plip.name)
   end
-  if t.shouldFail("modGroup root :something plop.site.net",
-                  Mine::GroupTable.modGroup("root", :something,
-                                            "plop.site.net"),
-                  ":something isn't a Group field")
-    t.shouldSuccess("selectGroup root name unchanged",
-                    (Mine::GroupTable.selectGroup("root").name == "root" ||
-                     Mine::GroupTable.selectGroup("root").name.nil?))
-  end
-  if t.shouldFail("modGroup Unknown :name plip",
-                  Mine::GroupTable.modGroup("Unknown", :name,
-                                            "plip"),
-                  "Group Unknown doesn't exist")
-    t.shouldFail("selectGroup Unknown",
-                 Mine::GroupTable.selectGroup("Unknown"),
-                 "Group Unknown doesn't exist")
-  end
+  unknown = Mine::GroupInfos.selectGroup "Unknown"
+  t.shouldFail("selectGroup Unknown", unknown,
+               "Group Unknown doesn't exist")
 end
 
 group_userTblTest = Proc.new do |t|
