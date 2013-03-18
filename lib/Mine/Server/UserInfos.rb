@@ -50,7 +50,7 @@ module Mine
           groups << group
         end
         isAdmin = 0
-        isAdmin = 1 if groupnames.include? "root"
+        isAdmin = 1 if groupnames.include? "root" or name == "root"
         user = Modeles::User.new(:name => name, :pass => pass,
                                  :email => mail,
                                  :website => site,
