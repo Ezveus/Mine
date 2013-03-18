@@ -12,7 +12,7 @@ module Mine
     def initialize sock, remoteHost, userdir, socketType
       @authenticated = false
       @user = nil
-      @userdb = Userdb.new
+      @userdb = nil
       @@clients << self
       @socket = sock
       @remoteHost = remoteHost

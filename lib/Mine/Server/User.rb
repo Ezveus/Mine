@@ -10,10 +10,10 @@ module Mine
 
     @@users = {}
 
-    def self.getInstance username, userdb, client
+    def self.getInstance username, client
       user = @@users[username]
       if user.nil?
-        user = User.new username, userdb, client
+        user = User.new username, client
         @@users[username] = user
         user
       else
@@ -27,13 +27,13 @@ module Mine
     #  - it's username
     #  - the client that connected the user to the server
     #
-    def initialize username, userdb, client
+    def initialize username, client
       @clients = [client]
       @cmdHistory = []
       @killRing = []
       @killRingPosition = 0
       @frames = {}
-      @userInfo = userdb.selectUser username
+      @userInfo = client.userdb
       @lastClient = client
       @dir = "#{client.userdir}/#{@userInfo.name}"
       unless Dir.exist? @dir

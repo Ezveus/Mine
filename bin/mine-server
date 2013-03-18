@@ -45,6 +45,7 @@ def launchRailsServer options
 end
 
 def launchServer options
+  Mine::Database.instance
   launchRailsServer options if options[:withRails]
 
   begin
