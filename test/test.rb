@@ -11,6 +11,7 @@ module Mine
   class Test
     def initialize testnames, blocks
       @testnames = testnames
+      @testresults = []
       if @testnames.length == blocks.length
         @testnames.each_index do |i|
           @success = []
@@ -18,7 +19,13 @@ module Mine
           @i = i
           puts "\033[34mTesting #{@testnames[i]} :\033[0m"
           blocks[i].call self
-          self.end
+          @testresults << self.end
+        end
+        puts "\n>>> Reporting :"
+        if @testresults.length > 1
+          @testresults.each do |test|
+            self.report test
+          end
         end
       else
         raise "The number of tests and names are different"
@@ -60,6 +67,16 @@ module Mine
       puts "\033[34m#{@testnames[@i]} :"
       puts "\t\033[32m#{@success.length} passed"
       puts "\t\033[31m#{@failures.length} failed"
+      puts "\033[0m"
+      { :name => @testnames[@i],
+        :success => @success.length,
+        :failures => @failures.length }
+    end
+
+    def report test
+      puts "\033[34m#{test[:name]} :"
+      puts "\t\033[32m#{test[:success]} passed"
+      puts "\t\033[31m#{test[:failures]} failed"
       puts "\033[0m"
     end
   end
