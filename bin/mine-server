@@ -91,17 +91,17 @@ eos
       options[:wsport] = p
     end
 
-    opts.on "-j", "--rhost HOST", "Rails authorized distant hosts" do |h|
-      options[:railshost] = h
-    end
+    # opts.on "-j", "--rhost HOST", "Rails authorized distant hosts" do |h|
+    #   options[:railshost] = h
+    # end
 
-    opts.on "-r", "--rport PORT", Integer, "Rails communication port" do |p|
-      options[:railsport] = p
-    end
+    # opts.on "-r", "--rport PORT", Integer, "Rails communication port" do |p|
+    #   options[:railsport] = p
+    # end
 
-    opts.on "-w", "--webclient", "switch to decide if the rails server has to be launched" do |w|
-      options[:withRails] = !options[:withRails]
-    end
+    # opts.on "-w", "--webclient", "switch to decide if the rails server has to be launched" do |w|
+    #   options[:withRails] = !options[:withRails]
+    # end
 
     opts.on "--help", "displays this screen" do |h|
       puts opts
