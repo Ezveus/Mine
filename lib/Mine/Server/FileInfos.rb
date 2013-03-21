@@ -127,9 +127,13 @@ module Mine
     end
 
     def rights
-      r = 0 + @userRights * 0100
-      r += @groupRights * 010
-      r + @othersRights
+      if @userRights and @groupRights and @othersRights
+        r = 0 + @userRights * 0100
+        r += @groupRights * 010
+        r + @othersRights
+      else
+        0
+      end
     end
 
     def path= path
@@ -292,7 +296,15 @@ module Mine
     # Delete this file from the database
     #
     def delete
-      raise "Not Implemented Function"
+      Modeles::File.delete @fileInTable.id
+      @errors = nil
+      @fileInTable = nil
+      @path = nil
+      @user = nil
+      @group = nil
+      @userRights = nil
+      @groupRights = nil
+      @othersRights = nil
     end
 
     private

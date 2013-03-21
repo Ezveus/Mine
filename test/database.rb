@@ -63,6 +63,18 @@ userTblTest = Proc.new do |t|
   unknown = Mine::UserInfos.selectUser "Unknown"
   t.shouldFail("selectUser Unknown", unknown,
                "User Unknown doesn't exist")
+  deleteuser = Mine::UserInfos.addUser("Delete", "del",
+                                       "del@a.net")
+  t.shouldSuccess "addUser Delete del del@a.net", deleteuser
+  puts deleteuser.to_s
+  du = Mine::UserInfos.selectUser "Delete"
+  if t.shouldSuccess "selectUser Delete A", du == deleteuser
+    deleteuser.delete
+    puts "Delete : #{deleteuser}"
+    t.shouldFail("selectUser Delete B",
+                 Mine::UserInfos.selectUser("Delete"),
+                 "User Delete was deleted")
+  end
 end
 
 groupTblTest = Proc.new do |t|
@@ -87,6 +99,15 @@ groupTblTest = Proc.new do |t|
   unknown = Mine::GroupInfos.selectGroup "Unknown"
   t.shouldFail("selectGroup Unknown", unknown,
                "Group Unknown doesn't exist")
+  deletegroup = Mine::GroupInfos.selectGroup "Delete"
+  if t.shouldSuccess "selectGroup Delete A", deletegroup
+    puts deletegroup.to_s
+    deletegroup.delete
+    puts "Delete : #{deletegroup}"
+    t.shouldFail("selectGroup Delete B",
+                 Mine::GroupInfos.selectGroup("Delete"),
+                 "Group Delete was deleted")
+  end
 end
 
 group_userTblTest = Proc.new do |t|
@@ -229,6 +250,19 @@ fileTblTest = Proc.new do |t|
                (file.group = "UnknownGroup") == file.group,
                "UnknownGroup doesn't exist")
   puts "file : #{file}"
+  deletefile = Mine::FileInfos.addFile("file.rb",
+                                       "Kagnus",
+                                       "Idea3", 0600)
+  t.shouldSuccess "addFile file.rb Kagnus Idea3 0600", deletefile
+  puts deletefile.to_s
+  du = Mine::FileInfos.selectFile "file.rb", "Kagnus", "Idea3"
+  if t.shouldSuccess "selectFile file.rb A", du == deletefile
+    deletefile.delete
+    puts "Delete : #{deletefile}"
+    t.shouldFail("selectFile file.rb B",
+                 Mine::FileInfos.selectFile("file.rb", "Kagnus", "Idea3"),
+                 "File file.rb was deleted")
+  end
 end
 
 Mine::Test.new [ "Mine User Table", "Mine Group Table", "Mine Group User Join Table", "Mine File Table" ], [ userTblTest, groupTblTest, group_userTblTest, fileTblTest ]

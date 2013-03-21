@@ -168,7 +168,15 @@ module Mine
     # Delete this user from the database
     #
     def delete
-      raise "Not Implemented Function"
+      Modeles::User.delete @userInTable.id
+      @userInTable = nil
+      @name = nil
+      @groups = nil
+      @mail = nil
+      @website = nil
+      @isAdmin = nil
+      @files = nil
+      @errors = nil
     end
 
     def getData data, objects

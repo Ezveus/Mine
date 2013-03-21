@@ -101,10 +101,15 @@ module Mine
     end
 
     #
-    # Delete this group from the database
+    # Delete this user from the database
     #
     def delete
-      raise "Not Implemented Function"
+      Modeles::Group.delete @groupInTable.id
+      @groupInTable = nil
+      @name = nil
+      @users = nil
+      @files = nil
+      @errors = nil
     end
 
     def getData data, objects
