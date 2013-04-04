@@ -6,8 +6,12 @@ module Mine
   # for use by the server
   #
   class FileInfos
+    extend Forwardable
+
     attr_reader :path, :user, :group, :userRights
     attr_reader :groupRights, :othersRights, :errors
+
+    def_delegators :@fileInTable, :id
 
     class << self
       #
@@ -34,7 +38,7 @@ module Mine
       # Add a file in the database and returns the
       # corresponding FileInfos
       #
-      def addFile path, username, groupname, rights
+      def addFile path, username, groupname, rights = 0640
         userRights = getUserRights rights
         groupRights = getGroupRights rights
         othersRights = getOthersRights rights

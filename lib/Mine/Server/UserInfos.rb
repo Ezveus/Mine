@@ -5,8 +5,12 @@ module Mine
   # for use by the server
   #
   class UserInfos
+    extend Forwardable
+
     attr_reader :name, :groups, :mail, :website
     attr_reader :isAdmin, :files, :errors
+
+    def_delegators :@userInTable, :id
 
     class << self
       #
@@ -87,16 +91,23 @@ module Mine
     def initialize user
       @userInTable = user
       @name = user.name
-      @groups = getData(:name, user.groups).sort
+      @groups = {}
+      user.groups.each do |group|
+        @groups[group.name] = GroupInfos.new group
+      end
       @mail = user.email
       @website = user.website
       @isAdmin = user.isAdmin
-      @files = getData(:path, user.files).sort
+      @files = {}
+      user.files.each do |file|
+        @files[files.path] = FileInfos.new file
+      end
       @errors = []
     end
 
     def to_s
-      res = "#{@name} #{@groups} #{@files}"
+      return "" if @name.nil?
+      res = "#{@name} #{@groups.keys.sort} #{@files.keys.sort}"
       if @isAdmin == 1
         res += " # "
       else
@@ -130,7 +141,7 @@ module Mine
     end
 
     def == u
-      @name == u.name and @groups == u.groups and @mail == u.mail and @website == u.website and @isAdmin == u.isAdmin and @files == u.files
+      @name == u.name and @groups.keys.sort == u.groups.keys.sort and @mail == u.mail and @website == u.website and @isAdmin == u.isAdmin and @files.keys.sort == u.files.keys.sort
     end
 
     def != u
@@ -164,6 +175,75 @@ module Mine
       save
     end
 
+    def addGroup groupname
+      return true if @groups.include? groupname
+      group = getModele(Modeles::Group, "name", groupname,
+                        {
+                          :name => groupname
+                        })
+      @userInTable.groups << group
+      ret = @userInTable.save
+      if ret
+        @groups[groupname] = GroupInfos.new group
+        true
+      else
+        false
+      end
+    end
+
+    def delGroup groupname
+      return false if groupname == @name
+      return false unless @groups.include? groupname
+      group = getModele Modeles::Group, "name", groupname
+      @userInTable.groups.delete group
+      ret = @userInTable.save
+      if ret
+        @groups.delete groupname
+        Modeles::Group.delete group.id
+        true
+      else
+        false
+      end
+    end
+
+    def addFile filepath, groupname
+      path = "#{@name}/#{groupname}/#{filepath}"
+      return true if @files.include? path
+      return false unless @groups.include? groupname
+      file = getModele(Modeles::File, "path", path,
+                       {
+                         :path => path,
+                         :user_id => @userInTable.id,
+                         :group_id => @groups[groupname].id,
+                         :userRights => 6,
+                         :groupRights => 4,
+                         :othersRights => 0
+                       })
+      @userInTable.files << file
+      ret = @userInTable.save
+      if ret
+        @files[path] = FileInfos.new file
+        true
+      else
+        false
+      end
+    end
+
+    def delFile filepath, group
+      path = "#{@name}/#{group}/#{filepath}"
+      return false unless @files.include? path
+      file = getModele Modeles::File, "path", path
+      @userInTable.files.delete file
+      ret = @userInTable.save
+      if ret
+        @files.delete path
+        Modeles::File.delete file.id
+        true
+      else
+        false
+      end
+    end
+
     #
     # Delete this user from the database
     #
@@ -179,6 +259,7 @@ module Mine
       @errors = nil
     end
 
+    private
     def getData data, objects
       res = []
       objects.each do |object|
@@ -187,6 +268,16 @@ module Mine
         end
       end
       res
+    end
+
+    def getModele acmodele, prop, value, hash = nil
+      m = acmodele.where("#{prop} = ?", value).first
+      if m.nil?
+        return nil if hash.nil?
+        m = acmodele.new hash
+        m.save
+      end
+      m
     end
   end
 end

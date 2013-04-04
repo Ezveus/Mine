@@ -75,6 +75,43 @@ userTblTest = Proc.new do |t|
                  Mine::UserInfos.selectUser("Delete"),
                  "User Delete was deleted")
   end
+  groupUser = Mine::UserInfos.addUser("GroupUser", "grp",
+                                      "grp@a.net", "www.g.g",
+                                      "Plop", "root", "Mine",
+                                      "truc")
+  t.shouldSuccess "addUser GroupUser grp grp@a.net www.g.g Plop root Mine truc", groupUser
+  puts groupUser.to_s
+  t.shouldSuccess("groupUser.groups.include? truc",
+                  (groupUser.groups.include? "truc"))
+  t.shouldFail("groupUser.groups.include? plip",
+               (groupUser.groups.include? "plip"),
+               "Group wasn't added to GroupUser")
+  t.shouldSuccess("groupUser.addGroup plip",
+                  (groupUser.addGroup "plip"))
+  t.shouldSuccess("groupUser.groups.include? plip",
+                  (groupUser.groups.include? "plip"))
+  t.shouldSuccess("groupUser.addGroup GroupUser",
+                  (groupUser.addGroup "GroupUser"))
+  t.shouldFail("groupUser.delGroup GroupUser",
+               (groupUser.delGroup "GroupUser"),
+               "A user must belongs to his group")
+  t.shouldSuccess("groupUser.delGroup plip",
+                  (groupUser.delGroup "plip"))
+  t.shouldFail("groupUser.delGroup plip",
+               (groupUser.delGroup "plip"),
+               "GroupUser doesn't belong to plip")
+  t.shouldSuccess("groupUser.addFile fileTest truc",
+                  (groupUser.addFile "fileTest", "truc"))
+  t.shouldSuccess("groupUser.addFile fileTest truc",
+                  (groupUser.addFile "fileTest", "truc"))
+  t.shouldFail("groupUser.addFile fileTest MegaPlop",
+               (groupUser.addFile "fileTest", "MegaPlop"),
+               "GroupUser doesn't belong to MegaPlop")
+  t.shouldFail("groupUser.delFile fileTest MegaPlop",
+               (groupUser.delFile "fileTest", "MegaPlop"),
+               "GroupUser doesn't own fileTest in MegaPlop")
+  t.shouldSuccess("groupUser.delFile fileTest truc",
+                  (groupUser.delFile "fileTest", "truc"))
 end
 
 groupTblTest = Proc.new do |t|

@@ -5,7 +5,11 @@ module Mine
   # for use by the server
   #
   class GroupInfos
+    extend Forwardable
+
     attr_reader :name, :users, :files, :errors
+
+    def_delegators :@groupInTable, :id
 
     class << self
       #
