@@ -70,13 +70,19 @@ module Mine
       puts "\033[0m"
       { :name => @testnames[@i],
         :success => @success.length,
-        :failures => @failures.length }
+        :failures => @failures.length,
+        :failed => @failures }
     end
 
     def report test
       puts "\033[34m#{test[:name]} :"
       puts "\t\033[32m#{test[:success]} passed"
       puts "\t\033[31m#{test[:failures]} failed"
+      if test[:failures] > 0
+        test[:failed].each do |testname|
+          puts "\t\033[31m-> #{testname}"
+        end
+      end
       puts "\033[0m"
     end
   end
