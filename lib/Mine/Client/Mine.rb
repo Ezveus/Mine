@@ -23,6 +23,10 @@ module MineClient
   # This function is the Mine Client's main loop.
   def run
     # here should the connection be established
+    connection = Connection.instance
+    connection.config
+    connection.connect
+    connection.authenticate
     begin
       catch :close do
         loop do

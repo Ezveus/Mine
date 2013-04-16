@@ -1,9 +1,12 @@
 require 'ffi-ncurses'
 require 'rbcurse'
-require 'logger'
 require 'singleton'
+require 'json'
+require 'securerandom'
+require 'celluloid/io'
 
 require 'Client/Mine'
+require 'Client/Connection'
 require 'Client/Form'
 require 'Client/Key'
 require 'Client/Window'

@@ -1,6 +1,6 @@
 MESSAGE ::= REQUEST = { ARGUMENTS[, ARGUMENTS]* }
 
-REQUEST = AUTHENTICATE | SIGNUP | EXEC | INSERT | MOVE | BACKSPACE | DELETE | SYNC | LOAD | SHELL | RESPONSE
+REQUEST ::= AUTHENTICATE | SIGNUP | EXEC | INSERT | MOVE | BACKSPACE | DELETE | SYNC | LOAD | SHELL | RESPONSE
 
 ARGUMENTS ::= " VALUE " : " VALUE "
 
@@ -24,7 +24,7 @@ Command List and Arguments Sent by Clients :
 -> LOAD : id type[up | down] path size[integer] line[integer] port[integer]
         => RESPONSE info : uuid
 
--> SHELL : id command args	
+-> SHELL : id command args
 
 Command List and Arguments sent by Server :
 

@@ -25,8 +25,9 @@ module MineClient
         # Init rbcurse Window.
         @window = VER::Window.root_window
         Ncurses.nl
+
       else
-        # Init Form and Widgets
+        # Init Widgets
         return self unless mine_widgets
         @form = Form.new @window
         @form.init_widgets mine_widgets
@@ -34,6 +35,7 @@ module MineClient
         # Refresh.
         @form.write 0
         Ncurses.use_default_colors
+        $datacolor = 0
         @window.wrefresh
       end
       self
