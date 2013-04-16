@@ -38,17 +38,29 @@ module Mine
         response.status = Constant::JSONParserError
         return Constant::Fail
       end
-      unless client.userdb.matchPass name, pass
+      userdb = UserInfos.selectUser name
+      unless userdb
         Log::Client.error "Unknown user"
         response.status = Constant::UnknownUser
         return Constant::Fail
       end
-      client.user = User.getInstance name, client.userdb, client
+      unless userdb.matchPass pass
+        Log::Client.error "Unknown user"
+        response.status = Constant::UnknownUser
+        return Constant::Fail
+      end
+      client.userdb = userdb
+      client.user = User.getInstance name, client
       Log::Client.log "User logged : #{client.user.userInfo}"
       Constant::Success
     end
 
     def self.signup jsonRqst, response, client
+      if client.authenticated
+        Log::Client.error "#{client.user} already logged"
+        response.status = Constant::AlreadyLogged
+        return Constant::Fail
+      end
       object = getObjectFromJSON jsonRqst, response
       return Constant::Fail if object.nil?
       name = object["name"]
@@ -60,14 +72,15 @@ module Mine
         response.status = Constant::JSONParserError
         return Constant::Fail
       end
-      unless client.userdb.addUser name, pass, email, website
-        client.userdb.errors.each do |err|
-          Log::Client.error err
-        end
+      userdb = UserInfos.addUser name, pass, email, website
+      unless userdb
+        Log::Client.error "User #{name} can't be added"
         response.status = Constant::BadRegistration
         return Constant::Fail
       end
-      Log::Client.log "New user : #{client.userdb.selectUser name}"
+      client.userdb = userdb
+      client.user = User.getInstance name, client
+      Log::Client.log "New user : #{userdb}"
       Constant::Success
     end
 

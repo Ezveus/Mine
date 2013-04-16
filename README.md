@@ -18,17 +18,13 @@ Or install it yourself as:
 
 ## Usage
 
-Usage: mine-server [OPTIONS]
-Launch a mine server
-    -h, --host HOST                  TCP authorized distant hosts
-    -p, --port PORT                  TCP communication port
+Usage: mine-server [OPTIONS]<br />
+Launch a mine server<br />
+    -h, --host HOST                  TCP authorized distant hosts<br />
+    -p, --port PORT                  TCP communication port<br />
     -i, --wshost HOST                WebSocket authorized distant
-    hosts
-    -q, --wsport PORT                WebSocket communication port
-    -j, --rhost HOST                 Rails authorized distant hosts
-    -r, --rport PORT                 Rails communication port
-    -w, --webclient                  switch to decide if the rails
-    server has to be launched
+    hosts<br />
+    -q, --wsport PORT                WebSocket communication port<br />
         --help                       displays this screen
 
 ## Contributing
