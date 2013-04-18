@@ -3,6 +3,8 @@ require 'rbcurse'
 require 'singleton'
 require 'json'
 require 'securerandom'
+gem 'celluloid', '= 0.12.4'
+gem 'celluloid-io', '= 0.12.1'
 require 'celluloid/io'
 
 require 'Client/Mine'

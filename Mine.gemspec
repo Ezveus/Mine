@@ -27,7 +27,7 @@ EOS
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.require_paths = ["lib"]
   gem.add_runtime_dependency 'activerecord', '~> 3.2', '>= 3.2.11'
-  gem.add_runtime_dependency 'celluloid-io', '~> 0.12', '>= 0.12.1'
+  gem.add_runtime_dependency 'celluloid-io', '~> 0.12', '<= 0.12.1'
   gem.add_runtime_dependency 'WEBSocket', '~> 0.1', '>= 0.1.1'
   gem.add_runtime_dependency 'diff-lcs', '~> 1.1', '>= 1.1.3'
   gem.add_runtime_dependency 'sqlite3', '~> 1.3', '>= 1.3.7'
