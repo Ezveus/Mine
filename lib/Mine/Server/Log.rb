@@ -1,5 +1,8 @@
 module Mine
   module Log
+    #
+    # Isn't the code and the names clear enough
+    #
     module Server
       def self.log str
         puts "--> #{str}"

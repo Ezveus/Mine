@@ -148,6 +148,9 @@ module Mine
       !(self == u)
     end
 
+    #
+    # save the new value of the pass in the database
+    #
     def pass= newval
       @userInTable.pass = newval
       save
@@ -157,24 +160,36 @@ module Mine
       @userInTable.pass == pass
     end
 
+    #
+    # Save the new value of the email in the database
+    #
     def email= newval
       @email = newval
       @userInTable.email = newval
       save
     end
 
+    #
+    # Save the new value of the website in the database
+    #
     def website= newval
       @website = newval
       @userInTable.website = newval
       save
     end
 
+    #
+    # set if th euser is an admin of the server and save it in the database
+    #
     def isAdmin= newval
       @isAdmin = newval
       @userInTable.isAdmin = newval
       save
     end
 
+    #
+    # add a group, create the directories, and save the rights in the database
+    #
     def addGroup groupname
       return true if @groups.include? groupname
       group = getModele(Modeles::Group, "name", groupname,
@@ -191,6 +206,9 @@ module Mine
       end
     end
 
+    #
+    # delete a group, delete the directories, and delete it from the database
+    #
     def delGroup groupname
       return false if groupname == @name
       return false unless @groups.include? groupname
@@ -206,6 +224,9 @@ module Mine
       end
     end
 
+    #
+    # add a file in the database and save it
+    #
     def addFile filepath, groupname
       path = "#{@name}/#{groupname}/#{filepath}"
       return true if @files.include? path
@@ -229,6 +250,9 @@ module Mine
       end
     end
 
+    #
+    # delete a file and delete it from the database
+    #
     def delFile filepath, group
       path = "#{@name}/#{group}/#{filepath}"
       return false unless @files.include? path

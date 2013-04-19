@@ -3,7 +3,10 @@
 module Mine
   class Response
     attr_accessor :status, :id, :info
-  
+
+    #
+    # Creates a new RESPONSE request
+    #  
     def initialize
       @status = Constant::Ok
       @id = ""

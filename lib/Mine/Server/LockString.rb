@@ -13,7 +13,7 @@ module Mine
     #  - if the LockString is locked or not at it construction
     #
     def initialize content = "", locked = nil
-      super content
+      super content # \o/ Epic win !
       @locked = locked
     end
 

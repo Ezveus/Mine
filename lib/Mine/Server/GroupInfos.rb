@@ -98,6 +98,9 @@ module Mine
       !(self == g)
     end
 
+    #
+    # Change the name of the group and save it in the database
+    #
     def name= newval
       @name = newval
       @groupInTable.name = newval
@@ -116,6 +119,9 @@ module Mine
       @errors = nil
     end
 
+    #
+    # get an attribute of the given object
+    #
     def getData data, objects
       res = []
       objects.each do |object|
@@ -125,5 +131,6 @@ module Mine
       end
       res
     end
+
   end
 end

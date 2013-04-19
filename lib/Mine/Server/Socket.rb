@@ -1,5 +1,8 @@
 module Mine
   module Socket
+    #
+    # Method used as a dispatcher to create our sockets
+    #
     def self.create rhost, rport, type = :tcp
       case type
       when :tcp then Celluloid::IO::TCPSocket.new rhost, rport

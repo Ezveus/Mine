@@ -1,3 +1,6 @@
+#
+# Require all the things ! \o\
+#
 require 'ffi-ncurses'
 require 'rbcurse'
 require 'singleton'

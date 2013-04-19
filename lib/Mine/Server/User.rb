@@ -8,6 +8,7 @@ module Mine
     attr_reader :userInfo, :frames, :cmdHistory, :killRing, :dir
     attr_accessor :lastClient, :clients
 
+    # class variable giving access to all the user logged
     @@users = {}
 
     def self.getInstance username, client
@@ -59,6 +60,9 @@ module Mine
       end
     end
 
+    #
+    # Method called when a new frame is to be created
+    #
     def addFrame fileLocation, fileName, fileContent, rights, serverSide, line, overWrite = false
       buf = nil
       @frames.each do |buffer, frame|
@@ -97,6 +101,9 @@ module Mine
       buffer.id
     end
 
+    #
+    # Method used to find a specific buffer
+    #
     def findBuffer bufferid
       buf = nil
       @frames.each do |buffer, frame|
@@ -108,6 +115,9 @@ module Mine
       buf
     end
 
+    #
+    # Method used to close a buffer
+    #
     def killBuffer buffer
       @frames.delete buffer
     end
@@ -253,6 +263,9 @@ module Mine
     end
 
     public
+    #
+    # Method used to "save as" a file on the server side
+    #
     def writeDistantFile buffer, args
       path = "#{@dir}/#{args[0]}"
       begin
@@ -266,6 +279,9 @@ module Mine
     end
 
     public
+    #
+    # Method used to save a file on the server side
+    #
     def saveDistantFile buffer, args, response
       unless buffer.serverSide
         response.status = Constant::ServerFile

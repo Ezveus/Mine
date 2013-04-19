@@ -1,3 +1,6 @@
+#
+# Require all the things ! \O\
+#
 require 'active_record'
 require 'logger'
 require 'json'

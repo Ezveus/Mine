@@ -1,14 +1,22 @@
 #!/usr/bin/env ruby
 
 module Mine
+
+  #
+  # Class containing all the data and methods concerning a client
+  #
   class Client
     include Protocol
 
     attr_accessor :userdb
     attr_reader :user, :socket, :authenticated, :remoteHost, :socketType, :userdir
 
+    # Class variable containing all the connected clients
     @@clients = []
 
+    #
+    # Constructor takes the socket the remote host adress the directory where server files are stored and the socket type TCP or WebSocket
+    #
     def initialize sock, remoteHost, userdir, socketType
       @authenticated = false
       @user = nil
@@ -20,6 +28,9 @@ module Mine
       @userdir = userdir
     end
 
+    #
+    # Method called when the user is authenticated
+    #
     def user= user
       @user = user
       if @user
@@ -29,6 +40,9 @@ module Mine
       end
     end
 
+    #
+    # Method to call when a client deisconnect or when the server quits
+    #
     def exit exitType = :signalCatch
       @@clients.delete self
       if exitType == :signalCatch
@@ -43,10 +57,16 @@ module Mine
       @socket.close
     end
 
+    #
+    # getter
+    #
     def self.clients
       @@clients
     end
 
+    #
+    # Method called whenever the client gets data
+    #
     def readAndProcessRequest
       buffer = @socket.readpartial Constant::RequestSize
       buffer = buffer.strip
@@ -60,6 +80,7 @@ module Mine
     end
 
     private
+    # request array containing all request type
     Requests ||= [
                   Authenticate = "AUTHENTICATE",
                   Signup = "SIGNUP",
@@ -71,7 +92,9 @@ module Mine
                   Load = "LOAD",
                   Shell = "SHELL"
                  ]
-
+    #
+    # is the request known or not ?
+    #
     def unknownRequest? request, response
       unless Requests.index request
         Log::Client.error "Unknown request"
@@ -81,6 +104,9 @@ module Mine
       false
     end
 
+    #
+    # is the request invalid ?
+    #
     def unvalidRequest? msg, response
       unless (msg =~ /.+={.*}/) == 0
         Log::Client.error "Unvalid request : bad body"

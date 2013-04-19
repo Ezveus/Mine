@@ -1,7 +1,13 @@
 #!/usr/bin/env ruby
 
 module Mine
+  #
+  # The method are acting as their sisters in a UNIX system
+  #
   module Shell
+    #
+    # Method called when the argument of the request SHELL is 'Mkdir'
+    #
     def self.mkdir args, response, client
       unless Dir.exist? "#{client.user.dir}/#{args[0]}"
         begin
@@ -18,6 +24,9 @@ module Mine
       Constant::Fail
     end
 
+    #
+    # Method called when the argument of the request SHELL is 'Rmdir'
+    #
     def self.rmdir args, response, client
       if Dir.exist? "#{client.user.dir}/#{args[0]}"
         if Dir.entries("#{client.user.dir}/#{args[0]}").size == 2
@@ -37,6 +46,9 @@ module Mine
       Constant::Fail
     end
 
+    #
+    # Method called when the argument of the request SHELL is 'Rm'
+    #
     def self.rm args, response, client
       if File.exist? "#{client.user.dir}/#{args[0]}"
         begin
@@ -51,6 +63,9 @@ module Mine
       Constant::Fail
     end
 
+    #
+    # Method called when the argument of the request SHELL is 'Ls'
+    #
     def self.ls args, response, client
       if Dir.exist? "#{client.user.dir}/#{args[0]}"
         ls = Dir.entries "#{client.user.dir}/#{args[0]}"
@@ -64,6 +79,9 @@ module Mine
       Constant::Fail
     end
 
+    #
+    # Method called when the argument of the request SHELL is 'Cp'
+    #
     def self.cp args, response, client
       if File.exist? "#{client.user.dir}/#{args[0]}"
         if Dir.exist? (File.dirname "#{client.user.dir}/#{args[1]}")
@@ -77,6 +95,9 @@ module Mine
       Constant::Fail
     end
 
+    #
+    # Method called when the argument of the request SHELL is 'Touch'
+    #
     def self.touch args, response, client
       unless File.exist? "#{client.user.dir}/#{args[0]}"
         File.new "#{client.user.dir}/#{args[0]}", File::CREAT
@@ -86,6 +107,9 @@ module Mine
       Constant::Fail 
     end
 
+    #
+    # Method called when the argument of the request SHELL is 'Mv'
+    #
     def self.mv args, response, client
       if File.exist? "#{client.user.dir}/#{args[0]}"
         unless File.exist? "#{client.user.dir}/#{args[1]}"
@@ -101,6 +125,9 @@ module Mine
     end
 
     private
+    #
+    # Method used with mkdir to create all the directories needed
+    #
     def self.createIntermediateDirs path, userpath
       p = File.dirname path
       if p =~ /\//
@@ -111,6 +138,9 @@ module Mine
       end
     end
 
+    #
+    # Method used to copy a file in an other
+    #
     def self.copyFile args, client
       f1 = File.new "#{client.user.dir}/#{args[0]}"
       f2 = File.new "#{client.user.dir}/#{args[1]}", 'w'
@@ -120,6 +150,9 @@ module Mine
     end
 
     public
+    #
+    # hash acting as a dispatcher for the above methods
+    #
     ShellCommands ||= {
       "Mkdir".to_sym    => Proc.new { |args, response, client| self.mkdir args, response, client },
       "Rmdir".to_sym    => Proc.new { |args, response, client| self.rmdir args, response, client },

@@ -27,6 +27,9 @@ module Mine
       @overWrite
     end
 
+    #
+    # Method to call every time a request is received
+    #
     def updateLastCmd newCmd
       @lastCmd = newCmd
       nil

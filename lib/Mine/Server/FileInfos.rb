@@ -60,6 +60,9 @@ module Mine
         end
       end
 
+      #
+      # get the user rights
+      #
       def getUserRights right
         r = right.to_i / 0100 % 010
         if r > 07
@@ -68,6 +71,9 @@ module Mine
         r
       end
 
+      #
+      # get the group rights
+      #
       def getGroupRights right
         r = right.to_i / 010 % 010
         if r > 07
@@ -76,6 +82,9 @@ module Mine
         r
       end
 
+      #
+      # get rights for other users
+      #
       def getOthersRights right
         r = right.to_i % 010
         if r > 07
@@ -130,6 +139,9 @@ module Mine
         !(self == a)
     end
 
+    #
+    # get the rights in the UGO format
+    #
     def rights
       if @userRights and @groupRights and @othersRights
         r = 0 + @userRights * 0100
@@ -140,12 +152,18 @@ module Mine
       end
     end
 
+    #
+    # set the path in the table
+    #
     def path= path
       @path = path
       @fileInTable.path = @user + '/' + @group + '/' + @path
       save
     end
 
+    #
+    # creates a user in the database if necessary and creates the defaults directories
+    #
     def user= user
       unless user.class == Modeles::User
         username = user.to_s
@@ -163,6 +181,9 @@ module Mine
       save
     end
 
+    #
+    # Creates a group if needed and create the associated directories
+    #
     def group= group
       unless group.class == Modeles::Group
         groupname = group.to_s
@@ -180,6 +201,9 @@ module Mine
       save
     end
 
+    #
+    # set the rights and save them in the database
+    #
     def rights= rights
       rights = rights.to_i
       @fileInTable.userRights = FileInfos.getUserRights rights

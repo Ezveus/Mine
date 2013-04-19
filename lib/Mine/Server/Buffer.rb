@@ -33,6 +33,9 @@ module Mine
       @diffHistoryPosition = 0
     end
 
+    #
+    # Method transform a buffer into a sendable string
+    #
     def to_file
       file = ""
       @fileContent.each do |line|
@@ -312,9 +315,9 @@ module Mine
         cursor.moveToLine diff.cursorBefore[0]
         cursor.moveToColumn diff.cursorBefore[1]
         @diffHistoryPosition += 1
-        return #whatever we want
+        return :success
       end
-      return #whatever we want but not the same as above
+      :failure
     end
 
     public
@@ -328,9 +331,9 @@ module Mine
         cursor.moveToLine diff.cursorAfter[0]
         cursor.moveToColumn diff.cursorAfter[1]
         @diffHistoryPosition -= 1
-        return #whatever we want
+        return :success
       end
-      return #whatever we want but not the same as above
+      :failure
     end
 
     private
@@ -369,6 +372,9 @@ module Mine
     end
 
     private
+    #
+    # Method to split a text the way we want
+    #
     def splitText text
       res = Array.new(text.count("\n") + 1) {LockString.new}
       i = 0

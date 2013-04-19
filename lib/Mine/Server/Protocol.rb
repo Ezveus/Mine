@@ -3,6 +3,9 @@
 module Mine
   module Protocol
 
+    #
+    # method that checks common errors for the requests
+    #
     def self.getObjectFromJSON jsonRqst, response
       Log::Client.debug "Parsing #{jsonRqst}"
       object = {}
@@ -23,6 +26,9 @@ module Mine
       object
     end
 
+    #
+    # method called when an AUTHENTICATE request is received
+    #
     def self.authenticate jsonRqst, response, client
       if client.authenticated
         Log::Client.error "#{client.user} already logged"
@@ -55,6 +61,9 @@ module Mine
       Constant::Success
     end
 
+    #
+    # Method called when a SIGNUP request is received
+    #
     def self.signup jsonRqst, response, client
       if client.authenticated
         Log::Client.error "#{client.user} already logged"
@@ -84,6 +93,9 @@ module Mine
       Constant::Success
     end
 
+    #
+    # Method called when an EXEC request is received
+    #
     def self.exec jsonRqst, response, client
       object = getObjectFromJSON jsonRqst, response
       return Constant::Fail if object.nil?
@@ -106,6 +118,9 @@ module Mine
       Exec::ExecCommands[object["command"].to_sym].call buffer, object["args"], response, client
     end
 
+    #
+    # Method called when an INSERT request is received
+    #
     def self.insert jsonRqst, response, client
       object = getObjectFromJSON jsonRqst, response
       return Constant::Fail if object.nil?
@@ -126,6 +141,9 @@ module Mine
       Constant::Success
     end
 
+    #
+    # Method called when a BACKSPACE request is received
+    #
     def self.backspace jsonRqst, response, client
       object = getObjectFromJSON jsonRqst, response
       return Constant::Fail if object.nil?
@@ -146,6 +164,9 @@ module Mine
       Constant::Success
     end
 
+    #
+    # Method called when a DELETE request is received
+    #
     def self.delete jsonRqst, response, client
       object = getObjectFromJSON jsonRqst, response
       return Constant::Fail if object.nil?
@@ -165,6 +186,9 @@ module Mine
       Constant::Success
     end
 
+    #
+    # Method called when a MOVE request is received
+    #
     def self.move jsonRqst, response, client
       object = getObjectFromJSON jsonRqst, response
       return Constant::Fail if object.nil?
@@ -185,6 +209,9 @@ module Mine
       Constant::Success
     end
 
+    #
+    # Method called when a LOAD request is received
+    #
     def self.load jsonRqst, response, client
       object = getObjectFromJSON jsonRqst, response
       return Constant::Fail if object.nil?
@@ -205,6 +232,9 @@ module Mine
       Constant::Success
     end
 
+    #
+    # Method called when the parameter of a LOAD request is up
+    #
     def self.uploadFile object, response, client, uuid
       path = object["path"]
       fileName = File.basename path
@@ -215,6 +245,9 @@ module Mine
       Constant::Success
     end
 
+    #
+    # Method called when the parameter of a LOAD request id down
+    #
     def self.downloadFile object, response, client, uuid
       path = "#{client.user.dir}/#{object["path"]}"
       unless File.exist? path
@@ -246,6 +279,9 @@ module Mine
       Constant::Success
     end
 
+    #
+    # Method called when a SHELL request is received
+    #
     def self.shell jsonRqst, response, client
       object = getObjectFromJSON jsonRqst, response
       return Constant::Fail if object.nil?
@@ -262,6 +298,7 @@ module Mine
       Shell::ShellCommands[object["command"].to_sym].call object["args"], response, client
     end
 
+    # hash acting as a dispatcher for the above methods
     Commands ||= {
       "AUTHENTICATE".to_sym => Proc.new { |jsonRqst, response, client| self.authenticate jsonRqst, response, client },
       "SIGNUP".to_sym => Proc.new { |jsonRqst, response, client| self.signup jsonRqst, response, client },

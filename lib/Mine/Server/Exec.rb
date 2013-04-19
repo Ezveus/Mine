@@ -2,7 +2,9 @@
 
 module Mine
   module Exec
-
+    #
+    # the following methods are called when the user request a specific action
+    #
     def self.killLine buffer, args, response, client
       client.user.killLine buffer
     end
@@ -50,6 +52,7 @@ module Mine
       Constant::Success
     end
 
+    # hash acting as a dispatcher for the above commands
     ExecCommands ||= {
       "KillLine".to_sym => Proc.new { |buffer, args, response, client| self.killLine buffer, args, response, client },
       "Yank".to_sym => Proc.new { |buffer, args, response, client| self.yank buffer, args, response, client },
